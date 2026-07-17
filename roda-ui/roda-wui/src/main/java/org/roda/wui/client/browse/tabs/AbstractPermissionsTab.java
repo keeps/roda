@@ -9,8 +9,6 @@ import java.util.Set;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Document;
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -26,6 +24,8 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.aip.MembersLookupRequest;
+import org.roda.core.data.v2.aip.MembersLookupResponse;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.dialogs.Dialogs;
@@ -69,14 +69,29 @@ public abstract class AbstractPermissionsTab<T extends IsIndexed> extends Generi
     metadataContainer.clear();
     Permissions permissions = getPermissions(data);
 
-    addSeparator(messages.permissionAssignedGroups());
-    metadataContainer.add(createGroupsTable(permissions));
+    Set<String> usernames = permissions.getUsernames();
+    Set<String> groupnames = permissions.getGroupnames();
 
-    addSeparator(messages.permissionAssignedUsers());
-    metadataContainer.add(createUsersTable(permissions));
+    MembersLookupRequest request = new MembersLookupRequest(usernames, groupnames);
+    Services services = new Services("Get members display names", "post");
+
+    services.membersResource(s -> s.getMembersDisplayNames(request)).whenComplete((response, throwable) -> {
+      metadataContainer.clear();
+
+      // Safety fallback: if the request fails, use an empty response so raw IDs are
+      // displayed
+      MembersLookupResponse safeResponse = (throwable == null && response != null) ? response
+        : new MembersLookupResponse();
+
+      addSeparator(messages.permissionAssignedGroups());
+      metadataContainer.add(createGroupsTable(permissions, safeResponse));
+
+      addSeparator(messages.permissionAssignedUsers());
+      metadataContainer.add(createUsersTable(permissions, safeResponse));
+    });
   }
 
-  private ScrollPanel createGroupsTable(Permissions permissions) {
+  private ScrollPanel createGroupsTable(Permissions permissions, MembersLookupResponse response) {
     Set<String> groupNames = permissions.getGroupnames();
     if (groupNames == null || groupNames.isEmpty()) {
       return createEmptyPanel(messages.permissionAssignedGroupsEmpty());
@@ -84,7 +99,7 @@ public abstract class AbstractPermissionsTab<T extends IsIndexed> extends Generi
 
     BasicTablePanel<String> table = new BasicTablePanel<>(groupNames.iterator(),
       new BasicTablePanel.ColumnInfo<>("", 0.8, getGroupTypeColumn()),
-      new BasicTablePanel.ColumnInfo<>(messages.groupName(), 15, getGroupNameColumn()),
+      new BasicTablePanel.ColumnInfo<>(messages.groupName(), 15, getGroupNameColumn(response)),
       new BasicTablePanel.ColumnInfo<>(messages.userPermissions(), 20, getGroupPermissionsColumn()),
       new BasicTablePanel.ColumnInfo<>(messages.actions(), 5, getGroupActionsColumn()));
 
@@ -94,15 +109,15 @@ public abstract class AbstractPermissionsTab<T extends IsIndexed> extends Generi
     return new ScrollPanel(panel);
   }
 
-  private ScrollPanel createUsersTable(Permissions permissions) {
+  private ScrollPanel createUsersTable(Permissions permissions, MembersLookupResponse response) {
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_UPDATE_AIP_PERMISSIONS)) {
-      return createUsersTableFullPermissions(permissions);
+      return createUsersTableFullPermissions(permissions, response);
     } else {
-      return createUsersTableReadOnly(permissions);
+      return createUsersTableReadOnly(permissions, response);
     }
   }
 
-  private ScrollPanel createUsersTableFullPermissions(Permissions permissions) {
+  private ScrollPanel createUsersTableFullPermissions(Permissions permissions, MembersLookupResponse response) {
     Set<String> usernames = permissions.getUsernames();
     if (usernames == null || usernames.isEmpty()) {
       return createEmptyPanel(messages.permissionAssignedUsersEmpty());
@@ -110,7 +125,7 @@ public abstract class AbstractPermissionsTab<T extends IsIndexed> extends Generi
 
     BasicTablePanel<String> table = new BasicTablePanel<>(usernames.iterator(),
       new BasicTablePanel.ColumnInfo<>("", 0.8, getUserTypeColumn()),
-      new BasicTablePanel.ColumnInfo<>(messages.username(), 15, getUserNameColumn()),
+      new BasicTablePanel.ColumnInfo<>(messages.username(), 15, getUserNameColumn(response)),
       new BasicTablePanel.ColumnInfo<>(messages.userPermissions(), 20, getUserPermissionsColumn()),
       new BasicTablePanel.ColumnInfo<>(messages.actions(), 5, getUserActionsColumn()));
 
@@ -120,7 +135,7 @@ public abstract class AbstractPermissionsTab<T extends IsIndexed> extends Generi
     return new ScrollPanel(panel);
   }
 
-  private ScrollPanel createUsersTableReadOnly(Permissions permissions) {
+  private ScrollPanel createUsersTableReadOnly(Permissions permissions, MembersLookupResponse response) {
     Set<String> usernames = permissions.getUsernames();
     if (usernames == null || usernames.isEmpty()) {
       return createEmptyPanel(messages.permissionAssignedUsersEmpty());
@@ -128,7 +143,7 @@ public abstract class AbstractPermissionsTab<T extends IsIndexed> extends Generi
 
     BasicTablePanel<String> table = new BasicTablePanel<>(usernames.iterator(),
       new BasicTablePanel.ColumnInfo<>("", 0.8, getUserTypeColumn()),
-      new BasicTablePanel.ColumnInfo<>(messages.username(), 15, getUserNameColumn()),
+      new BasicTablePanel.ColumnInfo<>(messages.username(), 15, getUserNameColumn(response)),
       new BasicTablePanel.ColumnInfo<>(messages.userPermissions(), 20, getUserPermissionsColumn()));
 
     table.removeSelectionModel();
@@ -163,56 +178,22 @@ public abstract class AbstractPermissionsTab<T extends IsIndexed> extends Generi
     };
   }
 
-  private Column<String, SafeHtml> getGroupNameColumn() {
+  private Column<String, SafeHtml> getGroupNameColumn(final MembersLookupResponse response) {
     return new Column<String, SafeHtml>(new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(String groupName) {
-        String elementId = "group-cell-" + groupName + "-" + System.currentTimeMillis();
-        Services services = new Services("Get group", "get");
-        services.membersResource(s -> s.getGroup(groupName)).whenComplete((group, throwable) -> {
-          if (throwable == null && group != null) {
-            Element element = Document.get().getElementById(elementId);
-            if (element != null) {
-              String displayName = group.getFullName() != null && !group.getFullName().isEmpty()
-                ? group.getFullName() + " (" + groupName + ")"
-                : groupName;
-              element.setInnerText(displayName);
-            }
-          }
-        });
-
-        SafeHtmlBuilder builder = new SafeHtmlBuilder();
-        builder.appendHtmlConstant("<span id=\"" + elementId + "\">");
-        builder.appendEscaped(groupName);
-        builder.appendHtmlConstant("</span>");
-        return builder.toSafeHtml();
+        String displayName = response.getGroupDisplayName(groupName);
+        return SafeHtmlUtils.fromString(displayName);
       }
     };
   }
 
-  private Column<String, SafeHtml> getUserNameColumn() {
+  private Column<String, SafeHtml> getUserNameColumn(final MembersLookupResponse response) {
     return new Column<String, SafeHtml>(new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(String username) {
-        String elementId = "user-cell-" + username + "-" + System.currentTimeMillis();
-        Services services = new Services("Get user", "get");
-        services.membersResource(s -> s.getUser(username)).whenComplete((user, throwable) -> {
-          if (throwable == null && user != null) {
-            Element element = Document.get().getElementById(elementId);
-            if (element != null) {
-              String displayName = user.getFullName() != null && !user.getFullName().isEmpty()
-                ? user.getFullName() + " (" + username + ")"
-                : username;
-              element.setInnerText(displayName);
-            }
-          }
-        });
-
-        SafeHtmlBuilder builder = new SafeHtmlBuilder();
-        builder.appendHtmlConstant("<span id=\"" + elementId + "\">");
-        builder.appendEscaped(username);
-        builder.appendHtmlConstant("</span>");
-        return builder.toSafeHtml();
+        String displayName = response.getUserDisplayName(username);
+        return SafeHtmlUtils.fromString(displayName);
       }
     };
   }

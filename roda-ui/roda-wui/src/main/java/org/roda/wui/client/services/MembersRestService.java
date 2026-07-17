@@ -14,6 +14,8 @@ import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.accessKey.CreateAccessKeyRequest;
 import org.roda.core.data.v2.accessToken.AccessToken;
+import org.roda.core.data.v2.aip.MembersLookupRequest;
+import org.roda.core.data.v2.aip.MembersLookupResponse;
 import org.roda.core.data.v2.generics.StringResponse;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.jobs.Job;
@@ -285,4 +287,11 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   AccessKey revokeAccessKey(
     @Parameter(description = "The access key identifier") @PathVariable(name = "id") String accessKeyId);
+
+  @RequestMapping(path = "/resolve-names", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Resolve the user/group identifiers to its full name", description = "Resolve the user/group identifiers to its full name", responses = {
+          @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccessKey.class))),
+          @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  MembersLookupResponse getMembersDisplayNames(
+          MembersLookupRequest request);
 }

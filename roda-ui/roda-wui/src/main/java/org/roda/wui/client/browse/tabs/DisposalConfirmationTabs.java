@@ -42,7 +42,7 @@ public class DisposalConfirmationTabs extends Tabs {
               new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name())))
           .withSummary(messages.listOfAIPs()).bindOpener());
 
-      createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.allIntellectualEntities()), new TabContentBuilder() {
+      createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.disposalScheduleListAips()), new TabContentBuilder() {
         @Override
         public Widget buildTabWidget() {
           return new SearchWrapper(false).createListAndSearchPanel(aipsListBuilder);

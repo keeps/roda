@@ -43,6 +43,8 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.v2.aip.MembersLookupRequest;
+import org.roda.core.data.v2.aip.MembersLookupResponse;
 import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
@@ -325,8 +327,8 @@ public class MembersService {
     return new User();
   }
 
-  public Group addMembersToGroup(String id, SelectedItemsRequest members)
-          throws GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException, IllegalOperationException {
+  public Group addMembersToGroup(String id, SelectedItemsRequest members) throws GenericException,
+    AuthorizationDeniedException, AlreadyExistsException, NotFoundException, IllegalOperationException {
     if (members instanceof SelectedItemsListRequest listRequest) {
       Set<String> collect = listRequest.getIds().stream().map(m -> m.replace("user-", "")).collect(Collectors.toSet());
 
@@ -388,7 +390,7 @@ public class MembersService {
   }
 
   public Group removeMemberFromGroup(String id, String userId)
-          throws GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
+    throws GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
     User user = RodaCoreFactory.getModelService().retrieveUser(userId);
     user.getGroups().remove(id);
     RodaCoreFactory.getModelService().updateUser(user, null, true);
@@ -592,7 +594,7 @@ public class MembersService {
 
     try (InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(
       RodaConstants.USERS_TEMPLATE_FOLDER + "/" + RodaConstants.USER_EXTRA_METADATA_FILE)) {
-      template = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
+      template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
     } catch (IOException e) {
       LOGGER.error("Error getting template from stream", e);
     }
@@ -600,4 +602,52 @@ public class MembersService {
     return ServerTools.transform(template);
   }
 
+  public MembersLookupResponse resolveMembersDisplayNames(MembersLookupRequest request) {
+    MembersLookupResponse response = new MembersLookupResponse();
+
+    response.setUsers(resolveUsers(request));
+    response.setGroups(resolveGroups(request));
+
+    return response;
+  }
+
+  private Map<String, String> resolveUsers(MembersLookupRequest request) {
+    Map<String, String> users = new HashMap<>();
+    // Resolve Users
+    if (request.getUsernames() != null) {
+      for (String username : request.getUsernames()) {
+        try {
+          User user = retrieveUser(username);
+          String display = (user != null && user.getFullName() != null && !user.getFullName().trim().isEmpty())
+            ? user.getFullName() + " (" + username + ")"
+            : username;
+          users.put(username, display);
+        } catch (Exception e) {
+          users.put(username, username); // Fallback to raw ID
+        }
+      }
+    }
+
+    return users;
+  }
+
+  private Map<String, String> resolveGroups(MembersLookupRequest request) {
+    Map<String, String> groups = new HashMap<>();
+    // Resolve Groups
+    if (request.getGroupNames() != null) {
+      for (String groupName : request.getGroupNames()) {
+        try {
+          Group group = retrieveGroup(groupName);
+          String display = (group != null && group.getFullName() != null && !group.getFullName().trim().isEmpty())
+            ? group.getFullName() + " (" + groupName + ")"
+            : groupName;
+          groups.put(groupName, display);
+        } catch (Exception e) {
+          groups.put(groupName, groupName); // Fallback to raw ID
+        }
+      }
+    }
+    return groups;
+
+  }
 }

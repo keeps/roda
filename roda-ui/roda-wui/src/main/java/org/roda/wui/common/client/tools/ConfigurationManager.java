@@ -23,6 +23,7 @@ import org.roda.core.data.v2.index.facet.RangeFacetParameter;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.wui.client.common.lists.utils.ColumnOptions;
 import org.roda.wui.client.common.lists.utils.ColumnOptions.RenderingHint;
+import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.core.client.GWT;
@@ -263,6 +264,10 @@ public class ConfigurationManager {
 
       List<String> parameterNames = getStringList(RodaConstants.UI_LISTS_PROPERTY, listId,
         RodaConstants.UI_LISTS_FACETS_PARAMETERS_PROPERTY);
+
+      if (!PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION)) {
+        parameterNames.removeIf(name -> name.equals("hasRepresentations"));
+      }
 
       if (!parameterNames.isEmpty()) {
         if (query != null) {

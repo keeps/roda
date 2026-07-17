@@ -27,6 +27,7 @@ import org.roda.wui.api.v2.controller.RequestHandler;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.stream.FacetsCSVOutputStream;
 import org.roda.wui.api.v2.stream.ResultsCSVOutputStream;
+import org.roda.wui.api.v2.utils.SecurityFilteringUtils;
 import org.roda.wui.common.I18nUtility;
 import org.roda.wui.common.RequestControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
@@ -72,6 +73,9 @@ public class IndexService {
         if (findRequest.getFilter() == null || findRequest.getFilter().getParameters().isEmpty()) {
           return new IndexResult<>();
         }
+
+        // 1. Sanitize requested facets before querying Solr
+        SecurityFilteringUtils.sanitizeFindRequest(findRequest, requestContext.getUser());
 
         // delegate
         IndexResult<T> result = requestContext.getIndexService().find(classToReturn, findRequest,

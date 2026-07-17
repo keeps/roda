@@ -37,6 +37,9 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.ser.FilterProvider;
+import tools.jackson.databind.ser.std.SimpleBeanPropertyFilter;
+import tools.jackson.databind.ser.std.SimpleFilterProvider;
 import tools.jackson.databind.type.TypeFactory;
 
 public final class JsonUtils {
@@ -48,8 +51,16 @@ public final class JsonUtils {
     // do nothing
   }
 
+  private static JsonMapper.Builder createJsonMapperBuilder() {
+    FilterProvider defaultFilters = new SimpleFilterProvider()
+            .addFilter("aipPermissionFilter", SimpleBeanPropertyFilter.serializeAll())
+            .setFailOnUnknownId(false);
+
+    return JsonMapper.builder().filterProvider(defaultFilters);
+  }
+
   public static byte[] toByteArray(Object object) {
-    JsonMapper mapper = JsonMapper.builder().build();
+    JsonMapper mapper = createJsonMapperBuilder().build();
     return mapper.writeValueAsBytes(object);
   }
 
@@ -99,7 +110,7 @@ public final class JsonUtils {
   public static String getJsonFromObject(Object object, Class<?> mixin) {
     String ret = null;
     try {
-      JsonMapper.Builder builder = JsonMapper.builder();
+      JsonMapper.Builder builder = createJsonMapperBuilder();
       addMixinsToBuilder(builder, object, mixin);
       JsonMapper mapper = builder.build();
 
@@ -118,7 +129,7 @@ public final class JsonUtils {
           ret.append("\n");
         }
 
-        JsonMapper mapper = JsonMapper.builder()
+        JsonMapper mapper = createJsonMapperBuilder()
                 .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_EMPTY))
                 .build();
 
@@ -241,7 +252,7 @@ public final class JsonUtils {
   public static String getJsonFromNode(JsonNode node) {
     String ret = null;
     try {
-      JsonMapper mapper = JsonMapper.builder().build();
+      JsonMapper mapper = createJsonMapperBuilder().build();
       ret = mapper.writeValueAsString(node);
     } catch (JacksonException e) {
       LOGGER.error(ERROR_TRANSFORMING_OBJECT_TO_JSON_STRING, node, e);

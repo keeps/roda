@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -79,8 +78,8 @@ public class BrowseAIP extends Composite {
 
   private static final List<String> fieldsToReturn = new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private static SimplePanel container;
   private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+  private static SimplePanel container;
 
   static {
     fieldsToReturn.addAll(
@@ -118,10 +117,10 @@ public class BrowseAIP extends Composite {
   @UiField
   FlowPanel disseminationCards;
 
-  private String aipId;
-  private IndexedAIP aip;
-  private Map<Actionable.ActionImpact, Runnable> handlers = new HashMap<>();
-  private AsyncCallback<Actionable.ActionImpact> handler = new NoAsyncCallback<Actionable.ActionImpact>() {
+  private final String aipId;
+  private final IndexedAIP aip;
+  private final Map<Actionable.ActionImpact, Runnable> handlers = new HashMap<>();
+  private final AsyncCallback<Actionable.ActionImpact> handler = new NoAsyncCallback<Actionable.ActionImpact>() {
     @Override
     public void onSuccess(Actionable.ActionImpact result) {
       if (handlers.containsKey(result)) {
@@ -169,7 +168,7 @@ public class BrowseAIP extends Composite {
             .withJustActive(justActive).withSummary(messages.listOfAIPs()).bindOpener());
 
       } else {
-        aipChildrenListBuilder = new ListBuilder<>(ConfigurableAsyncTableCell::new,
+        aipChildrenListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
           new AsyncTableCellOptions<>(IndexedAIP.class, "BrowseAIP_aipChildren")
             .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId())))
             .withJustActive(justActive).withSummary(messages.listOfAIPs()).bindOpener().withActionable(aipActions)
@@ -237,7 +236,8 @@ public class BrowseAIP extends Composite {
 
       if (response.getDipCount().getResult() > 0) {
         showSidePanel = true;
-        this.disseminationCards.add(new AIPDisseminationCardList(aipId, SorterUtils.dipsDefault(), response.getDipCount().getResult().intValue()));
+        this.disseminationCards.add(new AIPDisseminationCardList(aipId, SorterUtils.dipsDefault(),
+          response.getDipCount().getResult().intValue()));
       }
 
       this.sidePanel.setVisible(showSidePanel);
@@ -246,17 +246,6 @@ public class BrowseAIP extends Composite {
     }
 
     keyboardFocus.setFocus(true);
-  }
-
-  private void initHandlers() {
-    handlers.put(Actionable.ActionImpact.DESTROYED, () -> {
-      if (StringUtils.isNotBlank(aip.getParentID())) {
-        HistoryUtils.newHistory(BrowseTop.RESOLVER, aip.getParentID());
-      } else {
-        HistoryUtils.newHistory(BrowseTop.RESOLVER);
-      }
-    });
-    handlers.put(Actionable.ActionImpact.UPDATED, () -> refresh(aipId, new NoAsyncCallback<>()));
   }
 
   public static void getAndRefresh(String id, AsyncCallback<Widget> callback) {
@@ -346,6 +335,17 @@ public class BrowseAIP extends Composite {
           });
         }
       });
+  }
+
+  private void initHandlers() {
+    handlers.put(Actionable.ActionImpact.DESTROYED, () -> {
+      if (StringUtils.isNotBlank(aip.getParentID())) {
+        HistoryUtils.newHistory(BrowseTop.RESOLVER, aip.getParentID());
+      } else {
+        HistoryUtils.newHistory(BrowseTop.RESOLVER);
+      }
+    });
+    handlers.put(Actionable.ActionImpact.UPDATED, () -> refresh(aipId, new NoAsyncCallback<>()));
   }
 
   private void updateSectionIdentification(BrowseAIPResponse response) {

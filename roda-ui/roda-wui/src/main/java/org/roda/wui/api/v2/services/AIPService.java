@@ -240,9 +240,9 @@ public class AIPService {
     return new DescriptiveMetadataInfos();
   }
 
-  public DescriptiveMetadataInfos retrieveRepresentationDescriptiveMetadataList(RequestContext context, String aipId, String representationId,
-                                                                  final Locale locale)
-          throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+  public DescriptiveMetadataInfos retrieveRepresentationDescriptiveMetadataList(RequestContext context, String aipId,
+    String representationId, final Locale locale)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     if (UserUtility.hasPermissions(context.getUser(), RodaConstants.PERMISSION_METHOD_LIST_AIP_DESCRIPTIVE_METADATA)) {
       return retrieveDescriptiveMetadataInfos(context.getModelService(), aipId, representationId, locale);
 
@@ -551,12 +551,11 @@ public class AIPService {
         return new SupportedMetadataValue(values);
       }
 
-      if (checkIfDescriptiveMetadataExists(context.getModelService(), aip, representation,
-              descriptiveMetadataFile)) {
+      if (checkIfDescriptiveMetadataExists(context.getModelService(), aip, representation, descriptiveMetadataFile)) {
         template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
         String representationId = representation != null ? representation.getId() : null;
         Binary binary = context.getModelService().retrieveDescriptiveMetadataBinary(aip.getId(), representationId,
-                descriptiveMetadataFile);
+          descriptiveMetadataFile);
         String xml = IOUtils.toString(binary.getContent().createInputStream(), StandardCharsets.UTF_8);
 
         Set<MetadataValue> result = getMetadataValuesFromDescriptiveMetadataFile(template, xml);
@@ -889,5 +888,4 @@ public class AIPService {
     }
     return isSimilar;
   }
-
 }

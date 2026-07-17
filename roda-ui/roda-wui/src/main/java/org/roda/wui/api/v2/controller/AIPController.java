@@ -663,21 +663,23 @@ public class AIPController implements AIPRestService, Exportable {
   }
 
   @Override
-  public DescriptiveMetadataInfos getRepresentationDescriptiveMetadata(String aipId, String representationId, String localeString) {
+  public DescriptiveMetadataInfos getRepresentationDescriptiveMetadata(String aipId, String representationId,
+    String localeString) {
 
     return requestHandler.processRequest(new RequestHandler.RequestProcessor<DescriptiveMetadataInfos>() {
       @Override
       public DescriptiveMetadataInfos process(RequestContext requestContext,
-                                              RequestControllerAssistant controllerAssistant) throws RODAException, RESTException, IOException {
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException, IOException {
         Locale locale = ServerTools.parseLocale(localeString);
         controllerAssistant.setRelatedObjectId(aipId);
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId);
 
         controllerAssistant.checkObjectPermissions(requestContext.getUser(),
-                SelectedItemsList.create(IndexedAIP.class, aipId));
+          SelectedItemsList.create(IndexedAIP.class, aipId));
 
         // delegate
-        return aipService.retrieveRepresentationDescriptiveMetadataList(requestContext, aipId, representationId, locale);
+        return aipService.retrieveRepresentationDescriptiveMetadataList(requestContext, aipId, representationId,
+          locale);
       }
     });
   }
