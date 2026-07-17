@@ -4641,7 +4641,7 @@ public class DefaultModelService implements ModelService {
     disposal.addDisposalHold(disposalHoldAIPMetadata);
 
     AIP updatedAIP = updateAIPMetadata(aip, associatedBy);
-    notifyAipUpdatedOnChanged(updatedAIP);
+    notifyAipDisposalHoldUpdated(updatedAIP);
 
     return disposal;
   }
@@ -5512,6 +5512,11 @@ public class DefaultModelService implements ModelService {
   @Override
   public ReturnWithExceptionsWrapper notifyAipUpdatedOnChanged(AIP aip) {
     return notifyObserversSafely(observer -> observer.aipUpdatedOn(aip));
+  }
+
+  @Override
+  public ReturnWithExceptionsWrapper notifyAipDisposalHoldUpdated(AIP aip) {
+    return notifyObserversSafely(observer -> observer.aipOnDisposalHoldUpdated(aip));
   }
 
   @Override
