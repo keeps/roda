@@ -38,6 +38,10 @@ import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.metadata.DisposalConfirmationAIPMetadata;
+import org.roda.core.data.v2.disposal.metadata.DisposalHoldAIPMetadata;
+import org.roda.core.data.v2.disposal.metadata.DisposalScheduleAIPMetadata;
+import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldAIPMetadata;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -423,6 +427,22 @@ public class IndexModelObserver implements ModelObserver {
     // change AIP
     Map<String, Object> updatedFields = new HashMap<>();
     updatedFields.put(RodaConstants.AIP_DISPOSAL_HOLD_STATUS, status);
+    SolrUtils.update(index, IndexedAIP.class, aip.getId(), updatedFields, (ModelObserver) this).addTo(ret);
+    return ret;
+  }
+
+  @Override
+  public ReturnWithExceptions<Void, ModelObserver> aipOnDisposalHoldUpdated(AIP aip) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+
+    Map<String, Object> updatedFields = new HashMap<>();
+
+    if (aip.getDisposal() != null && aip.getDisposal().getHolds() != null) {
+      List<DisposalHoldAIPMetadata> holds = aip.getDisposal().getHolds();
+      updatedFields.put(RodaConstants.AIP_DISPOSAL_HOLDS_ID,
+        holds.stream().map(DisposalHoldAIPMetadata::getId).toList());
+    }
+
     SolrUtils.update(index, IndexedAIP.class, aip.getId(), updatedFields, (ModelObserver) this).addTo(ret);
     return ret;
   }

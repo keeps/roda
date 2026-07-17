@@ -44,6 +44,8 @@ public interface ModelObserver {
 
   ReturnWithExceptions<Void, ModelObserver> aipOnHoldStatusUpdated(AIP aip, boolean status);
 
+  ReturnWithExceptions<Void, ModelObserver> aipOnDisposalHoldUpdated(AIP aip);
+
   public ReturnWithExceptions<Void, ModelObserver> aipDestroyed(AIP aip);
 
   public ReturnWithExceptions<Void, ModelObserver> aipStateUpdated(AIP aip);

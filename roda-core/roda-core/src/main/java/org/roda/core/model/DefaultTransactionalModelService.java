@@ -4225,6 +4225,11 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   @Override
+  public ReturnWithExceptionsWrapper notifyAipDisposalHoldUpdated(AIP aip) {
+    return getModelService().notifyAipUpdatedOnChanged(aip);
+  }
+
+  @Override
   public ReturnWithExceptionsWrapper notifyAipOnHoldStatusUpdated(AIP aip, boolean status) {
     return getModelService().notifyAipOnHoldStatusUpdated(aip, status);
   }
