@@ -87,13 +87,8 @@
       as part of the main source set, which does not see test-scoped dependencies.
     -->
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
+      <groupId>tools.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-    </dependency>
-    <!-- Required by generated JSON.java for Java 8 date/time serialization -->
-    <dependency>
-      <groupId>com.fasterxml.jackson.datatype</groupId>
-      <artifactId>jackson-datatype-jsr310</artifactId>
     </dependency>
     <dependency>
       <groupId>jakarta.annotation</groupId>
