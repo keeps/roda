@@ -1906,6 +1906,8 @@ public interface ClientMessages extends Messages {
 
   String descriptiveHistoryRemoveConfirmDialogMessage();
 
+  String descriptiveHistoryRemoveVersionButton();
+
   String descriptiveHistoryRevertConfirmDialogTitle();
 
   String descriptiveHistoryRevertConfirmDialogMessage();

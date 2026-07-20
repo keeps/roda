@@ -8,7 +8,6 @@
     <g:FocusPanel ui:field="keyboardFocus">
         <g:FlowPanel styleName="browse wui-browse-metadata-descriptive-versions" addStyleNames="wrapper skip_padding">
             <common:NavigationToolbar ui:field="navigationToolbar"/>
-            <common:ActionsToolbar ui:field="actionsToolbar"/>
             <g:FlowPanel addStyleNames="row full_width skip_padding">
                 <g:FlowPanel addStyleNames="col_12 content">
                     <common:TitlePanel ui:field="title"/>
@@ -19,9 +18,13 @@
                             </g:Label>
                             <g:FlowPanel ui:field="radioContainer" addStyleNames="versions-timeline"/>
                         </g:FlowPanel>
-                        <g:FlowPanel addStyleNames="history-content-area roda6Card">
-                            <g:FlowPanel ui:field="versionActionsPanel" addStyleNames="alignButtonsPanel mb-16"/>
-                            <g:SimplePanel ui:field="tabsContainer"/>
+                        <g:FlowPanel addStyleNames="history-content-area roda6CardWithHeader">
+                            <g:FlowPanel addStyleNames="cardHeader">
+                                <common:ActionsToolbar ui:field="actionsToolbar"/>
+                            </g:FlowPanel>
+                            <g:FlowPanel addStyleNames="cardBody">
+                                <g:SimplePanel ui:field="tabsContainer"/>
+                            </g:FlowPanel>
                         </g:FlowPanel>
                     </g:FlowPanel>
                 </g:FlowPanel>
