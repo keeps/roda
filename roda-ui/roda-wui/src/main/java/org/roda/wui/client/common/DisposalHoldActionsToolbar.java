@@ -33,6 +33,6 @@ public class DisposalHoldActionsToolbar extends BrowseObjectActionsToolbar<Dispo
 
     DisposalHoldToolbarActions toolbarActions = DisposalHoldToolbarActions.get();
     this.actions.add(new ActionableWidgetBuilder<DisposalHold>(toolbarActions).withActionCallback(actionCallback)
-      .buildGroupedListWithObjects(new ActionableObject<>(object), List.of(DisposalHoldAction.LIFT), List.of()));
+      .buildGroupedListWithObjects(new ActionableObject<>(object), List.of(DisposalHoldAction.LIFT), List.of(DisposalHoldAction.LIFT)));
   }
 }

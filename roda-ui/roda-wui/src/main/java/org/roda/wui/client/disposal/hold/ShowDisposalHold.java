@@ -140,6 +140,7 @@ public class ShowDisposalHold extends Composite {
             // 2. Update the main TitlePanel
             title.setText(updatedHold.getTitle());
 
+            actionsToolbar.setObjectAndBuild(updatedHold, null, handler);
             navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getDisposalHoldBreadcrumbs(updatedHold));
 
             // 4. Re-initialize tabs (this recreates the details panel with the new
