@@ -7,7 +7,6 @@
  */
 package org.roda.wui.client.browse;
 
-import org.apache.http.HttpStatus;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIPState;
@@ -293,7 +292,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
 
           @Override
           public void onResponseReceived(Request request, Response response) {
-            if (response.getStatusCode() == HttpStatus.SC_OK) {
+            if (response.getStatusCode() == Response.SC_OK) {
               HTML html = new HTML("<pre><code>" + SafeHtmlUtils.htmlEscape(response.getText()) + "</code></pre>");
               FlowPanel frame = new FlowPanel();
               frame.add(html);

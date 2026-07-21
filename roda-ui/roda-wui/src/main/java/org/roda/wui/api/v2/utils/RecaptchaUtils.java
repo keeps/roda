@@ -7,13 +7,11 @@
  */
 package org.roda.wui.api.v2.utils;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.BasicHttpClientResponseHandler;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
 
@@ -30,20 +28,15 @@ public class RecaptchaUtils {
       String url = "https://www.google.com/recaptcha/api/siteverify?" + urlParameters;
       String userAgent = "Mozilla/5.0";
 
-      HttpClient client = HttpClientBuilder.create().build();
-      HttpGet request = new HttpGet(url);
+      try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
+        HttpGet request = new HttpGet(url);
+        request.addHeader("User-Agent", userAgent);
+        // BasicHttpClientResponseHandler automatically handles resource deallocation,
+        // checks for HTTP 2xx success status codes, and returns the body as a String.
+        HttpClientResponseHandler<String> responseHandler = new BasicHttpClientResponseHandler();
+        String jsonResponse = client.execute(request, responseHandler);
 
-      request.addHeader("User-Agent", userAgent);
-      HttpResponse response = client.execute(request);
-
-      StringBuilder builder = new StringBuilder();
-      try (
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()))) {
-        for (String line = null; (line = bufferedReader.readLine()) != null;) {
-          builder.append(line).append("\n");
-        }
-
-        JsonNode jsonObject = JsonUtils.parseJson(builder.toString());
+        JsonNode jsonObject = JsonUtils.parseJson(jsonResponse);
         boolean success = jsonObject.get("success").asBoolean(false);
         if (!success) {
           throw new RecaptchaException("ReCAPTCHA verification failed");
