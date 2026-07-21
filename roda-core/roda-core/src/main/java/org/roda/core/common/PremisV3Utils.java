@@ -508,7 +508,7 @@ public final class PremisV3Utils {
       IdUtils.getRepresentationPreservationId(aipId, representationId, RODAInstanceUtils.getLocalInstanceIdentifier()));
     representation.getObjectIdentifier().add(objectIdentifier);
     PreservationLevelComplexType preservationLevelComplexType = FACTORY.createPreservationLevelComplexType();
-    preservationLevelComplexType.setPreservationLevelValue(getStringPlusAuthority(""));
+    preservationLevelComplexType.setPreservationLevelValue(getStringPlusAuthority(RodaConstants.PRESERVATION_LEVEL_FULL));
     representation.getPreservationLevel().add(preservationLevelComplexType);
 
     return representation;
