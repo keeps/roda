@@ -1,6 +1,7 @@
 package org.roda.wui.client.planning.risks.tabs;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.aip.MembersLookupRequest;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.common.panels.GenericMetadataCardPanel;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -18,6 +19,8 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 
 import config.i18n.client.ClientMessages;
+
+import java.util.Collections;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -108,11 +111,16 @@ public class RiskIncidenceDetailsPanel extends GenericMetadataCardPanel<RiskInci
     buildField(label).withWidget(userLabel).build();
 
     // 2. Fetch the user asynchronously via Services using CompletableFuture
-    Services services = new Services("Retrieve user", "get");
-    services.membersResource(s -> s.getUser(username)).whenComplete((user, error) -> {
-      if (error == null && user != null && StringUtils.isNotBlank(user.getFullName())) {
-        // 3. Update the label text directly to: fullname (username)
-        userLabel.setText(user.getFullName() + " (" + user.getName() + ")");
+    Services services = new Services("Retrieve user display name", "get");
+    MembersLookupRequest request = new MembersLookupRequest(Collections.singleton(username), Collections.emptySet());
+
+    services.membersResource(s -> s.getMembersDisplayNames(request)).whenComplete((response, error) -> {
+      if (error == null && response != null) {
+        String displayName = response.getUserDisplayName(username);
+        if (StringUtils.isNotBlank(displayName) && !displayName.equals(username)) {
+          // 3. Update the label text directly to the resolved display name
+          userLabel.setText(displayName);
+        }
       }
     });
     // } else {

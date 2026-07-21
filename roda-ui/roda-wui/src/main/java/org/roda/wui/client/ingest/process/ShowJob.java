@@ -13,6 +13,7 @@ import com.google.gwt.user.client.ui.Widget;
 import config.i18n.client.ClientMessages;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.aip.MembersLookupRequest;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -42,6 +43,7 @@ import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -53,7 +55,6 @@ import java.util.concurrent.CompletableFuture;
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 public class ShowJob extends Composite {
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
@@ -68,16 +69,16 @@ public class ShowJob extends Composite {
           .thenCompose(retrievedJob -> services.jobsResource(
             s -> s.getJobPluginInfo(new PluginInfoRequest(retrievedJob), LocaleInfo.getCurrentLocale().getLocaleName()))
             .thenCompose(pluginInfoList -> {
-              // Fetch user data via memberResource based on job username
-              String username = retrievedJob.getUsername();
-              if (username != null && !username.isEmpty()) {
-                return services.membersResource(s -> s.getUser(username)).exceptionally(ex -> null) // Fallback to null
-                                                                                                    // if user not
-                                                                                                    // found/error
-                  .thenApply(user -> {
-                    String displayName = username;
-                    if (user != null && user.getFullName() != null && !user.getFullName().isEmpty()) {
-                      displayName = user.getFullName() + " (" + username + ")";
+              // Fetch display name via membersResource based on job username
+              String retrievedJobUsername = retrievedJob.getUsername();
+              if (retrievedJobUsername != null && !retrievedJobUsername.isEmpty()) {
+                MembersLookupRequest lookupRequest = new MembersLookupRequest(Collections.singleton(retrievedJobUsername),
+                  Collections.emptySet());
+                return services.membersResource(s -> s.getMembersDisplayNames(lookupRequest)).exceptionally(ex -> null)
+                  .thenApply(response -> {
+                    String displayName = retrievedJobUsername;
+                    if (response != null) {
+                      displayName = response.getUserDisplayName(retrievedJobUsername);
                     }
                     return new JobLoadContext(retrievedJob, pluginInfoList, displayName);
                   });
@@ -129,6 +130,7 @@ public class ShowJob extends Composite {
       return "job";
     }
   };
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
   // Timer Constants
   private static final int PERIOD_MILLIS = 10000;
   private static final int PERIOD_MILLIS_FAST = 2000;
@@ -159,6 +161,7 @@ public class ShowJob extends Composite {
   private int autoUpdateTimerPeriod = 0;
   private SelectedItems<?> cachedSourceObjects = null;
   private boolean sourceObjectsFetched = false;
+
   public ShowJob(IndexedJob job, Map<String, PluginInfo> pluginsInfo, List<FilterParameter> extraReportFilterParameters,
     String username) {
     this.job = job;
