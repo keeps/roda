@@ -1,5 +1,4 @@
 services:
-
   zoo:
     image: docker.io/zookeeper:3.9.5-jre-17
     restart: unless-stopped
@@ -17,7 +16,6 @@ services:
     environment:
       SOLR_HEAP: 2g
       ZK_HOST: zoo:2181
-    command: -c
     volumes:
       - solr_data:/var/solr
 
@@ -117,7 +115,6 @@ services:
       - "5432:5432"
     volumes:
       - pg_data:/var/lib/postgresql/data
-
 
 volumes:
   zookeeper_data:

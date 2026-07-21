@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 import org.roda.wui.api.v2.controller.MembersController;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.slf4j.Logger;
@@ -105,9 +105,24 @@ public class InternalWebAuthFilter implements Filter {
       if (redirectURL.isAbsolute()) {
         httpResponse.sendRedirect("/");
       } else {
-        httpResponse.sendRedirect(redirectURL.toString());
-      }
+        String urlString = redirectURL.toString();
 
+        // 1. Ensure root-relative URIs start with a leading slash in HttpComponents 5
+        if (!urlString.startsWith("/")) {
+          urlString = "/" + urlString;
+        }
+
+        // 2. Fix HttpComponents 5 aggressive '%2F' encoding in hash fragments.
+        // GWT routing tokens (e.g., #login/welcome) require literal slashes.
+        int fragmentIndex = urlString.indexOf('#');
+        if (fragmentIndex != -1) {
+          String beforeFragment = urlString.substring(0, fragmentIndex);
+          String fragment = urlString.substring(fragmentIndex);
+          urlString = beforeFragment + fragment.replace("%2F", "/").replace("%2f", "/");
+        }
+
+        httpResponse.sendRedirect(urlString);
+      }
     } catch (URISyntaxException e) {
       LOGGER.error("Could not generate service URL", e);
       httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,

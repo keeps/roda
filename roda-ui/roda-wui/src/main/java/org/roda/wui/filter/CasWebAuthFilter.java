@@ -14,7 +14,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.http.client.utils.URIBuilder;
+
+import org.apache.hc.core5.net.URIBuilder;
 import org.apereo.cas.client.util.CommonUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.InactiveUserException;
@@ -81,7 +82,7 @@ public class CasWebAuthFilter implements Filter {
    */
   @Override
   public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
-    throws IOException, ServletException {
+          throws IOException, ServletException {
 
     final HttpServletRequest httpRequest = (HttpServletRequest) request;
     final HttpServletResponse httpResponse = (HttpServletResponse) response;
@@ -105,10 +106,10 @@ public class CasWebAuthFilter implements Filter {
       uri.setScheme(rodaServerNameUri.getScheme());
       uri.setHost(rodaServerNameUri.getHost());
       uri.setPort(rodaServerNameUri.getPort());
-      uri.setFragment(hash);
     }
 
     uri.setPath(path);
+    uri.setFragment(hash); // Moved outside the if-block (see bug note below)
 
     // adding all other parameters
     parameterMap.forEach((param, values) -> {
@@ -118,7 +119,7 @@ public class CasWebAuthFilter implements Filter {
     });
 
     LOGGER.info("URL: {} ; Request URI: {} ; Path: {} ; Hash: {}; Parameters: {}", url, requestURI, path, hash,
-      parameterMap);
+            parameterMap);
 
     if (url.endsWith("/login")) {
       try {
@@ -127,7 +128,9 @@ public class CasWebAuthFilter implements Filter {
             MembersController.casLogin(httpRequest.getUserPrincipal().getName(), httpRequest);
           } catch (InactiveUserException e) {
             LOGGER.error("Error authenticating CAS user", e);
-            httpResponse.sendRedirect(uri.build().toString() + "#theme/ErrorInactiveAccount.html");
+            // Fix: set the fragment cleanly instead of string concatenation
+            uri.setFragment("theme/ErrorInactiveAccount.html");
+            httpResponse.sendRedirect(buildUrlString(uri));
             return;
           } catch (RODAException e) {
             LOGGER.error("Error authenticating CAS user", e);
@@ -136,21 +139,21 @@ public class CasWebAuthFilter implements Filter {
           }
         }
 
-        httpResponse.sendRedirect(uri.build().toString());
+        httpResponse.sendRedirect(buildUrlString(uri));
       } catch (URISyntaxException e) {
         LOGGER.error("Could not generate service URL, redirecting to base path {}", path, e);
         httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-          "Unexpected error, see server logs for details");
+                "Unexpected error, see server logs for details");
       }
 
     } else if (url.endsWith("/logout")) {
 
       MembersController.logout(httpRequest,
-        Arrays.asList("edu.yale.its.tp.cas.client.filter.user", "_const_cas_assertion_"));
+              Arrays.asList("edu.yale.its.tp.cas.client.filter.user", "_const_cas_assertion_"));
 
       String service;
       try {
-        service = uri.build().toString();
+        service = buildUrlString(uri);
       } catch (URISyntaxException e) {
         LOGGER.error("Could not generate service URL, redirecting to base path {}", path, e);
         service = path;
@@ -161,6 +164,29 @@ public class CasWebAuthFilter implements Filter {
     } else {
       chain.doFilter(request, response);
     }
+  }
 
+  /**
+   * Helper method to safely build URL strings in HttpComponents 5.
+   * Fixes leading slashes on relative paths and decodes '%2F' inside SPA hash fragments.
+   */
+  private String buildUrlString(URIBuilder uriBuilder) throws URISyntaxException {
+    URI uri = uriBuilder.build();
+    String urlString = uri.toString();
+
+    // 1. Ensure root-relative URIs always start with a leading slash in HttpComponents 5
+    if (!uri.isAbsolute() && !urlString.startsWith("/")) {
+      urlString = "/" + urlString;
+    }
+
+    // 2. Decode HttpComponents 5 aggressive '%2F' encoding inside hash fragments for GWT/SPA routing
+    int fragmentIndex = urlString.indexOf('#');
+    if (fragmentIndex != -1) {
+      String beforeFragment = urlString.substring(0, fragmentIndex);
+      String fragment = urlString.substring(fragmentIndex);
+      urlString = beforeFragment + fragment.replace("%2F", "/").replace("%2f", "/");
+    }
+
+    return urlString;
   }
 }
