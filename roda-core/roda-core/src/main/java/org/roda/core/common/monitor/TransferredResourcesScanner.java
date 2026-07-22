@@ -119,7 +119,10 @@ public class TransferredResourcesScanner {
       parentPath = basePath;
     }
 
-    Path file = parentPath.resolve(fileName);
+    Path file = parentPath.resolve(fileName).normalize();
+    if (!RodaCoreFactory.checkPathIsWithin(file, parentPath)) {
+      throw new GenericException("Invalid file name: " + fileName);
+    }
     try {
       try {
         Files.createDirectories(parentPath);
@@ -143,8 +146,10 @@ public class TransferredResourcesScanner {
 
   public InputStream retrieveFile(String path) throws NotFoundException, RequestNotValidException, GenericException {
     InputStream ret;
-    Path p = basePath.resolve(path);
-    if (!FSUtils.exists(p)) {
+    Path p = basePath.resolve(path).normalize();
+    if (!RodaCoreFactory.checkPathIsWithin(p, basePath)) {
+      throw new RequestNotValidException("Requested path is outside the transferred resources folder: " + path);
+    } else if (!FSUtils.exists(p)) {
       throw new NotFoundException("File not found: " + path);
     } else if (!FSUtils.isFile(p)) {
       throw new RequestNotValidException("Requested file is not a regular file: " + path);
@@ -159,8 +164,10 @@ public class TransferredResourcesScanner {
   }
 
   public Path retrieveFilePath(String path) throws NotFoundException, RequestNotValidException, GenericException {
-    Path p = basePath.resolve(path);
-    if (!FSUtils.exists(p)) {
+    Path p = basePath.resolve(path).normalize();
+    if (!RodaCoreFactory.checkPathIsWithin(p, basePath)) {
+      throw new RequestNotValidException("Requested path is outside the transferred resources folder: " + path);
+    } else if (!FSUtils.exists(p)) {
       throw new NotFoundException("File not found: " + path);
     } else if (!FSUtils.isFile(p)) {
       throw new RequestNotValidException("Requested file is not a regular file: " + path);
@@ -169,7 +176,10 @@ public class TransferredResourcesScanner {
   }
 
   public boolean fileExists(String path) {
-    Path p = basePath.resolve(path);
+    Path p = basePath.resolve(path).normalize();
+    if (!RodaCoreFactory.checkPathIsWithin(p, basePath)) {
+      return false;
+    }
     return FSUtils.exists(p);
   }
 
