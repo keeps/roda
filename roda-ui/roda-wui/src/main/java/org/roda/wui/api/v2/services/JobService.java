@@ -252,7 +252,7 @@ public class JobService {
     throws NotFoundException, GenericException {
     Path filePath = RodaCoreFactory.getJobAttachmentsDirectoryPath().resolve(jobId).resolve(attachmentId);
 
-    if (!filePath.startsWith(RodaCoreFactory.getJobAttachmentsDirectoryPath())) {
+    if (!RodaCoreFactory.checkPathIsWithin(filePath, RodaCoreFactory.getJobAttachmentsDirectoryPath())) {
       throw new GenericException("Attempt to retrieve files outside the permitted scope");
     }
 
