@@ -38,10 +38,7 @@ import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
-import org.roda.core.data.v2.disposal.metadata.DisposalConfirmationAIPMetadata;
 import org.roda.core.data.v2.disposal.metadata.DisposalHoldAIPMetadata;
-import org.roda.core.data.v2.disposal.metadata.DisposalScheduleAIPMetadata;
-import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldAIPMetadata;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -1001,7 +998,47 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> fileCreated(File file) {
+    ReturnWithExceptions<Void, ModelObserver> ret = indexSingleFile(file);
+
+    if (ret.isEmpty()) {
+      updateRepresentationFileCounters(file.getAipId(), file.getRepresentationId()).addTo(ret);
+    }
+
+    return ret;
+  }
+
+  @Override
+  public ReturnWithExceptions<Void, ModelObserver> fileUpdated(File file) {
+    ReturnWithExceptions<Void, ModelObserver> ret = deleteSingleIndexedFile(file.getAipId(), file.getRepresentationId(),
+      file.getPath(), file.getId(), false);
+
+    if (ret.isEmpty()) {
+      indexSingleFile(file).addTo(ret);
+    }
+
+    if (ret.isEmpty()) {
+      updateRepresentationFileCounters(file.getAipId(), file.getRepresentationId()).addTo(ret);
+    }
+
+    return ret;
+  }
+
+  @Override
+  public ReturnWithExceptions<Void, ModelObserver> fileDeleted(String aipId, String representationId,
+    List<String> fileDirectoryPath, String fileId, boolean deleteIncidences) {
+    ReturnWithExceptions<Void, ModelObserver> ret = deleteSingleIndexedFile(aipId, representationId, fileDirectoryPath,
+      fileId, deleteIncidences);
+
+    if (ret.isEmpty()) {
+      updateRepresentationFileCounters(aipId, representationId).addTo(ret);
+    }
+
+    return ret;
+  }
+
+  private ReturnWithExceptions<Void, ModelObserver> indexSingleFile(File file) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+
     try {
       AIP aip = model.retrieveAIP(file.getAipId());
       List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
@@ -1014,16 +1051,7 @@ public class IndexModelObserver implements ModelObserver {
     return ret;
   }
 
-  @Override
-  public ReturnWithExceptions<Void, ModelObserver> fileUpdated(File file) {
-    ReturnWithExceptions<Void, ModelObserver> ret = fileDeleted(file.getAipId(), file.getRepresentationId(),
-      file.getPath(), file.getId(), false);
-    fileCreated(file).addTo(ret);
-    return ret;
-  }
-
-  @Override
-  public ReturnWithExceptions<Void, ModelObserver> fileDeleted(String aipId, String representationId,
+  private ReturnWithExceptions<Void, ModelObserver> deleteSingleIndexedFile(String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId, boolean deleteIncidences) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
@@ -1032,6 +1060,45 @@ public class IndexModelObserver implements ModelObserver {
 
     if (deleteIncidences) {
       deleteDocumentsFromIndex(RiskIncidence.class, RodaConstants.RISK_INCIDENCE_FILE_ID, fileId).addTo(ret);
+    }
+
+    return ret;
+  }
+
+  private ReturnWithExceptions<Void, ModelObserver> updateRepresentationFileCounters(String aipId,
+    String representationId) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+
+    long sizeInBytes = 0L;
+    long numberOfDataFiles = 0L;
+    long numberOfDataFolders = 0L;
+
+    String representationUUID = IdUtils.getRepresentationId(aipId, representationId);
+
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, representationUUID));
+
+    try (IterableIndexResult<IndexedFile> files = new IterableIndexResult<>(index, IndexedFile.class, filter, null,
+      true, Arrays.asList(RodaConstants.FILE_SIZE, RodaConstants.FILE_ISDIRECTORY))) {
+
+      for (IndexedFile indexedFile : files) {
+        if (indexedFile.isDirectory()) {
+          numberOfDataFolders++;
+        } else {
+          numberOfDataFiles++;
+          sizeInBytes += indexedFile.getSize();
+        }
+      }
+
+      Map<String, Object> updatedFields = new HashMap<>();
+      updatedFields.put(RodaConstants.REPRESENTATION_SIZE_IN_BYTES, sizeInBytes);
+      updatedFields.put(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES, numberOfDataFiles);
+      updatedFields.put(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FOLDERS, numberOfDataFolders);
+
+      SolrUtils.update(index, IndexedRepresentation.class, representationUUID, updatedFields, (ModelObserver) this)
+        .addTo(ret);
+    } catch (IOException e) {
+      LOGGER.error("Cannot update representation file counters: {} / {}", aipId, representationId, e);
+      ret.add(e);
     }
 
     return ret;
