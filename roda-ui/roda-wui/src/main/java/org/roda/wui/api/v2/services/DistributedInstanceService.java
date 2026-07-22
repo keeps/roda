@@ -122,13 +122,28 @@ public class DistributedInstanceService {
 
   public StreamResponse retrieveLastSyncFileByClass(final String instanceIdentifier, final String entityClass,
     final String type) {
+    // these are meant to be simple identifiers, not path fragments, so reject anything that could
+    // be used to escape the synchronization directory
+    if (containsPathSeparator(instanceIdentifier) || containsPathSeparator(entityClass)
+      || containsPathSeparator(type)) {
+      throw new IllegalArgumentException("Invalid instance identifier, entity class or type");
+    }
+
     final StringBuilder fileNameBuilder = new StringBuilder();
     fileNameBuilder.append(type).append("_").append(instanceIdentifier).append("_").append(entityClass)
       .append(".jsonl");
 
-    final Path filePath = RodaCoreFactory.getSynchronizationDirectoryPath().resolve(fileNameBuilder.toString());
+    final Path base = RodaCoreFactory.getSynchronizationDirectoryPath();
+    final Path filePath = base.resolve(fileNameBuilder.toString()).normalize();
+    if (!RodaCoreFactory.checkPathIsWithin(filePath, base)) {
+      throw new IllegalArgumentException("Invalid instance identifier, entity class or type");
+    }
 
     return SyncUtils.createLastSyncFileStreamResponse(filePath);
+  }
+
+  private static boolean containsPathSeparator(String value) {
+    return value != null && (value.contains("/") || value.contains("\\") || value.contains(".."));
   }
 
   public Job importSyncBundle(User user, String instanceIdentifier, MultipartFile resource)

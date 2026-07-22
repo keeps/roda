@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -156,13 +157,23 @@ public class SyncUtils {
   }
 
   public static Path getSyncOutcomeBundlePath(String bundleName) {
-    return RodaCoreFactory.getSynchronizationDirectoryPath().resolve(RodaConstants.CORE_SYNCHRONIZATION_OUTCOME_FOLDER)
-      .resolve(bundleName);
+    Path base = RodaCoreFactory.getSynchronizationDirectoryPath()
+      .resolve(RodaConstants.CORE_SYNCHRONIZATION_OUTCOME_FOLDER);
+    Path bundlePath = base.resolve(bundleName).normalize();
+    if (!RodaCoreFactory.checkPathIsWithin(bundlePath, base)) {
+      throw new IllegalArgumentException("Invalid sync bundle name: " + bundleName);
+    }
+    return bundlePath;
   }
 
   public static Path getSyncIncomingBundlePath(String bundleName) {
-    return RodaCoreFactory.getSynchronizationDirectoryPath().resolve(RodaConstants.CORE_SYNCHRONIZATION_INCOMING_FOLDER)
-      .resolve(bundleName);
+    Path base = RodaCoreFactory.getSynchronizationDirectoryPath()
+      .resolve(RodaConstants.CORE_SYNCHRONIZATION_INCOMING_FOLDER);
+    Path bundlePath = base.resolve(bundleName).normalize();
+    if (!RodaCoreFactory.checkPathIsWithin(bundlePath, base)) {
+      throw new IllegalArgumentException("Invalid sync bundle name: " + bundleName);
+    }
+    return bundlePath;
   }
 
   public static boolean removeSyncBundleLocal(String bundleName, String deletionDirectory) throws IOException {
@@ -177,17 +188,28 @@ public class SyncUtils {
 
   }
 
-  public static Path receiveBundle(String fileName, InputStream inputStream) throws IOException {
-    Path filePath = RodaCoreFactory.getSynchronizationDirectoryPath()
-      .resolve(RodaConstants.CORE_SYNCHRONIZATION_INCOMING_FOLDER).resolve(fileName);
+  public static Path receiveBundle(String fileName, InputStream inputStream) throws IOException, GenericException {
+    Path base = RodaCoreFactory.getSynchronizationDirectoryPath()
+      .resolve(RodaConstants.CORE_SYNCHRONIZATION_INCOMING_FOLDER);
+    // the incoming bundle file name is attacker-controlled (multipart upload filename), so keep only its
+    // basename before resolving, and validate the result stays within the incoming folder
+    String sanitizedFileName = Paths.get(fileName).getFileName().toString();
+    Path filePath = base.resolve(sanitizedFileName).normalize();
+    if (!RodaCoreFactory.checkPathIsWithin(filePath, base)) {
+      throw new GenericException("Invalid sync bundle file name: " + fileName);
+    }
     FileUtils.copyInputStreamToFile(inputStream, filePath.toFile());
     return filePath;
   }
 
   public static Path compress(Path workingDir, String filename)
     throws NotFoundException, GenericException, IOException {
-    Path outcomePath = RodaCoreFactory.getSynchronizationDirectoryPath()
-      .resolve(RodaConstants.CORE_SYNCHRONIZATION_OUTCOME_FOLDER).resolve(filename);
+    Path base = RodaCoreFactory.getSynchronizationDirectoryPath()
+      .resolve(RodaConstants.CORE_SYNCHRONIZATION_OUTCOME_FOLDER);
+    Path outcomePath = base.resolve(filename).normalize();
+    if (!RodaCoreFactory.checkPathIsWithin(outcomePath, base)) {
+      throw new GenericException("Invalid sync bundle file name: " + filename);
+    }
     LOGGER.debug("Compress files to {}", outcomePath);
 
     if (FSUtils.exists(outcomePath)) {
