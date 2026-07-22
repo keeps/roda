@@ -147,7 +147,7 @@ public class RepresentationSearchWrapperActions extends AbstractActionable<Index
         @Override
         public void onSuccess(String details) {
           Services services = new Services("Create representation", "create");
-          services.representationResource(s -> s.createRepresentation(parentAipId, "MIXED", details))
+          services.representationResource(s -> s.createRepresentation(parentAipId, RodaConstants.REPRESENTATION_TYPE_MIXED_DISPLAY, details))
             .whenComplete((representation, error) -> {
               if (representation != null) {
                 HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, parentAipId, representation.getId());

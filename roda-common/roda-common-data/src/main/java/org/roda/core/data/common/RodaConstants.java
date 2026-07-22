@@ -1150,6 +1150,7 @@ public final class RodaConstants {
 
   // Representation types
   public static final String REPRESENTATION_TYPE_MIXED = "MIXED";
+  public static final String REPRESENTATION_TYPE_MIXED_DISPLAY = "Mixed";
 
   /*
    * OTHER FIELDS
