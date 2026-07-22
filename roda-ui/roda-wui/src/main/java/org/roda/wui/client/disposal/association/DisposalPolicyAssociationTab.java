@@ -10,11 +10,15 @@ package org.roda.wui.client.disposal.association;
 import static org.roda.core.data.common.RodaConstants.SEARCH_WITH_PREFILTER_HANDLER;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.SelectedItemsUtils;
+import org.roda.core.data.v2.aip.MembersLookupRequest;
+import org.roda.core.data.v2.aip.MembersLookupResponse;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationState;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
@@ -74,7 +78,7 @@ public class DisposalPolicyAssociationTab extends GenericMetadataCardPanel<Index
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private final DisposalHolds disposalHoldList = new DisposalHolds();
   private final DisposalHolds transitiveHoldList = new DisposalHolds();
-  private AsyncCallback<Actionable.ActionImpact> actionCallback;
+  private final AsyncCallback<Actionable.ActionImpact> actionCallback;
 
   public DisposalPolicyAssociationTab(IndexedAIP indexedAIP, AsyncCallback<Actionable.ActionImpact> actionCallback) {
     this.actionCallback = actionCallback;
@@ -160,43 +164,76 @@ public class DisposalPolicyAssociationTab extends GenericMetadataCardPanel<Index
       transitiveHoldsFuture = CompletableFuture.completedFuture(new DisposalTransitiveHoldsAIPMetadata());
     }
 
-    // 3. Wait for all network calls to finish, then draw the DOM sequentially!
+    // 3. Wait for all network calls to finish, collect usernames, and fetch display
+    // names!
     CompletableFuture.allOf(confirmationFuture, holdsFuture, transitiveHoldsFuture).whenComplete((v, throwable) -> {
       if (throwable != null) {
         AsyncCallbackUtils.defaultFailureTreatment(throwable);
         return;
       }
 
-      // A. Draw Confirmation (First)
       DisposalConfirmation confirmation = confirmationFuture.join();
-      if (canReadDisposalConfirmations && confirmation != null) {
-        buildDisposalConfirmation(confirmation);
+      List<DisposalHoldAIPMetadata> associations = holdsFuture.join();
+      DisposalTransitiveHoldsAIPMetadata transitiveHolds = transitiveHoldsFuture.join();
+
+      // Collect all usernames from both confirmation and holds
+      Set<String> usernames = new HashSet<>();
+      if (confirmation != null && StringUtils.isNotBlank(confirmation.getExecutedBy())) {
+        usernames.add(confirmation.getExecutedBy());
+      }
+      if (associations != null) {
+        for (DisposalHoldAIPMetadata assoc : associations) {
+          if (StringUtils.isNotBlank(assoc.getAssociatedBy())) {
+            usernames.add(assoc.getAssociatedBy());
+          }
+        }
       }
 
-      // B. Draw Schedule (Second)
-      if (canReadDisposalSchedules) {
-        buildDisposalScheduleInformation(data);
-      }
-
-      // C. Draw Holds (Third)
-      if (canReadDisposalHolds) {
-        List<DisposalHoldAIPMetadata> associations = holdsFuture.join();
-        boolean hasDirectHolds = associations != null && !associations.isEmpty();
-
-        if (hasDirectHolds) {
-          addSeparator(messages.disposalHoldsAssociationInformationTitle());
-          getDisposalHoldList(data, associations);
-        }
-
-        DisposalTransitiveHoldsAIPMetadata transitiveHolds = transitiveHoldsFuture.join();
-        boolean hasTransitiveHolds = transitiveHolds != null && transitiveHolds.getObjects() != null
-          && !transitiveHolds.getObjects().isEmpty();
-
-        if (hasTransitiveHolds) {
-          buildTransitiveHoldsInformation(transitiveHolds.getObjects());
-        }
+      // 4. Fetch member display names in a single batch, then render DOM
+      if (!usernames.isEmpty()) {
+        MembersLookupRequest request = new MembersLookupRequest(usernames, new HashSet<>());
+        Services memberServices = new Services("Get members display names", "post");
+        memberServices.membersResource(s -> s.getMembersDisplayNames(request)).whenComplete((response, t) -> {
+          MembersLookupResponse safeResponse = (t == null && response != null) ? response : new MembersLookupResponse();
+          renderDom(data, confirmation, associations, transitiveHolds, safeResponse, canReadDisposalConfirmations,
+            canReadDisposalSchedules, canReadDisposalHolds);
+        });
+      } else {
+        renderDom(data, confirmation, associations, transitiveHolds, new MembersLookupResponse(),
+          canReadDisposalConfirmations, canReadDisposalSchedules, canReadDisposalHolds);
       }
     });
+  }
+
+  private void renderDom(IndexedAIP data, DisposalConfirmation confirmation, List<DisposalHoldAIPMetadata> associations,
+    DisposalTransitiveHoldsAIPMetadata transitiveHolds, MembersLookupResponse membersResponse,
+    boolean canReadDisposalConfirmations, boolean canReadDisposalSchedules, boolean canReadDisposalHolds) {
+
+    // A. Draw Confirmation (First)
+    if (canReadDisposalConfirmations && confirmation != null) {
+      buildDisposalConfirmation(confirmation, membersResponse);
+    }
+
+    // B. Draw Schedule (Second)
+    if (canReadDisposalSchedules) {
+      buildDisposalScheduleInformation(data);
+    }
+
+    // C. Draw Holds (Third)
+    if (canReadDisposalHolds) {
+      boolean hasDirectHolds = associations != null && !associations.isEmpty();
+      boolean hasTransitiveHolds = transitiveHolds != null && transitiveHolds.getObjects() != null
+        && !transitiveHolds.getObjects().isEmpty();
+
+      if (hasDirectHolds) {
+        addSeparator(messages.disposalHoldsAssociationInformationTitle());
+        getDisposalHoldList(data, associations, membersResponse);
+      }
+
+      if (hasTransitiveHolds) {
+        buildTransitiveHoldsInformation(transitiveHolds.getObjects());
+      }
+    }
   }
 
   private void buildTransitiveHoldsInformation(List<DisposalTransitiveHoldAIPMetadata> transitiveHolds) {
@@ -272,7 +309,7 @@ public class DisposalPolicyAssociationTab extends GenericMetadataCardPanel<Index
     );
   }
 
-  private void buildDisposalConfirmation(DisposalConfirmation confirmation) {
+  private void buildDisposalConfirmation(DisposalConfirmation confirmation, MembersLookupResponse membersResponse) {
     addSeparator(messages.disposalConfirmationAssociationInformationTitle());
     buildField(messages.disposalConfirmationAssociationTitle()).withValue(confirmation.getTitle())
       .onClick(event -> HistoryUtils.newHistory(ShowDisposalConfirmation.RESOLVER, confirmation.getId())).build();
@@ -282,8 +319,10 @@ public class DisposalPolicyAssociationTab extends GenericMetadataCardPanel<Index
 
     if (DisposalConfirmationState.APPROVED.equals(confirmation.getState())
       || DisposalConfirmationState.PERMANENTLY_DELETED.equals(confirmation.getState())) {
-      buildField("Executed on").withValue(Humanize.formatDate(confirmation.getExecutedOn())).build();
-      buildField("Executed by").withValue(confirmation.getExecutedBy()).build();
+      buildField(messages.disposalConfirmationExecutedOn()).withValue(Humanize.formatDate(confirmation.getExecutedOn()))
+        .build();
+      buildField(messages.disposalConfirmationExecutedBy())
+        .withValue(membersResponse.getUserDisplayName(confirmation.getExecutedBy())).build();
     }
 
     buildField(messages.disposalConfirmationStatus())
@@ -313,15 +352,16 @@ public class DisposalPolicyAssociationTab extends GenericMetadataCardPanel<Index
     }
   }
 
-  private void getDisposalHoldList(IndexedAIP aip, List<DisposalHoldAIPMetadata> disposalHoldAssociations) {
+  private void getDisposalHoldList(IndexedAIP aip, List<DisposalHoldAIPMetadata> disposalHoldAssociations,
+    MembersLookupResponse membersResponse) {
     BasicTablePanel<DisposalHoldAIPMetadata> tableHolds = getBasicTablePanelForDisposalHolds(aip,
-      disposalHoldAssociations);
+      disposalHoldAssociations, membersResponse);
     tableHolds.removeSelectionModel();
     metadataContainer.add(tableHolds);
   }
 
   private BasicTablePanel<DisposalHoldAIPMetadata> getBasicTablePanelForDisposalHolds(IndexedAIP aip,
-    List<DisposalHoldAIPMetadata> disposalHoldAssociations) {
+    List<DisposalHoldAIPMetadata> disposalHoldAssociations, MembersLookupResponse membersResponse) {
     Label headerHolds = new Label();
     HTMLPanel info = new HTMLPanel(SafeHtmlUtils.EMPTY_SAFE_HTML);
 
@@ -346,15 +386,6 @@ public class DisposalPolicyAssociationTab extends GenericMetadataCardPanel<Index
         }
       }),
 
-      new BasicTablePanel.ColumnInfo<>(messages.disposalHoldStateCol(), 10,
-        new Column<DisposalHoldAIPMetadata, SafeHtml>(new SafeHtmlCell()) {
-          @Override
-          public SafeHtml getValue(DisposalHoldAIPMetadata association) {
-            DisposalHold hold = disposalHoldList.findDisposalHold(association.getId());
-            return HtmlSnippetUtils.getDisposalHoldStateHtml(hold);
-          }
-        }),
-
       new BasicTablePanel.ColumnInfo<DisposalHoldAIPMetadata>(messages.disposalHoldAssociatedOn(), 5,
         new TextColumn<DisposalHoldAIPMetadata>() {
           @Override
@@ -372,10 +403,18 @@ public class DisposalPolicyAssociationTab extends GenericMetadataCardPanel<Index
           @Override
           public String getValue(DisposalHoldAIPMetadata association) {
             if (association != null && association.getAssociatedBy() != null) {
-              return association.getAssociatedBy();
+              return membersResponse.getUserDisplayName(association.getAssociatedBy());
             } else {
               return "";
             }
+          }
+        }),
+      new BasicTablePanel.ColumnInfo<>(messages.disposalHoldStateCol(), 10,
+        new Column<DisposalHoldAIPMetadata, SafeHtml>(new SafeHtmlCell()) {
+          @Override
+          public SafeHtml getValue(DisposalHoldAIPMetadata association) {
+            DisposalHold hold = disposalHoldList.findDisposalHold(association.getId());
+            return HtmlSnippetUtils.getDisposalHoldStateHtml(hold);
           }
         }),
       new BasicTablePanel.ColumnInfo<>(messages.actions(), 5, getDisposalHoldActionsColumn(aip)));
@@ -400,9 +439,7 @@ public class DisposalPolicyAssociationTab extends GenericMetadataCardPanel<Index
         return false;
       }
 
-      if (!aip.getTransitiveDisposalHoldsId().isEmpty()) {
-        return false;
-      }
+      return aip.getTransitiveDisposalHoldsId().isEmpty();
     }
 
     return true;

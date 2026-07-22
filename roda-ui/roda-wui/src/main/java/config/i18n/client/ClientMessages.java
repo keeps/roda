@@ -2202,6 +2202,10 @@ public interface ClientMessages extends Messages {
 
   String disposalConfirmationCreationBy();
 
+  String disposalConfirmationExecutedOn();
+
+  String disposalConfirmationExecutedBy();
+
   String disposalConfirmationStatus();
 
   String disposalConfirmationAIPs();
