@@ -35,10 +35,16 @@ jobs:
         run: mvn $MAVEN_CLI_OPTS -Dtestng.groups="travis" -Denforcer.skip=true clean org.jacoco:jacoco-maven-plugin:prepare-agent install
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Find generated JAR
+        id: jar-location
+        run: |
+          # Find the jar matching your pattern and pick the first match
+          JAR_PATH=$(ls roda-ui/roda-wui/target/roda-wui-*.jar | head -n 1)
+          echo "path=$JAR_PATH" >> $GITHUB_OUTPU
       - name: Generate SBOM with Syft
         uses: anchore/sbom-action@v0
         with:
-          file: roda-ui/roda-wui/target/roda-wui-*.jar
+          file: ${{ steps.jar-location.outputs.path }}
           format: spdx-json
           output-file: sbom.spdx.json
       - name: Scan SBOM with Grype
