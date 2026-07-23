@@ -8,6 +8,10 @@
 package org.roda.core.common;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.util.Date;
 
 import org.apache.hc.client5.http.classic.methods.HttpPost;
@@ -61,6 +65,8 @@ public class TokenManager {
   }
 
   public AccessToken grantToken(LocalInstance localInstance) throws GenericException, AuthenticationDeniedException {
+    validateCentralInstanceUrl(localInstance.getCentralInstanceURL());
+
     CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     String url = localInstance.getCentralInstanceURL() + RodaConstants.API_SEP + RodaConstants.API_REST_V2_MEMBERS
       + RodaConstants.API_PATH_PARAM_AUTH_TOKEN;
@@ -83,6 +89,42 @@ public class TokenManager {
       }
     } catch (IOException e) {
       throw new GenericException("Error sending POST request", e);
+    }
+  }
+
+  /**
+   * Guards against Server-Side Request Forgery: the central instance URL comes straight from an
+   * HTTP request body (local instance registration/configuration), and this method sends the
+   * instance's bearer access key to it, so an unvalidated URL would let a caller make this server
+   * POST a live credential to an arbitrary host (e.g. an internal service or a cloud metadata
+   * endpoint).
+   */
+  private static void validateCentralInstanceUrl(String centralInstanceUrl) throws GenericException {
+    URI uri;
+    try {
+      uri = new URI(centralInstanceUrl);
+    } catch (URISyntaxException | NullPointerException e) {
+      throw new GenericException("Invalid central instance URL: " + centralInstanceUrl);
+    }
+
+    String scheme = uri.getScheme();
+    if (scheme == null || !(scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https"))) {
+      throw new GenericException("Invalid central instance URL scheme: " + centralInstanceUrl);
+    }
+
+    String host = uri.getHost();
+    if (host == null) {
+      throw new GenericException("Invalid central instance URL: " + centralInstanceUrl);
+    }
+
+    try {
+      InetAddress address = InetAddress.getByName(host);
+      if (address.isLoopbackAddress() || address.isLinkLocalAddress() || address.isSiteLocalAddress()
+        || address.isAnyLocalAddress() || address.isMulticastAddress()) {
+        throw new GenericException("Central instance URL resolves to a disallowed address: " + centralInstanceUrl);
+      }
+    } catch (UnknownHostException e) {
+      throw new GenericException("Could not resolve central instance URL host: " + centralInstanceUrl, e);
     }
   }
 
