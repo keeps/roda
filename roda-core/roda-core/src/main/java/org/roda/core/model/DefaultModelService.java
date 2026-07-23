@@ -61,6 +61,7 @@ import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
 import org.roda.core.common.notifications.NotificationProcessor;
 import org.roda.core.common.validation.ValidationUtils;
+import org.roda.core.config.SpringContext;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.NodeType;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -158,6 +159,8 @@ import org.roda.core.model.utils.ResourceParseUtils;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.base.ingest.PermissionUtils;
 import org.roda.core.protocols.Protocol;
+import org.roda.core.repository.job.JobRepository;
+import org.roda.core.repository.job.ReportRepository;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.storage.BinaryVersion;
@@ -182,9 +185,6 @@ import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.HTTPUtility;
 import org.roda.core.util.IdUtils;
 import org.roda.core.util.RESTClientUtility;
-import org.roda.core.config.SpringContext;
-import org.roda.core.repository.job.JobRepository;
-import org.roda.core.repository.job.ReportRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -756,7 +756,8 @@ public class DefaultModelService implements ModelService {
     AIP aip = retrieveAIP(aipId);
     aip.setType(type);
     AIP updatedAIP = updateAIPMetadata(aip, updatedBy);
-    //TODO: Create partial update to Type and then change to notifyAipUpdatedOnChanged
+    // TODO: Create partial update to Type and then change to
+    // notifyAipUpdatedOnChanged
     notifyAipUpdated(updatedAIP).failOnError();
   }
 
@@ -1258,7 +1259,8 @@ public class DefaultModelService implements ModelService {
     AIP updatedAIP = updateAIPMetadata(aip, updatedBy);
 
     if (notify) {
-      //TODO: Create partial update to this flag and then change to notifyAipUpdatedOnChanged
+      // TODO: Create partial update to this flag and then change to
+      // notifyAipUpdatedOnChanged
       notifyAipUpdated(updatedAIP).failOnError();
     }
   }
@@ -1469,6 +1471,27 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
+  public Long retrieveFileSize(File file)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException, IOException {
+    if (file.isDirectory()) {
+      return 0L;
+    }
+
+    if (FSUtils.isManifestOfExternalFiles(file.getId())) {
+      try {
+        return getExternalFilesTotalSize(file);
+      } catch (GenericException e) {
+        throw new GenericException("Could not get external files size", e);
+      }
+    }
+
+    Binary binary = getStorage().getBinary(ModelUtils.getFileStoragePath(file));
+    Long sizeInBytes = binary.getSizeInBytes();
+
+    return sizeInBytes != null ? sizeInBytes : 0L;
+  }
+
+  @Override
   public File createFile(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload, String createdBy) throws RequestNotValidException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
@@ -1506,7 +1529,7 @@ public class DefaultModelService implements ModelService {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
     StoragePath filePath;
     if (fileId == null) {
-       filePath = ModelUtils.getDirectoryStoragePath(aipId, representationId, directoryPath);
+      filePath = ModelUtils.getDirectoryStoragePath(aipId, representationId, directoryPath);
     } else {
       filePath = ModelUtils.getFileStoragePath(aipId, representationId, directoryPath, fileId);
     }

@@ -1073,22 +1073,25 @@ public class IndexModelObserver implements ModelObserver {
     long numberOfDataFiles = 0L;
     long numberOfDataFolders = 0L;
 
-    String representationUUID = IdUtils.getRepresentationId(aipId, representationId);
+    try (CloseableIterable<OptionalWithCause<File>> files = model.listFilesUnder(aipId, representationId, true)) {
+      for (OptionalWithCause<File> oFile : files) {
+          if (oFile.isPresent()) {
+            File file = oFile.get();
 
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, representationUUID));
-
-    try (IterableIndexResult<IndexedFile> files = new IterableIndexResult<>(index, IndexedFile.class, filter, null,
-      true, Arrays.asList(RodaConstants.FILE_SIZE, RodaConstants.FILE_ISDIRECTORY))) {
-
-      for (IndexedFile indexedFile : files) {
-        if (indexedFile.isDirectory()) {
-          numberOfDataFolders++;
-        } else {
-          numberOfDataFiles++;
-          sizeInBytes += indexedFile.getSize();
-        }
+            if (file.isDirectory()) {
+              numberOfDataFolders++;
+            } else {
+              numberOfDataFiles++;
+              // should get file size
+              sizeInBytes += model.retrieveFileSize(file);
+            }
+          } else {
+            LOGGER.error("Cannot update representation file counters: {} / {}", aipId, representationId);
+            ret.add(oFile.getCause());
+          }
       }
 
+      String representationUUID = IdUtils.getRepresentationId(aipId, representationId);
       Map<String, Object> updatedFields = new HashMap<>();
       updatedFields.put(RodaConstants.REPRESENTATION_SIZE_IN_BYTES, sizeInBytes);
       updatedFields.put(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES, numberOfDataFiles);
@@ -1096,7 +1099,8 @@ public class IndexModelObserver implements ModelObserver {
 
       SolrUtils.update(index, IndexedRepresentation.class, representationUUID, updatedFields, (ModelObserver) this)
         .addTo(ret);
-    } catch (IOException e) {
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
+      | IOException e) {
       LOGGER.error("Cannot update representation file counters: {} / {}", aipId, representationId, e);
       ret.add(e);
     }

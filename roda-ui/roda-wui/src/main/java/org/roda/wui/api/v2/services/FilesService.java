@@ -174,7 +174,7 @@ public class FilesService {
       model.createEvent(aipId, representationId, null, null, RodaConstants.PreservationEventType.CREATION,
           eventDescription, null, targets, PluginState.SUCCESS, outcomeText, details, user.getName(), true, null);
 
-      requestContext.getIndexService().commit(IndexedFile.class);
+      requestContext.getIndexService().commit(IndexedFile.class, IndexedRepresentation.class);
       return file;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
         | AlreadyExistsException e) {
@@ -215,7 +215,7 @@ public class FilesService {
           RodaConstants.PreservationEventType.CREATION, eventDescription, PluginState.SUCCESS, outcomeText, details,
           user.getName(), true, null);
 
-      index.commit(IndexedFile.class);
+      index.commit(IndexedFile.class, IndexedRepresentation.class);
       return index.retrieve(IndexedFile.class, IdUtils.getFileId(newFolder), new ArrayList<>());
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       String outcomeText = "The folder '" + folderName + "' has not been manually created.";

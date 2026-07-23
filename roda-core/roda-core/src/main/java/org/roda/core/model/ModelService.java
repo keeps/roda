@@ -289,6 +289,9 @@ public interface ModelService extends ModelObservable {
   File retrieveFile(String aipId, String representationId, List<String> directoryPath, String fileId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
 
+  Long retrieveFileSize(File file)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException, IOException;
+
   File createFile(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload, String createdBy) throws RequestNotValidException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, NotFoundException;
@@ -312,7 +315,7 @@ public interface ModelService extends ModelObservable {
     boolean notify) throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException;
 
   File renameFolder(File folder, String newName, boolean reindexResources) throws AlreadyExistsException,
-          GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException;
+    GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException;
 
   void deleteFile(File file, String deletedBy, boolean notify)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException;
@@ -548,7 +551,8 @@ public interface ModelService extends ModelObservable {
   Group updateGroup(Group group, boolean notify, boolean isHandlingEvent)
     throws GenericException, NotFoundException, AuthorizationDeniedException;
 
-  Group updateGroupMembers(String id, Set<String> members, boolean notify,boolean isHandlingEvent) throws AuthorizationDeniedException, NotFoundException, GenericException;
+  Group updateGroupMembers(String id, Set<String> members, boolean notify, boolean isHandlingEvent)
+    throws AuthorizationDeniedException, NotFoundException, GenericException;
 
   void deleteGroup(String id, boolean notify) throws GenericException, AuthorizationDeniedException;
 

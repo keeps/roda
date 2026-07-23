@@ -1024,6 +1024,23 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   @Override
+  public Long retrieveFileSize(File file)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IOException {
+    List<TransactionalModelOperationLog> operationLogs = operationRegistry.registerOperationForFile(file.getAipId(),
+      file.getRepresentationId(), file.getPath(), file.getId(), OperationType.READ);
+
+    try {
+      Long sizeInBytes = stagingModelService.retrieveFileSize(file);
+      operationRegistry.updateOperationState(operationLogs, OperationState.SUCCESS);
+      return sizeInBytes;
+    } catch (IOException | RequestNotValidException | GenericException | NotFoundException
+      | AuthorizationDeniedException e) {
+      operationRegistry.updateOperationState(operationLogs, OperationState.FAILURE);
+      throw e;
+    }
+  }
+
+  @Override
   public File createFile(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload, String createdBy) throws RequestNotValidException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
