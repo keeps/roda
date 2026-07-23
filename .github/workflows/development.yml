@@ -40,7 +40,7 @@ jobs:
         run: |
           # Find the jar matching your pattern and pick the first match
           JAR_PATH=$(ls roda-ui/roda-wui/target/roda-wui-*.jar | head -n 1)
-          echo "path=$JAR_PATH" >> $GITHUB_OUTPU
+          echo "path=$JAR_PATH" >> $GITHUB_OUTPUT
       - name: Generate SBOM with Syft
         uses: anchore/sbom-action@v0
         with:
