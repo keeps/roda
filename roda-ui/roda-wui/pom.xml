@@ -731,7 +731,7 @@
                     <workingDirectory>${project.basedir}/src/main/js</workingDirectory>
                     <!-- Keep Node.js binary out of src/ -->
                     <installDirectory>${project.build.directory}/frontend</installDirectory>
-                    <nodeVersion>v22.14.0</nodeVersion>
+                    <nodeVersion>v22.23.1</nodeVersion>
                 </configuration>
                 <executions>
                     <execution>
