@@ -513,6 +513,24 @@ public class IndexModelObserver implements ModelObserver {
     return ret;
   }
 
+  @Override
+  public ReturnWithExceptions<Void, ModelObserver> aipHasShallowFiles(AIP aip) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+    Map<String, Object> updatedFields = new HashMap<>();
+    updatedFields.put(RodaConstants.AIP_HAS_SHALLOW_FILES, aip.getHasShallowFiles());
+    SolrUtils.update(index, IndexedAIP.class, aip.getId(), updatedFields, (ModelObserver) this).addTo(ret);
+    return ret;
+  }
+
+  @Override
+  public ReturnWithExceptions<Void, ModelObserver> aipChangedType(AIP aip) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+    Map<String, Object> updatedFields = new HashMap<>();
+    updatedFields.put(RodaConstants.AIP_TYPE, aip.getType());
+    SolrUtils.update(index, IndexedAIP.class, aip.getId(), updatedFields, (ModelObserver) this).addTo(ret);
+    return ret;
+  }
+
   private ReturnWithExceptions<Void, ModelObserver> descriptivesMetadataUpdated(final AIP aip) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
     for (DescriptiveMetadata metadata : aip.getDescriptiveMetadata()) {

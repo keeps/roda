@@ -756,8 +756,9 @@ public class DefaultModelService implements ModelService {
     AIP aip = retrieveAIP(aipId);
     aip.setType(type);
     AIP updatedAIP = updateAIPMetadata(aip, updatedBy);
-    //TODO: Create partial update to Type and then change to notifyAipUpdatedOnChanged
-    notifyAipUpdated(updatedAIP).failOnError();
+
+    notifyAipChangedType(updatedAIP).failOnError();
+    notifyAipUpdatedOnChanged(updatedAIP).failOnError();
   }
 
   /********************************
@@ -1258,8 +1259,8 @@ public class DefaultModelService implements ModelService {
     AIP updatedAIP = updateAIPMetadata(aip, updatedBy);
 
     if (notify) {
-      //TODO: Create partial update to this flag and then change to notifyAipUpdatedOnChanged
-      notifyAipUpdated(updatedAIP).failOnError();
+      notifyAipHasShallowFiles(updatedAIP).failOnError();
+      notifyAipUpdatedOnChanged(updatedAIP).failOnError();
     }
   }
 
@@ -5547,6 +5548,17 @@ public class DefaultModelService implements ModelService {
   @Override
   public ReturnWithExceptionsWrapper notifyAipDeleted(String aipId) {
     return notifyObserversSafely(observer -> observer.aipDeleted(aipId, true));
+  }
+
+  @Override
+  public ReturnWithExceptionsWrapper notifyAipHasShallowFiles(AIP aip) {
+    return notifyObserversSafely(
+      observer -> observer.aipHasShallowFiles(aip));
+  }
+
+  @Override
+  public ReturnWithExceptionsWrapper notifyAipChangedType(AIP aip) {
+    return notifyObserversSafely(observer -> observer.aipChangedType(aip));
   }
 
   @Override

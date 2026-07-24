@@ -56,6 +56,10 @@ public interface ModelObserver {
 
   public ReturnWithExceptions<Void, ModelObserver> aipDeleted(String aipId, boolean deleteIncidences);
 
+  public ReturnWithExceptions<Void, ModelObserver> aipHasShallowFiles(AIP aip);
+
+  public ReturnWithExceptions<Void, ModelObserver> aipChangedType(AIP aip);
+
   public ReturnWithExceptions<Void, ModelObserver> descriptiveMetadataCreated(
     DescriptiveMetadata descriptiveMetadataBinary);
 
