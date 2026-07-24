@@ -4260,6 +4260,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   @Override
+  public ReturnWithExceptionsWrapper notifyAipHasShallowFiles(AIP aip) {
+    return getModelService().notifyAipHasShallowFiles(aip);
+  }
+
+  @Override
+  public ReturnWithExceptionsWrapper notifyAipChangedType(AIP aip) {
+    return getModelService().notifyAipChangedType(aip);
+  }
+
+  @Override
   public ReturnWithExceptionsWrapper notifyDescriptiveMetadataCreated(DescriptiveMetadata descriptiveMetadata) {
     return getModelService().notifyDescriptiveMetadataCreated(descriptiveMetadata);
   }

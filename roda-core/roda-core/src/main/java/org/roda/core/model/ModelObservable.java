@@ -61,6 +61,10 @@ public interface ModelObservable {
 
   ReturnWithExceptionsWrapper notifyAipDeleted(String aipId);
 
+  ReturnWithExceptionsWrapper notifyAipHasShallowFiles (AIP aip);
+
+  ReturnWithExceptionsWrapper notifyAipChangedType (AIP aip);
+
   ReturnWithExceptionsWrapper notifyDescriptiveMetadataCreated(DescriptiveMetadata descriptiveMetadata);
 
   ReturnWithExceptionsWrapper notifyDescriptiveMetadataUpdated(DescriptiveMetadata descriptiveMetadata);
