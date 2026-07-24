@@ -679,7 +679,6 @@ public final class PremisV3Utils {
     }
 
     objectCharacteristics.setSize(binary.getSizeInBytes());
-    file.getObjectCharacteristics().add(objectCharacteristics);
 
     OriginalNameComplexType originalName = FACTORY.createOriginalNameComplexType();
     originalName.setValue(originalFile.getId());
