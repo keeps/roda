@@ -7,9 +7,6 @@
  */
 package org.roda.wui.client.browse.tabs;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -21,7 +18,6 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.tabs.aip.AipDetailsTab;
 import org.roda.wui.client.browse.tabs.aip.AipPermissionTabs;
 import org.roda.wui.client.common.actions.Actionable;
-import org.roda.wui.client.common.actions.AipToolbarActions;
 import org.roda.wui.client.common.lists.LogEntryList;
 import org.roda.wui.client.common.lists.PreservationEventList;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
