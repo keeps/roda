@@ -13,8 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexedRepresentationRequest;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -43,11 +41,14 @@ import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -171,8 +172,6 @@ public class DescriptiveMetadataHistory extends Composite {
   SimplePanel tabsContainer;
   @UiField
   FocusPanel keyboardFocus;
-  @UiField
-  FlowPanel versionActionsPanel;
   private DescriptiveMetadataVersions descriptiveMetadataVersions;
   private String selectedVersion = null;
   private boolean aipLocked;
@@ -216,38 +215,31 @@ public class DescriptiveMetadataHistory extends Composite {
     keyboardFocus.addStyleName("browse");
 
     init();
+    initVersionActions();
+  }
 
-    actionsToolbar.setLabel(messages.historyDescriptiveMetadataTitle());
+  private void initVersionActions() {
     actionsToolbar.setTagsVisible(false);
+    actionsToolbar.setLabelVisible(false);
 
-    if (PermissionClientUtils.hasPermissions(descriptiveMetadataVersions.getPermissions(),
-      RodaConstants.PERMISSION_METHOD_REVERT_DESCRIPTIVE_METADATA_VERSION)) {
+    FlowPanel actions = new FlowPanel();
+    actions.addStyleName("groupedActionableMenu");
 
-      Button revertBtn = new Button(messages.revertButton());
-      revertBtn.addStyleName("btn btn-play mr-10");
-      revertBtn.addStyleName("btn-separator-right");
-      revertBtn.addClickHandler(event -> revertSelectedVersion());
-
-      versionActionsPanel.add(revertBtn);
+    if (canRevert()) {
+      addVersionAction(actions,
+        createVersionActionButton(messages.revertButton(),
+          "actionable-button actionable-button-updated actionable-button-label btn-play",
+          event -> revertSelectedVersion()));
     }
 
-    if (PermissionClientUtils.hasPermissions(descriptiveMetadataVersions.getPermissions(),
-      RodaConstants.PERMISSION_METHOD_DELETE_DESCRIPTIVE_METADATA_VERSION)) {
-
-      Button removeBtn = new Button(messages.removeButton());
-      removeBtn.addStyleName("btn btn-ban btn-danger");
-      removeBtn.addStyleName("btn-separator-right");
-      removeBtn.addClickHandler(event -> removeSelectedVersion());
-
-      versionActionsPanel.add(removeBtn);
+    if (canRemove()) {
+      addVersionAction(actions,
+        createVersionActionButton(messages.descriptiveHistoryRemoveVersionButton(),
+          "actionable-button actionable-button-destroyed actionable-button-label btn-ban",
+          event -> removeSelectedVersion()));
     }
 
-    Button cancelBtn = new Button(messages.cancelButton());
-    cancelBtn.addStyleName("btn");
-    cancelBtn.addStyleName("btn-link");
-
-    cancelBtn.addClickHandler(event -> cancel());
-    versionActionsPanel.add(cancelBtn);
+    actionsToolbar.setActionableMenu(actions);
   }
 
   private void init() {
@@ -341,14 +333,6 @@ public class DescriptiveMetadataHistory extends Composite {
     }
 
     updateTabs();
-  }
-
-  private void cancel() {
-    if (representationId == null) {
-      HistoryUtils.newHistory(BrowseTop.RESOLVER, aipId);
-    } else {
-      HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
-    }
   }
 
   private void initTitle(IndexedAIP aip, TitlePanel title) {
@@ -557,6 +541,32 @@ public class DescriptiveMetadataHistory extends Composite {
       () -> new DescriptiveMetadataViewPanel(selectedVersion, false));
 
     tabsContainer.setWidget(versionTabs);
+  }
+
+  private boolean canRevert() {
+    return PermissionClientUtils.hasPermissions(descriptiveMetadataVersions.getPermissions(),
+      RodaConstants.PERMISSION_METHOD_REVERT_DESCRIPTIVE_METADATA_VERSION);
+  }
+
+  private boolean canRemove() {
+    return PermissionClientUtils.hasPermissions(descriptiveMetadataVersions.getPermissions(),
+      RodaConstants.PERMISSION_METHOD_DELETE_DESCRIPTIVE_METADATA_VERSION);
+  }
+
+  private Button createVersionActionButton(String label, String style, ClickHandler handler) {
+    Button button = new Button(label);
+    button.addStyleName(style);
+    button.addClickHandler(handler);
+    return button;
+  }
+
+  private void addVersionAction(FlowPanel actions, Button button) {
+    if (actions.getWidgetCount() > 0) {
+      SimplePanel divider = new SimplePanel();
+      divider.addStyleName("verticalDivider");
+      actions.add(divider);
+    }
+    actions.add(button);
   }
 
   interface MyUiBinder extends UiBinder<Widget, DescriptiveMetadataHistory> {
