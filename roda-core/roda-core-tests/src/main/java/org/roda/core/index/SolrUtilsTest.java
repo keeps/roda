@@ -46,6 +46,7 @@ import org.roda.core.data.v2.index.filter.LikeFilterParameter;
 import org.roda.core.data.v2.index.filter.LongRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.filter.TextToVectorFilterParameter;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.index.utils.SolrUtils;
@@ -260,6 +261,40 @@ public class SolrUtilsTest {
       assertTrue(stringFilter.isEmpty());
     } catch (RequestNotValidException e) {
       // do nothing as it was expected
+    }
+  }
+
+  @Test
+  public void testParserWithOneTextToVectorFilterParameter() {
+    try {
+      Filter filter = new Filter();
+      filter.add(
+        new TextToVectorFilterParameter(RodaConstants.INDEX_EMBEDDING_VECTOR, "iraqi ministry of defence meeting",
+          "roda-embedding-model", 10));
+      String stringFilter = SolrUtils.parseFilter(filter);
+      assertNotNull(stringFilter);
+      assertEquals(String.format("({!knn_text_to_vector model=%s f=%s topK=%d}%s)", "roda-embedding-model",
+        RodaConstants.INDEX_EMBEDDING_VECTOR, 10, "iraqi ministry of defence meeting"), stringFilter);
+    } catch (RODAException e) {
+      Assert.fail("An exception was not expected!");
+    }
+  }
+
+  @Test
+  public void testParserWithTextToVectorAndSimpleFilterParameter() {
+    try {
+      Filter filter = new Filter();
+      filter.add(new TextToVectorFilterParameter(RodaConstants.INDEX_EMBEDDING_VECTOR, "meeting minutes",
+        "roda-embedding-model", 5));
+      filter.add(new SimpleFilterParameter(RodaConstants.INDEX_SEARCH, FONDS));
+      String stringFilter = SolrUtils.parseFilter(filter);
+      assertNotNull(stringFilter);
+      assertEquals(
+        String.format("({!knn_text_to_vector model=%s f=%s topK=%d}%s) AND (%s:\"%s\")", "roda-embedding-model",
+          RodaConstants.INDEX_EMBEDDING_VECTOR, 5, "meeting minutes", RodaConstants.INDEX_SEARCH, FONDS),
+        stringFilter);
+    } catch (RODAException e) {
+      Assert.fail("An exception was not expected!");
     }
   }
 

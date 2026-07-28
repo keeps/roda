@@ -39,12 +39,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
   @JsonSubTypes.Type(value = AndFiltersParameters.class, name = "AndFiltersParameters"),
   @JsonSubTypes.Type(value = AllFilterParameter.class, name = "AllFilterParameter"),
   @JsonSubTypes.Type(value = ParentWhichFilterParameter.class, name = "ParentWhichFilterParameter"),
-  @JsonSubTypes.Type(value = ChildOfFilterParameter.class, name = "ChildOfFilterParameter"),})
+  @JsonSubTypes.Type(value = ChildOfFilterParameter.class, name = "ChildOfFilterParameter"),
+  @JsonSubTypes.Type(value = TextToVectorFilterParameter.class, name = "TextToVectorFilterParameter"),})
 @Schema(type = "object", subTypes = {BasicSearchFilterParameter.class, EmptyKeyFilterParameter.class,
   LikeFilterParameter.class, NotSimpleFilterParameter.class, OneOfManyFilterParameter.class,
   DateIntervalFilterParameter.class, DateRangeFilterParameter.class, LongRangeFilterParameter.class,
   StringRangeFilterParameter.class, SimpleFilterParameter.class, OrFiltersParameters.class, AndFiltersParameters.class,
-  AllFilterParameter.class, ParentWhichFilterParameter.class, ChildOfFilterParameter.class}, discriminatorMapping = {
+  AllFilterParameter.class, ParentWhichFilterParameter.class, ChildOfFilterParameter.class,
+  TextToVectorFilterParameter.class}, discriminatorMapping = {
     @DiscriminatorMapping(value = "BasicSearchFilterParameter", schema = BasicSearchFilterParameter.class),
     @DiscriminatorMapping(value = "LikeFilterParameter", schema = LikeFilterParameter.class),
     @DiscriminatorMapping(value = "NotSimpleFilterParameter", schema = NotSimpleFilterParameter.class),
@@ -58,7 +60,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
     @DiscriminatorMapping(value = "AndFiltersParameters", schema = AndFiltersParameters.class),
     @DiscriminatorMapping(value = "AllFilterParameter", schema = AllFilterParameter.class),
     @DiscriminatorMapping(value = "ParentWhichFilterParameter", schema = ParentWhichFilterParameter.class),
-    @DiscriminatorMapping(value = "ChildOfFilterParameter", schema = ChildOfFilterParameter.class)}, discriminatorProperty = "type")
+    @DiscriminatorMapping(value = "ChildOfFilterParameter", schema = ChildOfFilterParameter.class),
+    @DiscriminatorMapping(value = "TextToVectorFilterParameter",
+      schema = TextToVectorFilterParameter.class)}, discriminatorProperty = "type")
 public abstract class FilterParameter implements Serializable {
   @Serial
   private static final long serialVersionUID = 3744111668897879761L;
