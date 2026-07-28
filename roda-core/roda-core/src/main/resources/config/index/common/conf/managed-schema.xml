@@ -1053,7 +1053,7 @@
          core.index.embedding.dimensions - changing the embedding model after documents have
          been vectorized requires reindexing/re-vectorizing all documents.
          Vectors are populated by an external service on an asynchronous second pass, not by
-         RODA itself - see roda-mcp/PLAN.md. -->
+         RODA itself. -->
     <fieldType name="knn_vector" class="solr.DenseVectorField" vectorDimension="768" similarityFunction="cosine" knnAlgorithm="hnsw" />
 
 

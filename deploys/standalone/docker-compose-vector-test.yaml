@@ -1,5 +1,5 @@
-# Minimal stack for live-testing Solr text-to-vector semantic search
-# (see roda-mcp/PLAN.md). Brings up just ZooKeeper + Solr (with the
+# Minimal stack for live-testing Solr text-to-vector semantic search.
+# Brings up just ZooKeeper + Solr (with the
 # language-models module enabled) + PostgreSQL - enough for RODA to bootstrap
 # its schema (incl. registering the text-to-vector model against an external
 # embedding API) without the full docker-compose-dev.yaml stack.

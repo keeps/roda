@@ -77,8 +77,7 @@
   <!-- language-models module: provides text-to-vector query/index-time vectorization
        calling out to an external embedding API via LangChain4j. Requires the module to
        also be enabled on the Solr node (SOLR_MODULES=language-models). See
-       https://solr.apache.org/guide/solr/latest/query-guide/text-to-vector.html
-       and roda-mcp/PLAN.md for the overall design. -->
+       https://solr.apache.org/guide/solr/latest/query-guide/text-to-vector.html -->
   <lib dir="${solr.install.dir:../../../..}/modules/language-models/lib" regex=".*\.jar" />
 
   <!-- an exact 'path' can be used instead of a 'dir' to specify a

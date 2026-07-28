@@ -135,9 +135,8 @@ public class SolrBootstrapUtils {
    * text-to-vector search, so that {@code {!knn_text_to_vector model=...}}
    * queries can resolve it. This only wires up query-time vectorization -
    * index-time vectors are written by an external enrichment service, not by
-   * RODA (see roda-mcp/PLAN.md). Best-effort: semantic search is an optional
-   * feature, so failures here are logged but must not prevent RODA from
-   * starting.
+   * RODA. Best-effort: semantic search is an optional feature, so failures
+   * here are logged but must not prevent RODA from starting.
    */
   private static void registerTextToVectorModel(SolrClient client, String collectionName) {
     boolean enabled = Boolean
