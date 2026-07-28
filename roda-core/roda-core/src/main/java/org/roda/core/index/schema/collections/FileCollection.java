@@ -116,6 +116,12 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
     fields.add(new Field(RodaConstants.INGEST_UPDATE_JOB_IDS, Field.TYPE_STRING).setMultiValued(true));
     fields.add(new Field(RodaConstants.FILE_CREATED_ON, Field.TYPE_DATE));
 
+    // Semantic search: vector is populated by an external enrichment service on an
+    // asynchronous second pass, not by RODA (see roda-mcp/PLAN.md). vectorized_b lets
+    // that service find documents still awaiting vectorization.
+    fields.add(new Field(RodaConstants.INDEX_EMBEDDING_VECTOR, Field.TYPE_KNN_VECTOR).setStored(false));
+    fields.add(new Field(RodaConstants.INDEX_VECTORIZED, Field.TYPE_BOOLEAN).setDefaultValue("false"));
+
     return fields;
   }
 

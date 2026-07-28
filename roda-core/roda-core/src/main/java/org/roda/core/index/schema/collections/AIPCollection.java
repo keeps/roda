@@ -129,6 +129,12 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
 
     fields.add(SolrCollection.getSortFieldOf(RodaConstants.AIP_TITLE));
 
+    // Semantic search: vector is populated by an external enrichment service on an
+    // asynchronous second pass, not by RODA (see roda-mcp/PLAN.md). vectorized_b lets
+    // that service find documents still awaiting vectorization.
+    fields.add(new Field(RodaConstants.INDEX_EMBEDDING_VECTOR, Field.TYPE_KNN_VECTOR).setStored(false));
+    fields.add(new Field(RodaConstants.INDEX_VECTORIZED, Field.TYPE_BOOLEAN).setDefaultValue("false"));
+
     return fields;
   }
 

@@ -101,7 +101,7 @@ Given that, RODA's changes are limited to:
    (`roda-core/roda-core/src/main/java/org/roda/core/index/schema/SolrBootstrapUtils.java:71-123`)
    to perform this registration automatically from new `core.index.embedding.*` properties
    (base URL, model name, dimension).
-3. **New Solr fields** on `AIPCollection`/`FileCollection`
+3. **New Solr fields** on `AIPCollection`/`RepresentationCollection`/`FileCollection`
    (`roda-core/roda-core/src/main/java/org/roda/core/index/schema/collections/`): the
    vector field itself, and a `vectorized_b` boolean flag the external enrichment service
    can query (`fq=vectorized_b:false`) to find unvectorized documents. This is the same
@@ -124,6 +124,33 @@ Ranking strategy (pure top-K filter vs. blending into relevance scoring for true
 BM25+vector ranking) needs empirical tuning against a live Solr instance with real data.
 Ship as a hard top-K filter first (composes cleanly with structured filters, which is what
 the target use case needs); revisit hybrid ranking once there's a corpus to test against.
+
+### Live-tested
+
+Validated end-to-end against `deploys/standalone/docker-compose-vector-test.yaml`
+(ZooKeeper + Solr with `language-models` enabled + PostgreSQL) and a real OpenAI-compatible
+embedding server (`nomic-ai/nomic-embed-text-v1.5`, 768 dimensions — matches the schema
+default). A semantic query using vocabulary that did not overlap with the indexed text
+("notes from talks with Iraq's defense authorities about rebuilding") correctly ranked a
+document about "Minutes of Meeting with the Iraqi Ministry of Defence" far above two
+unrelated documents (score 0.886 vs. 0.72/0.719), confirming real semantic (not keyword)
+matching through `{!knn_text_to_vector}`.
+
+Two real bugs were found and fixed during this test:
+
+- `GenericSolrRequest` needs `setRequiresCollection(true)` — without it, `SolrBootstrapUtils`
+  PUT the model to `/solr/schema/text-to-vector-model-store` (missing the collection
+  segment) instead of `/solr/{collection}/schema/text-to-vector-model-store`, failing with
+  HTTP 405.
+- LangChain4j's `OpenAiEmbeddingModel` rejects a null/absent `apiKey` even against
+  auth-free local servers — `SolrBootstrapUtils` now always sends a value (a placeholder
+  when none is configured).
+
+Also worth knowing for whoever implements the external enrichment service: this particular
+embedding server (vLLM-served) silently drops the POST body when a client attempts an
+HTTP/2 cleartext upgrade (Java's `HttpClient` does this by default), returning a confusing
+"field required" error. Forcing HTTP/1.1 on the client resolved it — worth checking for
+if an enrichment service built against a similar server sees unexplained 400s.
 
 **Explicitly out of scope for this repository:** the external service that finds
 unvectorized documents and writes vectors back via atomic Solr updates. RODA's only
