@@ -22,6 +22,7 @@ import javax.crypto.SecretKey;
 import org.apache.commons.lang3.StringUtils;
 import org.apereo.cas.client.authentication.AttributePrincipal;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.CryptographyUtils;
 import org.roda.core.common.JwtUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.SecureString;
@@ -425,7 +426,7 @@ public class MembersController implements MembersRestService, Exportable {
       claims = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
       User user = RodaCoreFactory.getModelService().retrieveUser(claims.getSubject());
       AccessKeys accessKeys = RodaCoreFactory.getModelService().listAccessKeys();
-      AccessKey retAccessKey = accessKeys.getAccessKeyByKey(token);
+      AccessKey retAccessKey = accessKeys.getAccessKeyByKey(CryptographyUtils.hashTokenSHA256(token));
       if (retAccessKey != null) {
         AccessToken accessToken = new AccessToken();
         Date expirationDate = new Date(new Date().getTime() + RodaCoreFactory.getAccessTokenValidity());
