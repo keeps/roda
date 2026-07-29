@@ -460,7 +460,8 @@ public class MembersController implements MembersRestService, Exportable {
       }
 
       AccessKey accessKey = RodaCoreFactory.getModelService().retrieveAccessKey(id);
-      accessKey.setKey(JwtUtils.generateToken(accessKey.getName(), regenerateAccessKeyRequest.getExpirationDate()));
+      accessKey
+        .setKey(JwtUtils.generateToken(accessKey.getUserName(), regenerateAccessKeyRequest.getExpirationDate()));
       return RodaCoreFactory.getModelService().updateAccessKey(accessKey, requestContext.getUser().getName());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
