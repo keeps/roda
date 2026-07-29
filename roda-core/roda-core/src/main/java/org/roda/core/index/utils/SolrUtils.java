@@ -1091,9 +1091,19 @@ public class SolrUtils {
   private static void appendTextToVector(StringBuilder ret, TextToVectorFilterParameter parameter,
     boolean prefixWithANDOperatorIfBuilderNotEmpty) {
     appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
+    // The query text is passed via the "v" local param (quoted) rather than as trailing
+    // text after the local params block. Trailing text is only unambiguous for a single
+    // word - as soon as the free-text query contains a space, the outer query parser
+    // (this clause is combined with others via AND/OR into one larger query string) can
+    // split on it and try to resolve the extra words against the default search field,
+    // which RODA doesn't define, causing "undefined field _text_".
     ret.append("({!knn_text_to_vector model=").append(parameter.getModel()).append(" f=")
-      .append(parameter.getField()).append(" topK=").append(parameter.getTopK()).append("}")
-      .append(parameter.getQuery()).append(")");
+      .append(parameter.getField()).append(" topK=").append(parameter.getTopK()).append(" v='")
+      .append(escapeSolrLocalParamValue(parameter.getQuery())).append("'})");
+  }
+
+  private static String escapeSolrLocalParamValue(String value) {
+    return value.replace("\\", "\\\\").replace("'", "\\'");
   }
 
   private static void appendExactMatch(StringBuilder ret, String key, String value, boolean appendDoubleQuotes,
