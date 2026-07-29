@@ -108,6 +108,7 @@ import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.OrFiltersParameters;
 import org.roda.core.data.v2.index.filter.ParentWhichFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.filter.TextToVectorFilterParameter;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
@@ -1022,6 +1023,8 @@ public class SolrUtils {
       appendBlockJoinFilterParameter(ret, nestParentFilterParameter, prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof ChildOfFilterParameter nestChildOfFilterParameter) {
       appendBlockJoinChildrenFilterParameter(ret, nestChildOfFilterParameter, prefixWithANDOperatorIfBuilderNotEmpty);
+    } else if (parameter instanceof TextToVectorFilterParameter param) {
+      appendTextToVector(ret, param, prefixWithANDOperatorIfBuilderNotEmpty);
     } else {
       LOGGER.error("Unsupported filter parameter class: {}", parameter.getClass().getName());
       throw new RequestNotValidException("Unsupported filter parameter class: " + parameter.getClass().getName());
@@ -1076,6 +1079,31 @@ public class SolrUtils {
     if (prefixWithOROperatorIfBuilderNotEmpty && !ret.isEmpty()) {
       ret.append(" OR ");
     }
+  }
+
+  /**
+   * Renders a semantic-search clause vectorizing {@code parameter.getQuery()} at
+   * query time via Solr's {@code knn_text_to_vector} query parser (see
+   * https://solr.apache.org/guide/solr/latest/query-guide/text-to-vector.html),
+   * restricting results to the top-K nearest neighbours of the target
+   * {@code knn_vector} field.
+   */
+  private static void appendTextToVector(StringBuilder ret, TextToVectorFilterParameter parameter,
+    boolean prefixWithANDOperatorIfBuilderNotEmpty) {
+    appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
+    // The query text is passed via the "v" local param (quoted) rather than as trailing
+    // text after the local params block. Trailing text is only unambiguous for a single
+    // word - as soon as the free-text query contains a space, the outer query parser
+    // (this clause is combined with others via AND/OR into one larger query string) can
+    // split on it and try to resolve the extra words against the default search field,
+    // which RODA doesn't define, causing "undefined field _text_".
+    ret.append("({!knn_text_to_vector model=").append(parameter.getModel()).append(" f=")
+      .append(parameter.getField()).append(" topK=").append(parameter.getTopK()).append(" v='")
+      .append(escapeSolrLocalParamValue(parameter.getQuery())).append("'})");
+  }
+
+  private static String escapeSolrLocalParamValue(String value) {
+    return value.replace("\\", "\\\\").replace("'", "\\'");
   }
 
   private static void appendExactMatch(StringBuilder ret, String key, String value, boolean appendDoubleQuotes,

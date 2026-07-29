@@ -74,6 +74,12 @@
     -->
   <!-- <lib dir="${solr.install.dir:../../../..}/modules/ltr/lib" regex=".*\.jar" /> -->
 
+  <!-- language-models module: provides text-to-vector query/index-time vectorization
+       calling out to an external embedding API via LangChain4j. Requires the module to
+       also be enabled on the Solr node (SOLR_MODULES=language-models). See
+       https://solr.apache.org/guide/solr/latest/query-guide/text-to-vector.html -->
+  <lib dir="${solr.install.dir:../../../..}/modules/language-models/lib" regex=".*\.jar" />
+
   <!-- an exact 'path' can be used instead of a 'dir' to specify a
        specific jar file.  This will cause a serious error to be logged
        if it can't be loaded.
@@ -1101,6 +1107,12 @@
   <!--
      <queryParser name="myparser" class="com.mycompany.MyQParserPlugin"/>
     -->
+
+  <!-- Vectorizes free-text query strings on the fly using the model registered via
+       PUT /schema/text-to-vector-model-store (see SolrBootstrapUtils), then runs a KNN
+       search against a knn_vector field. Used by TextToVectorFilterParameter, e.g.:
+       {!knn_text_to_vector model=<solr_model> f=embedding_vector topK=10}free text query -->
+  <queryParser name="knn_text_to_vector" class="org.apache.solr.languagemodels.textvectorisation.search.TextToVectorQParserPlugin"/>
 
   <!-- Function Parsers
 
