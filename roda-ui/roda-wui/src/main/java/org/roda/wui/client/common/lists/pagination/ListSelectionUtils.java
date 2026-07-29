@@ -62,6 +62,12 @@ public class ListSelectionUtils {
 
   private static final Map<String, ListSelectionState<?>> clipboard = new HashMap<>();
 
+  private static boolean ignoreNextSelection = false;
+
+  public static void setIgnoreNextSelection(boolean ignore) {
+    ignoreNextSelection = ignore;
+  }
+
   static {
     loadClipboardOnStorage();
   }
@@ -261,6 +267,15 @@ public class ListSelectionUtils {
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
+
+        // 1. Check if we flagged this selection to be ignored (from Ctrl+Click)
+        if (ignoreNextSelection) {
+          ignoreNextSelection = false; // Reset the flag
+          list.clearSelected();        // Clear visual selection
+          return;                      // Abort normal navigation
+        }
+
+        // 2. Normal execution (no modifiers)
         ListSelectionState<T> selectionState = list.getListSelectionState();
 
         if (selectionState != null) {

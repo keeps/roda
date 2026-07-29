@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+import com.google.gwt.dom.client.NativeEvent;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.FindRequest;
@@ -390,6 +391,28 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     addAutoUpdateControlListener();
 
     if (options.isBindOpener()) {
+      display.addCellPreviewHandler(event -> {
+        NativeEvent nativeEvent = event.getNativeEvent();
+        if ("click".equals(nativeEvent.getType())) {
+          // Check for Ctrl (Windows/Linux) or Meta (Mac Cmd) key
+          if (nativeEvent.getCtrlKey() || nativeEvent.getMetaKey()) {
+
+            // Prevent browser defaults
+            nativeEvent.preventDefault();
+            nativeEvent.stopPropagation();
+
+            // --- SET THE FLAG HERE ---
+            // Tell the selection handler to ignore this click
+            ListSelectionUtils.setIgnoreNextSelection(true);
+
+            T object = event.getValue();
+            if (object != null) {
+              HistoryUtils.resolveInNewTab(object);
+            }
+          }
+        }
+      });
+
       ListSelectionUtils.bindBrowseOpener(this);
     }
 

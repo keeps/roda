@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.gwt.core.client.GWT;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
@@ -71,8 +72,6 @@ public class HistoryUtils {
   public static final String HISTORY_SEP_REGEX = "/";
   public static final String HISTORY_SEP_ESCAPE = "%2F";
   public static final String HISTORY_PERMISSION_SEP = ".";
-
-  private static boolean USING_PORTAL_UI = false;
   public static final HistoryResolver UUID_RESOLVER = new HistoryResolver() {
 
     @Override
@@ -100,6 +99,7 @@ public class HistoryUtils {
       return new ArrayList<>();
     }
   };
+  private static boolean USING_PORTAL_UI = false;
 
   private HistoryUtils() {
     // do nothing
@@ -363,7 +363,18 @@ public class HistoryUtils {
   }
 
   public static <T extends IsIndexed> void resolve(T object, boolean replace) {
-    List<String> path = null;
+    List<String> path = createHistoryToken(object);
+    if (path != null) {
+      if (replace) {
+        HistoryUtils.replaceHistory(path);
+      } else {
+        HistoryUtils.newHistory(path);
+      }
+    }
+  }
+
+  private static <T extends IsIndexed> List<String> createHistoryToken(T object) {
+    List<String> path = new ArrayList<>();
 
     if (object instanceof IndexedAIP) {
       IndexedAIP aip = (IndexedAIP) object;
@@ -408,16 +419,16 @@ public class HistoryUtils {
       path = HistoryUtils.getHistory(jobPath, ShowJobReport.RESOLVER.getHistoryToken(), report.getUUID());
     } else if (object instanceof RODAMember) {
       RODAMember member = (RODAMember) object;
-      HistoryUtils.newHistory(ShowMember.RESOLVER, member.getUUID());
+      path = HistoryUtils.getHistory(ShowMember.RESOLVER, member.getUUID());
     } else if (object instanceof IndexedPreservationAgent) {
       IndexedPreservationAgent agent = (IndexedPreservationAgent) object;
-      HistoryUtils.newHistory(ShowPreservationAgent.RESOLVER, agent.getId());
+      path = HistoryUtils.getHistory(ShowPreservationAgent.RESOLVER, agent.getId());
     } else if (object instanceof IndexedPreservationEvent) {
       IndexedPreservationEvent preservationEvent = (IndexedPreservationEvent) object;
       path = HistoryUtils.getHistory(ShowPreservationEvent.RESOLVER.getHistoryPath(), preservationEvent.getId());
     } else if (object instanceof LogEntry) {
       LogEntry logEntry = (LogEntry) object;
-      HistoryUtils.newHistory(ShowLogEntry.RESOLVER, logEntry.getUUID());
+      path = HistoryUtils.getHistory(ShowLogEntry.RESOLVER, logEntry.getUUID());
     } else if (object instanceof DisposalConfirmation) {
       DisposalConfirmation confirmationMetadata = (DisposalConfirmation) object;
       path = HistoryUtils.getHistory(ShowDisposalConfirmation.RESOLVER.getHistoryPath(),
@@ -435,17 +446,19 @@ public class HistoryUtils {
       Toast.showError("Resolve of class not supported: " + object.getClass().getName());
     }
 
-    if (path != null) {
-      if (replace) {
-        HistoryUtils.replaceHistory(path);
-      } else {
-        HistoryUtils.newHistory(path);
-      }
-    }
+    return path;
   }
 
   public static List<String> getHistoryUuidResolver(String objectClass, String objectUUID) {
     return Arrays.asList(UUID_RESOLVER.getHistoryToken(), objectClass, objectUUID);
   }
 
+  public static <T extends IsIndexed> void resolveInNewTab(T object) {
+    // Generate the fragment/token you normally pass to History.newItem()
+    List<String> historyToken = createHistoryToken(object);
+
+    // Open in a new tab
+    com.google.gwt.user.client.Window
+      .open(com.google.gwt.user.client.Window.Location.getPath() + createHistoryHashLink(historyToken), "_blank", "");
+  }
 }
