@@ -1,5 +1,38 @@
 # Changelog
 
+## v6.3.0 (03/08/2026)
+### :warning: Breaking Changes
+RODA 6.3.0 onwards will use Apache Solr 10 as indexing system. If you have an existing RODA implementation with Solr 9 you will need to [upgrade the Solr to version 10](https://solr.apache.org/guide/solr/latest/upgrade-notes/major-changes-in-solr-10.html) and then rebuild all indexes on RODA.
+
+#### New features
+- Upgrade to Solr 10
+- Use Spring 7 and Spring-boot 4
+- Add translation strings to RODA plugins
+- Added configuration for inventory report checksum algorithms (#3685)
+- Add flyway to manage the PostgreSQL database (45c9fb04db23c4543317f58f9e7aec79003614e2)
+ 
+#### Enhancements
+
+- Updated design and improved accessibility (#3395)
+- Allow users to open list items in a new tab using the control key plus clicking the item (e37c151c18b3f13e611f67b4e23e4ad3a8fc9fdb)
+
+#### Bug fixes
+
+- Descriptive metadata edit form not showing (#3525)
+- Fix regenerateAccessKey putting the wrong subject in the JWT (#3708)
+- Removed duplicated objectCharacteristics on file premis (#3702)
+- Fix empty preservationLevelValue (#3694)
+- Fix false positive results when running File Integrity Verifier plugin on historic AIPs
+- Fix problem affecting creating a disposal confirmation with more AIPs than the orchestrator batch size (11b4aca35b849d7819d2ddf7c4da8194fcaf043c)
+- Fix historical date timezone; replace descriptiveMetadata and advanced search DateBox with HTML5 date input for civil dates for RODA 6. (#3688)
+
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v6.2.1 (22/07/2026)
 #### Security
 - Several dependency major upgrades to fix security vulnerabilities
@@ -374,19 +407,6 @@ To try out this version, check the [install instructions](https://github.com/kee
 #### Bug fixes
 
 - Revert webjars-locator functionality
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
-## v5.6.2 (22/05/2024)
-#### Bug fixes
-
-- Base roda overwrites the configuration regarding user permissions in roda-config.properties #3189
-
-#### Security
-- Dependency major upgrades to fix security vulnerabilities
 
 ---
 
