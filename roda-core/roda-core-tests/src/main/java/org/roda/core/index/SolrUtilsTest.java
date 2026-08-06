@@ -266,15 +266,16 @@ public class SolrUtilsTest {
 
   @Test
   public void testParserWithOneTextToVectorFilterParameter() {
+    String queryStr = "hello world query";
     try {
       Filter filter = new Filter();
       filter.add(
-        new TextToVectorFilterParameter(RodaConstants.INDEX_EMBEDDING_VECTOR, "iraqi ministry of defence meeting",
+        new TextToVectorFilterParameter(RodaConstants.INDEX_EMBEDDING_VECTOR, queryStr,
           "roda-embedding-model", 10));
       String stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
-      assertEquals(String.format("({!knn_text_to_vector model=%s f=%s topK=%d}%s)", "roda-embedding-model",
-        RodaConstants.INDEX_EMBEDDING_VECTOR, 10, "iraqi ministry of defence meeting"), stringFilter);
+      assertEquals(String.format("({!knn_text_to_vector model=%s f=%s topK=%d v='%s'})", "roda-embedding-model",
+        RodaConstants.INDEX_EMBEDDING_VECTOR, 10, queryStr), stringFilter);
     } catch (RODAException e) {
       Assert.fail("An exception was not expected!");
     }
@@ -282,16 +283,17 @@ public class SolrUtilsTest {
 
   @Test
   public void testParserWithTextToVectorAndSimpleFilterParameter() {
+    String queryStr = "hello world query";
     try {
       Filter filter = new Filter();
-      filter.add(new TextToVectorFilterParameter(RodaConstants.INDEX_EMBEDDING_VECTOR, "meeting minutes",
+      filter.add(new TextToVectorFilterParameter(RodaConstants.INDEX_EMBEDDING_VECTOR, queryStr,
         "roda-embedding-model", 5));
       filter.add(new SimpleFilterParameter(RodaConstants.INDEX_SEARCH, FONDS));
       String stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
       assertEquals(
-        String.format("({!knn_text_to_vector model=%s f=%s topK=%d}%s) AND (%s:\"%s\")", "roda-embedding-model",
-          RodaConstants.INDEX_EMBEDDING_VECTOR, 5, "meeting minutes", RodaConstants.INDEX_SEARCH, FONDS),
+        String.format("({!knn_text_to_vector model=%s f=%s topK=%d v='%s'}) AND (%s:\"%s\")", "roda-embedding-model",
+          RodaConstants.INDEX_EMBEDDING_VECTOR, 5, queryStr, RodaConstants.INDEX_SEARCH, FONDS),
         stringFilter);
     } catch (RODAException e) {
       Assert.fail("An exception was not expected!");
