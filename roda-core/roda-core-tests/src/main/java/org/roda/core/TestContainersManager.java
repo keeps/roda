@@ -76,6 +76,7 @@ public class TestContainersManager {
 
     solr = new GenericContainer<>(DockerImageName.parse("solr:10.0.0")).withNetwork(network)
             .withExposedPorts(externalSolrPort)
+            .withEnv("SOLR_MODULES", "language-models")
             .withEnv("ZK_HOST", "zookeeper:2181")
             .withEnv("SOLR_HOST", dockerHostIp)
             .withEnv("SOLR_OPTS", "-Dhost=" + dockerHostIp)
