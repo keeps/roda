@@ -132,6 +132,13 @@ public class StorageServiceWrapper implements StorageService {
   }
 
   @Override
+  public Binary createBinaryIfNotExists(StoragePath storagePath, ContentPayload payload, boolean asReference)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+    return storageService.createBinaryIfNotExists(storagePath, payload, asReference);
+  }
+
+  @Override
   public Binary createRandomBinary(StoragePath parentStoragePath, ContentPayload payload, boolean asReference)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);

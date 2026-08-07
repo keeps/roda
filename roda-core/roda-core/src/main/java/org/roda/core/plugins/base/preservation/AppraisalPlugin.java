@@ -136,7 +136,7 @@ public class AppraisalPlugin extends AbstractPlugin<AIP> {
       LinkingIdentifier linkingIdentifierAgent = new LinkingIdentifier();
       String userAgentId;
       try {
-        PreservationMetadata pm = PremisV3Utils.createOrUpdatePremisUserAgentBinary(job.getUsername(), model, index,
+        PreservationMetadata pm = PremisV3Utils.createIfNotExistsPremisUserAgentBinary(job.getUsername(), model, index,
           true, job.getJobUsersDetails());
         linkingIdentifierAgent.setValue(pm.getId());
       } catch (AlreadyExistsException e) {
