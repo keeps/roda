@@ -245,6 +245,22 @@ public class TransactionalModelOperationRegistry {
     return registerOperationForPreservationMetadata(aipID, representationId, path, fileID, preservationID, operation);
   }
 
+  public List<TransactionalModelOperationLog> registerCreateIfNotExistsOperationForPreservationMetadata(String aipID,
+    String representationId, List<String> path, String fileID, String preservationID,
+    PreservationMetadata.PreservationMetadataType type) throws RequestNotValidException, AlreadyExistsException, GenericException {
+    OperationType operation = OperationType.OPTIMISTIC_CREATE_IF_NOT_EXISTS;
+
+    if (preservationID == null) {
+      preservationID = IdUtils.getPreservationId(type, aipID, representationId, path, fileID,
+          RODAInstanceUtils.getLocalInstanceIdentifier());
+    }
+
+    if (aipID == null) {
+      acquireLockAndCheckPreconditions(PreservationMetadata.class, preservationID, operation);
+    }
+    return registerOperationForPreservationMetadata(aipID, representationId, path, fileID, preservationID, operation);
+  }
+
   public List<TransactionalModelOperationLog> registerReadOperationForPreservationMetadata(String aipID,
     String representationId, List<String> path, String fileID, String preservationID,
     PreservationMetadata.PreservationMetadataType type) {
@@ -457,29 +473,41 @@ public class TransactionalModelOperationRegistry {
 
   private void acquireLockAndCheckPreconditions(Class<? extends IsRODAObject> clazz, String id, OperationType operation)
     throws AlreadyExistsException, RequestNotValidException, GenericException {
-    acquireLock(clazz, id, operation);
-    if (operation == OperationType.CREATE) {
+    if (operation == OperationType.OPTIMISTIC_CREATE_IF_NOT_EXISTS) {
       // Verify if the object already exists
       try {
         checkIfEntityExistsAndThrowException(clazz, id);
+        acquireLock(clazz, id, operation);
       } catch (AlreadyExistsException e) {
         LOGGER.debug(
-          "[transactionId:{}] Entity with ID {} already exists, cannot create a new one. Releasing lock and informing requester method.",
-          transaction.getId(), id);
-        releaseLock(clazz, id, operation);
-        throw e;
-      } catch (RequestNotValidException | GenericException e) {
-        LOGGER.error(
-          "[transactionId:{}] Error checking if entity with ID {} exists, releasing lock and informing requester method.",
-          transaction.getId(), id, e);
-        releaseLock(clazz, id, operation);
-        throw e;
+            "[transactionId:{}] Entity with ID {} already exists, will not create a new one. Lock not acquired.",
+            transaction.getId(), id, e);
       }
+    } else {
+      acquireLock(clazz, id, operation);
+      if (operation == OperationType.CREATE) {
+        // Verify if the object already exists
+        try {
+          checkIfEntityExistsAndThrowException(clazz, id);
+        } catch (AlreadyExistsException e) {
+          LOGGER.debug(
+              "[transactionId:{}] Entity with ID {} already exists, cannot create a new one. Releasing lock and informing requester method.",
+              transaction.getId(), id);
+          releaseLock(clazz, id, operation);
+          throw e;
+        } catch (RequestNotValidException | GenericException e) {
+          LOGGER.error(
+              "[transactionId:{}] Error checking if entity with ID {} exists, releasing lock and informing requester method.",
+              transaction.getId(), id, e);
+          releaseLock(clazz, id, operation);
+          throw e;
+        }
+      }
+      // Cannot check pre-conditions for UPDATE or DELETE operations, such as checking
+      // if the object exists in main storage, because some updates or deletes may
+      // only be on the scope of staging and due to previous CREATE operations in
+      // staging.
     }
-    // Cannot check pre-conditions for UPDATE or DELETE operations, such as checking
-    // if the object exists in main storage, because some updates or deletes may
-    // only be on the scope of staging and due to previous CREATE operations in
-    // staging.
   }
 
   private <T extends IsRODAObject> void acquireLock(Class<T> objectClass, String id, OperationType operation) {
@@ -487,8 +515,8 @@ public class TransactionalModelOperationRegistry {
       throw new IllegalArgumentException("[transactionId:" + transaction.getId() + "] Object ID cannot be null");
     }
 
-    if (operation == OperationType.READ) {
-      // DO NOT acquire lock for READ operation
+    if (operation == OperationType.READ || operation == OperationType.OPTIMISTIC_CREATE_IF_NOT_EXISTS) {
+      // DO NOT acquire lock for these operation types
       return;
     }
 
@@ -540,6 +568,11 @@ public class TransactionalModelOperationRegistry {
   public boolean isLockableClass(Class<? extends IsRODAObject> objectClass) {
     return AIP.class.isAssignableFrom(objectClass) || DIP.class.isAssignableFrom(objectClass)
       || LogEntry.class.isAssignableFrom(objectClass) || PreservationMetadata.class.isAssignableFrom(objectClass);
+  }
+
+  public boolean isLockingOperation(OperationType operationType) {
+    return !operationType.equals(OperationType.READ)
+      && !operationType.equals(OperationType.OPTIMISTIC_CREATE_IF_NOT_EXISTS);
   }
 
   public <T extends IsRODAObject> void checkIfEntityExistsAndThrowException(Class<T> objectClass, String... ids)

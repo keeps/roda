@@ -1596,9 +1596,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     // notify);
     // }
 
-    List<TransactionalModelOperationLog> operationLogs = operationRegistry
-      .registerCreateOperationForPreservationMetadata(null, null, null, null, id, type);
-
+    List<TransactionalModelOperationLog> operationLogs;
+    if (type.equals(PreservationMetadata.PreservationMetadataType.AGENT)) {
+      operationLogs = operationRegistry.registerCreateIfNotExistsOperationForPreservationMetadata(null, null, null,
+        null, id, type);
+    } else {
+      operationLogs = operationRegistry.registerCreateOperationForPreservationMetadata(null, null, null, null, id,
+        type);
+    }
     try {
       PreservationMetadata ret = getModelService().createPreservationMetadata(type, id, payload, notify);
       operationRegistry.updateOperationState(operationLogs, OperationState.SUCCESS);
@@ -4539,14 +4544,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public void commit() throws RODATransactionException {
     for (TransactionalModelOperationLog modelOperation : transactionLogService
       .getModelOperations(transaction.getId())) {
-      LiteRODAObject liteRODAObject = new LiteRODAObject(modelOperation.getLiteObject());
-      OptionalWithCause<Class<IsRODAObject>> isRODAObjectClassOptionalWithCause = LiteRODAObjectFactory
-        .getClass(liteRODAObject);
+      if (operationRegistry.isLockingOperation(modelOperation.getOperationType())) {
+        LiteRODAObject liteRODAObject = new LiteRODAObject(modelOperation.getLiteObject());
+        OptionalWithCause<Class<IsRODAObject>> isRODAObjectClassOptionalWithCause = LiteRODAObjectFactory
+          .getClass(liteRODAObject);
 
-      if (isRODAObjectClassOptionalWithCause.isPresent()) {
-        Class<IsRODAObject> isRODAObjectClass = isRODAObjectClassOptionalWithCause.get();
-        if (operationRegistry.isLockableClass(isRODAObjectClass)) {
-          PluginHelper.releaseObjectLock(modelOperation.getLiteObject(), transaction.getRequestId().toString());
+        if (isRODAObjectClassOptionalWithCause.isPresent()) {
+          Class<IsRODAObject> isRODAObjectClass = isRODAObjectClassOptionalWithCause.get();
+          if (operationRegistry.isLockableClass(isRODAObjectClass)) {
+            PluginHelper.releaseObjectLock(modelOperation.getLiteObject(), transaction.getRequestId().toString());
+          }
         }
       }
     }

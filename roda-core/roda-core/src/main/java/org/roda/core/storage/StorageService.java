@@ -20,7 +20,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.transaction.RODATransactionException;
 
 /**
  * <p>
@@ -235,6 +234,23 @@ public interface StorageService {
    */
   Binary createBinary(StoragePath storagePath, ContentPayload payload, boolean asReference) throws GenericException,
     AlreadyExistsException, RequestNotValidException, AuthorizationDeniedException, NotFoundException;
+
+  /**
+   * Create a binary resource with a defined content, or do nothing if it already
+   * exists.
+   *
+   * @param storagePath
+   *          storage path that identifies the binary
+   * @param payload
+   *          the content payload
+   * @param asReference
+   *          create the binary as a reference to the real content, which is
+   *          managed externally. If false, content should be copied into the
+   *          storage service.
+   *
+   */
+  Binary createBinaryIfNotExists(StoragePath storagePath, ContentPayload payload, boolean asReference)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException;
 
   /**
    * Create a binary resource with a defined content with a generated id.
