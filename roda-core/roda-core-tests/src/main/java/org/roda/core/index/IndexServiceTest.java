@@ -32,6 +32,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.schema.SchemaRequest;
+import org.apache.solr.client.solrj.response.schema.SchemaResponse.FieldsResponse;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.hamcrest.collection.IsCollectionWithSize;
@@ -58,6 +60,7 @@ import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
@@ -811,5 +814,21 @@ public class IndexServiceTest {
     // check if none is repeated
     Set<String> set = new HashSet<>(results);
     Assert.assertEquals(results.size(), set.size());
+  }
+
+  @Test
+  public void testEmbeddingFieldsAbsentByDefault() throws Exception {
+    // core.index.embedding.enabled defaults to false: the AIP/File/Representation
+    // collections must not have the embedding_vector/vectorized_b fields declared.
+    for (String indexName : new String[] {SolrCollectionRegistry.getIndexName(IndexedAIP.class),
+      SolrCollectionRegistry.getIndexName(IndexedFile.class),
+      SolrCollectionRegistry.getIndexName(IndexedRepresentation.class)}) {
+      SchemaRequest.Fields fieldsRequest = new SchemaRequest.Fields();
+      FieldsResponse response = fieldsRequest.process(index.getSolrClient(), indexName);
+      Set<String> fieldNames = response.getFields().stream().map(f -> (String) f.get("name"))
+        .collect(Collectors.toSet());
+      MatcherAssert.assertThat(fieldNames, Matchers.not(Matchers.hasItem(RodaConstants.INDEX_EMBEDDING_VECTOR)));
+      MatcherAssert.assertThat(fieldNames, Matchers.not(Matchers.hasItem(RodaConstants.INDEX_VECTORIZED)));
+    }
   }
 }

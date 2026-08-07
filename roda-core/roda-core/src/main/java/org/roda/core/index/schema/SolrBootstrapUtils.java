@@ -10,6 +10,7 @@ package org.roda.core.index.schema;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -39,6 +40,8 @@ public class SolrBootstrapUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(SolrBootstrapUtils.class);
   private static final String TEXT_TO_VECTOR_MODEL_STORE_PATH = "/schema/text-to-vector-model-store";
   private static final String LANGCHAIN4J_OPENAI_MODEL_CLASS = "dev.langchain4j.model.openai.OpenAiEmbeddingModel";
+  private static final Set<String> EMBEDDING_FIELD_NAMES = Set.of(RodaConstants.INDEX_EMBEDDING_VECTOR,
+    RodaConstants.INDEX_VECTORIZED);
 
   private static Map<String, Field> getFields(SolrClient client, String collectionName) throws GenericException {
 
@@ -87,8 +90,21 @@ public class SolrBootstrapUtils {
     Map<String, DynamicField> dynamicFields = getDynamicFields(client, collection.getIndexName());
     Set<CopyField> copyFields = getCopyFields(client, collection.getIndexName());
 
+    boolean embeddingEnabled = Boolean
+      .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.CORE_INDEX_EMBEDDING_ENABLED));
+
+    // Semantic search (embedding_vector/vectorized_b) is opt-in: skip both fields
+    // entirely on bootstrap unless core.index.embedding.enabled=true, so fresh
+    // instances get no explicit vector schema fields by default. Filtering by
+    // name (not by Field.TYPE_KNN_VECTOR) is required: vectorized_b is a plain
+    // boolean field and wouldn't otherwise be caught by a type-based check, but
+    // both fields must be gated together. See registerTextToVectorModel below
+    // for the separately-gated query-time model registration.
+    List<Field> collectionFields = collection.getFields().stream()
+      .filter(f -> embeddingEnabled || !EMBEDDING_FIELD_NAMES.contains(f.getName())).collect(Collectors.toList());
+
     SchemaBuilder b = new SchemaBuilder();
-    collection.getFields().forEach(f -> {
+    collectionFields.forEach(f -> {
       if (!fields.containsKey(f.getName())) {
         b.addField(f);
       } else if (!fields.get(f.getName()).isEquivalentTo(f)) {
@@ -123,8 +139,7 @@ public class SolrBootstrapUtils {
       LOGGER.info("Collection {} is up to date", collection.getIndexName());
     }
 
-    boolean hasVectorField = collection.getFields().stream()
-      .anyMatch(f -> Field.TYPE_KNN_VECTOR.equals(f.getType()));
+    boolean hasVectorField = collectionFields.stream().anyMatch(f -> Field.TYPE_KNN_VECTOR.equals(f.getType()));
     if (hasVectorField) {
       registerTextToVectorModel(client, collection.getIndexName());
     }
