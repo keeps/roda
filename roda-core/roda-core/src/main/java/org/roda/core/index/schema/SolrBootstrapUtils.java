@@ -9,6 +9,8 @@ package org.roda.core.index.schema;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +44,9 @@ public class SolrBootstrapUtils {
   private static final String LANGCHAIN4J_OPENAI_MODEL_CLASS = "dev.langchain4j.model.openai.OpenAiEmbeddingModel";
   private static final Set<String> EMBEDDING_FIELD_NAMES = Set.of(RodaConstants.INDEX_EMBEDDING_VECTOR,
     RodaConstants.INDEX_VECTORIZED);
+  private static final String SOLRCONFIG_FILE_NAME = "solrconfig.xml";
+  private static final String EMBEDDING_BLOCK_BEGIN_MARKER = "<!-- RODA-EMBEDDING-BEGIN -->";
+  private static final String EMBEDDING_BLOCK_END_MARKER = "<!-- RODA-EMBEDDING-END -->";
 
   private static Map<String, Field> getFields(SolrClient client, String collectionName) throws GenericException {
 
@@ -199,6 +204,59 @@ public class SolrBootstrapUtils {
           + "language-models Solr module to be enabled, see docker-compose SOLR_MODULES)",
         solrModel, collectionName, e);
     }
+  }
+
+  /**
+   * Removes the text-to-vector {@code <lib>}/{@code <queryParser>} declarations
+   * (marked with RODA-EMBEDDING-BEGIN/END comments in solrconfig.xml) from the
+   * configset directory copied out of the classpath, unless
+   * core.index.embedding.enabled=true. Must run before the directory is
+   * uploaded to Zookeeper, otherwise every collection sharing this configset
+   * would require the language-models Solr module to be present, even when
+   * semantic search is disabled.
+   */
+  public static void pruneEmbeddingSolrConfigIfDisabled(Path configDirectory) throws GenericException {
+    boolean embeddingEnabled = Boolean
+      .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.CORE_INDEX_EMBEDDING_ENABLED));
+    if (embeddingEnabled) {
+      return;
+    }
+
+    Path solrConfigFile = configDirectory.resolve(SOLRCONFIG_FILE_NAME);
+    if (!Files.isRegularFile(solrConfigFile)) {
+      LOGGER.warn("Could not find {} under {} to prune embedding config", SOLRCONFIG_FILE_NAME, configDirectory);
+      return;
+    }
+
+    try {
+      String content = Files.readString(solrConfigFile, StandardCharsets.UTF_8);
+      String pruned = pruneEmbeddingBlocks(content);
+      if (!pruned.equals(content)) {
+        Files.writeString(solrConfigFile, pruned, StandardCharsets.UTF_8);
+        LOGGER.info("Semantic search is disabled ({}=false); removed text-to-vector lib/queryParser "
+          + "declarations from {}", RodaConstants.CORE_INDEX_EMBEDDING_ENABLED, solrConfigFile);
+      }
+    } catch (IOException e) {
+      throw new GenericException("Could not prune embedding config from " + solrConfigFile, e);
+    }
+  }
+
+  private static String pruneEmbeddingBlocks(String content) {
+    StringBuilder pruned = new StringBuilder();
+    int cursor = 0;
+    int beginIndex;
+    while ((beginIndex = content.indexOf(EMBEDDING_BLOCK_BEGIN_MARKER, cursor)) != -1) {
+      int endIndex = content.indexOf(EMBEDDING_BLOCK_END_MARKER, beginIndex);
+      if (endIndex == -1) {
+        LOGGER.warn("Found {} without a matching {}, leaving the rest of the file untouched",
+          EMBEDDING_BLOCK_BEGIN_MARKER, EMBEDDING_BLOCK_END_MARKER);
+        break;
+      }
+      pruned.append(content, cursor, beginIndex);
+      cursor = endIndex + EMBEDDING_BLOCK_END_MARKER.length();
+    }
+    pruned.append(content.substring(cursor));
+    return pruned.toString();
   }
 
   public static void bootstrapSchemas(SolrClient client) throws GenericException {
