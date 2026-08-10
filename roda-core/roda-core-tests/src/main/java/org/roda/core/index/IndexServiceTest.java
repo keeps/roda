@@ -854,9 +854,14 @@ public class IndexServiceTest {
 
       SolrBootstrapUtils.pruneEmbeddingSolrConfigIfDisabled(tempConfDir);
 
+      // Check the actual XML elements, not the bare "knn_text_to_vector"/
+      // "language-models" substrings - those also appear in surrounding
+      // explanatory comments that are intentionally left in place outside the
+      // RODA-EMBEDDING-BEGIN/END markers.
       String prunedContent = Files.readString(solrConfigFile);
-      MatcherAssert.assertThat(prunedContent, Matchers.not(Matchers.containsString("knn_text_to_vector")));
-      MatcherAssert.assertThat(prunedContent, Matchers.not(Matchers.containsString("language-models/lib")));
+      MatcherAssert.assertThat(prunedContent,
+        Matchers.not(Matchers.containsString("<queryParser name=\"knn_text_to_vector\"")));
+      MatcherAssert.assertThat(prunedContent, Matchers.not(Matchers.containsString("modules/language-models/lib")));
     } finally {
       Files.deleteIfExists(tempConfDir.resolve("solrconfig.xml"));
       Files.deleteIfExists(tempConfDir);
