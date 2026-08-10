@@ -48,9 +48,16 @@ public class TestContainersManager {
   private final GenericContainer<?> siegfried;
   private final GenericContainer<?> clamav;
 
+  private final String tmpDir;
+
   @SuppressWarnings("resource")
   private TestContainersManager() {
     LOGGER.info("Starting test infrastructure containers...");
+
+    // Resolve and normalize java.io.tmpdir once, so the containers bind-mounted
+    // below always see the SAME directory that Files.createTempDirectory(...)
+    tmpDir = Paths.get(System.getProperty("java.io.tmpdir")).toAbsolutePath().normalize().toString();
+    LOGGER.info("Using java.io.tmpdir={} for container bind mounts", tmpDir);
 
     network = Network.newNetwork();
 
@@ -104,7 +111,7 @@ public class TestContainersManager {
 
     // Clamav
     clamav = new GenericContainer<>(DockerImageName.parse("clamav/clamav:1.5.2")).withExposedPorts(3310)
-      .withFileSystemBind("/tmp", "/tmp", BindMode.READ_WRITE)
+      .withFileSystemBind(tmpDir, tmpDir, BindMode.READ_WRITE)
       .waitingFor(Wait.forListeningPort().withStartupTimeout(Duration.ofSeconds(60)));
     clamav.start();
 
@@ -113,8 +120,8 @@ public class TestContainersManager {
       TCPAddr %s
       """.formatted(clamav.getMappedPort(3310), clamav.getHost());
 
+    Path tempConfigFile = Paths.get(tmpDir, "clamd.conf");
     try {
-      Path tempConfigFile = Paths.get("/tmp/clamd.conf");
       Files.writeString(tempConfigFile, configContent);
     } catch (IOException e) {
       stopAll();
@@ -126,7 +133,7 @@ public class TestContainersManager {
     // Siegfried
     siegfried = new GenericContainer<>(DockerImageName.parse("keeps/siegfried:v1.11.0"))
       .withEnv("SIEGFRIED_HOST", "0.0.0.0").withEnv("SIEGFRIED_PORT", "5138").withExposedPorts(5138)
-      .withFileSystemBind("/tmp", "/tmp", BindMode.READ_ONLY)
+      .withFileSystemBind(tmpDir, tmpDir, BindMode.READ_ONLY)
       .waitingFor(Wait.forListeningPort().withStartupTimeout(Duration.ofSeconds(60)));
     siegfried.start();
     LOGGER.info("Siegfried started at {}:{}", siegfried.getHost(), siegfried.getMappedPort(5138));
@@ -172,7 +179,8 @@ public class TestContainersManager {
     System.setProperty("RODA_CORE_EMAIL_HOST", mailpit.getHost());
     System.setProperty("RODA_CORE_EMAIL_PORT", mailpit.getMappedPort(1025).toString());
 
-    System.setProperty("RODA_CORE_PLUGINS_INTERNAL_VIRUS_CHECK_CLAMAV_PARAMS", "-m --stream -c /tmp/clamd.conf");
+    Path clamdConfFile = Paths.get(tmpDir, "clamd.conf");
+    System.setProperty("RODA_CORE_PLUGINS_INTERNAL_VIRUS_CHECK_CLAMAV_PARAMS", "-m --stream -c " + clamdConfFile);
 
     String siegfriedUrl = "http://" + siegfried.getHost() + ":" + siegfried.getMappedPort(5138);
     System.setProperty("RODA_CORE_TOOLS_SIEGFRIED_MODE", "server");
