@@ -775,7 +775,7 @@ public class RodaCoreFactory {
                       return FileVisitResult.SKIP_SUBTREE;
                     }
                   } catch (NotFoundException | GenericException | AlreadyExistsException e) {
-                    LOGGER.error("Could not copy directory {}", dir.toString(), e);
+                    LOGGER.error("Could not copy directory {}", dir, e);
                     return FileVisitResult.SKIP_SUBTREE;
                   }
                 }
@@ -1174,7 +1174,8 @@ public class RodaCoreFactory {
       try {
         RodaUtils.copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/"
           + SolrUtils.COMMON + "/" + SolrUtils.CONF + "/", commonConf, true);
-      } catch (IOException e) {
+        SolrBootstrapUtils.pruneEmbeddingSolrConfigIfDisabled(commonConf);
+      } catch (IOException | GenericException e) {
         instantiatedWithoutErrors = false;
       }
 
@@ -1218,7 +1219,7 @@ public class RodaCoreFactory {
       envInt = envString != null ? Integer.valueOf(envString) : defaultValue;
     } catch (NumberFormatException e) {
       envInt = defaultValue;
-      LOGGER.error("Invalid value for " + name + ", using default " + defaultValue, e);
+      LOGGER.error("Invalid value for {}, using default {}", name, defaultValue, e);
     }
     return envInt;
   }
@@ -1903,7 +1904,7 @@ public class RodaCoreFactory {
     final Console console = System.console();
     if (console == null) {
       final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-      System.out.print(String.format("%s (INSECURE - password will be shown): ", message));
+      System.out.printf("%s (INSECURE - password will be shown): ", message);
       return new SecureString(reader.readLine().toCharArray());
     } else {
       return new SecureString(new String(console.readPassword("%s: ", message)).toCharArray());
@@ -1970,7 +1971,7 @@ public class RodaCoreFactory {
     if ("index".equals(args.get(0))) {
       if ("list".equals(args.get(1)) && ("users".equals(args.get(2)) || "groups".equals(args.get(2)))) {
         final Filter filter = new Filter(
-          new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, "users".equals(args.get(2)) ? "true" : "false"));
+          new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, Boolean.toString("users".equals(args.get(2)))));
         printIndexMembers(args, filter, null, new Sublist(0, 10000), null);
       } else if ("list".equals(args.get(1)) && ("sips".equals(args.get(2)))) {
         printCountSips(null, new Sublist(0, 10000), null);

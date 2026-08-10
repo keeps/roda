@@ -12,7 +12,9 @@ import static org.testng.AssertJUnit.assertNotNull;
 import static org.testng.AssertJUnit.fail;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
@@ -80,6 +82,7 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.index.schema.SolrBootstrapUtils;
 import org.roda.core.index.schema.SolrCollectionRegistry;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.index.utils.SolrUtils;
@@ -829,6 +832,34 @@ public class IndexServiceTest {
         .collect(Collectors.toSet());
       MatcherAssert.assertThat(fieldNames, Matchers.not(Matchers.hasItem(RodaConstants.INDEX_EMBEDDING_VECTOR)));
       MatcherAssert.assertThat(fieldNames, Matchers.not(Matchers.hasItem(RodaConstants.INDEX_VECTORIZED)));
+    }
+  }
+
+  @Test
+  public void testEmbeddingSolrConfigPrunedByDefault() throws Exception {
+    // core.index.embedding.enabled defaults to false: the shared solrconfig.xml
+    // configset copied out of the classpath (and later uploaded to Zookeeper for
+    // every collection) must not carry the language-models module's <lib>/
+    // <queryParser> declarations, otherwise every collection sharing the
+    // configset would require that Solr module to be present even though
+    // semantic search is disabled. See SolrBootstrapUtils#pruneEmbeddingSolrConfigIfDisabled.
+    Path tempConfDir = Files.createTempDirectory("roda-solrconfig-test");
+    try {
+      Path solrConfigFile = tempConfDir.resolve("solrconfig.xml");
+      try (InputStream in = getClass().getClassLoader()
+        .getResourceAsStream("config/index/common/conf/solrconfig.xml")) {
+        assertNotNull(in);
+        Files.copy(in, solrConfigFile);
+      }
+
+      SolrBootstrapUtils.pruneEmbeddingSolrConfigIfDisabled(tempConfDir);
+
+      String prunedContent = Files.readString(solrConfigFile);
+      MatcherAssert.assertThat(prunedContent, Matchers.not(Matchers.containsString("knn_text_to_vector")));
+      MatcherAssert.assertThat(prunedContent, Matchers.not(Matchers.containsString("language-models/lib")));
+    } finally {
+      Files.deleteIfExists(tempConfDir.resolve("solrconfig.xml"));
+      Files.deleteIfExists(tempConfDir);
     }
   }
 }

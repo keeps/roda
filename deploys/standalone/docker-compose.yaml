@@ -16,7 +16,6 @@ services:
     environment:
       SOLR_HEAP: 2g
       ZK_HOST: zoo:2181
-      SOLR_MODULES: language-models
     volumes:
       - solr_data:/var/solr
 

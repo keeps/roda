@@ -21,7 +21,6 @@ services:
       ZK_HOST: zoo:2181
       SOLR_HOST: localhost
       SOLR_OPTS: "-Dsolr.environment=dev,label=DEV+ENV"
-      SOLR_MODULES: language-models
     depends_on:
       - zoo
     volumes:
