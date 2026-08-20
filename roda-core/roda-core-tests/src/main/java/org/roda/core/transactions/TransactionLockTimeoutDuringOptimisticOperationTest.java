@@ -37,6 +37,7 @@ import org.roda.core.plugins.base.FailAcceptPlugin;
 import org.roda.core.plugins.base.LongAcceptPlugin;
 import org.roda.core.plugins.orchestrate.JobsHelper;
 import org.roda.core.security.LdapUtilityTestHelper;
+import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.roda.core.transaction.RODATransactionException;
 import org.roda.core.transaction.RODATransactionManager;
@@ -77,7 +78,7 @@ public class TransactionLockTimeoutDuringOptimisticOperationTest extends Abstrac
   private Environment environment;
 
   @BeforeClass
-  public void setup() throws GenericException {
+  public void setup() throws RODAException {
     boolean deploySolr = true;
     boolean deployLdap = true;
     boolean deployFolderMonitor = false;
@@ -93,6 +94,8 @@ public class TransactionLockTimeoutDuringOptimisticOperationTest extends Abstrac
 
     transactionManager.setMainModelService(mainModelService);
     transactionManager.setInitialized(true);
+
+    cleanUp();
   }
 
   @AfterMethod
@@ -173,11 +176,13 @@ public class TransactionLockTimeoutDuringOptimisticOperationTest extends Abstrac
     // Accept them
     String agentName = "dummy";
     acceptAIPsWithLongBatchExecutionTime(1, 100, 5, agentName);
+    index.commit(IndexedPreservationAgent.class);
     IndexResult<IndexedAIP> findAcceptedAIPs = index.find(IndexedAIP.class,
       new Filter(new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name())), new Sorter(),
       new Sublist(0, 0), List.of());
     Assert.assertEquals(findAcceptedAIPs.getTotalCount(), totalAIPs,
       "Total accepted AIPs is " + findAcceptedAIPs.getTotalCount() + " instead of expected " + totalAIPs);
+    index.commit(IndexedPreservationAgent.class);
     IndexResult<IndexedPreservationAgent> findAgents = index.find(IndexedPreservationAgent.class,
       new Filter(new SimpleFilterParameter(RodaConstants.PRESERVATION_AGENT_ID, IdUtils.getUserAgentId("dummy", null))),
       new Sorter(), new Sublist(0, 0), List.of());
@@ -198,11 +203,13 @@ public class TransactionLockTimeoutDuringOptimisticOperationTest extends Abstrac
     // Accept them
     String agentName = "dummy";
     acceptAIPsWithLongBatchExecutionTime(10, 10, 5, agentName);
+    index.commit(IndexedPreservationAgent.class);
     IndexResult<IndexedAIP> findAcceptedAIPs = index.find(IndexedAIP.class,
       new Filter(new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name())), new Sorter(),
       new Sublist(0, 0), List.of());
     Assert.assertEquals(findAcceptedAIPs.getTotalCount(), totalAIPs,
       "Total accepted AIPs is " + findAcceptedAIPs.getTotalCount() + " instead of expected " + totalAIPs);
+    index.commit(IndexedPreservationAgent.class);
     IndexResult<IndexedPreservationAgent> findAgents = index.find(IndexedPreservationAgent.class,
       new Filter(new SimpleFilterParameter(RodaConstants.PRESERVATION_AGENT_ID, IdUtils.getUserAgentId("dummy", null))),
       new Sorter(), new Sublist(0, 0), List.of());
@@ -222,7 +229,8 @@ public class TransactionLockTimeoutDuringOptimisticOperationTest extends Abstrac
       "Total created AIPs is " + findAppraisalAIPs.getTotalCount() + " instead of expected " + totalAIPs);
     // Create the test agent
     String preExistingAgentName = "dummyExisting";
-    PremisV3Utils.createIfNotExistsPremisUserAgentBinary(preExistingAgentName, mainModelService, index, true,
+    PreservationMetadata preExistingAgentMetadata = PremisV3Utils
+      .createIfNotExistsPremisUserAgentBinary(preExistingAgentName, mainModelService, index, true,
       List.of());
     index.commit(IndexedPreservationAgent.class);
     IndexResult<IndexedPreservationAgent> initialFindPreExistingAgent = index.find(IndexedPreservationAgent.class,
@@ -231,22 +239,38 @@ public class TransactionLockTimeoutDuringOptimisticOperationTest extends Abstrac
       new Sorter(), new Sublist(0, 0), List.of());
     Assert.assertEquals(initialFindPreExistingAgent.getTotalCount(), 1,
       "Pre-existing job executing agent was not indexed.");
+    Binary preExistingAgentBinary = mainModelService.getBinary(preExistingAgentMetadata);
+    Assert.assertNotNull(preExistingAgentBinary, "Pre-existing job executing agent does not have a binary.");
     // Fail accepting AIPs using a pre-existing agent
     failAcceptingAIPs(10, 10, 5, preExistingAgentName);
+    index.commit(IndexedPreservationAgent.class);
     IndexResult<IndexedPreservationAgent> finalFindPreExistingAgent = index.find(IndexedPreservationAgent.class,
       new Filter(new SimpleFilterParameter(RodaConstants.PRESERVATION_AGENT_ID,
         IdUtils.getUserAgentId(preExistingAgentName, null))),
       new Sorter(), new Sublist(0, 0), List.of());
     Assert.assertEquals(finalFindPreExistingAgent.getTotalCount(), 1,
       "Pre-existing job executing agent was deleted after failed plugin.");
+    preExistingAgentBinary = mainModelService.getBinary(preExistingAgentMetadata);
+    Assert.assertNotNull(preExistingAgentBinary,
+      "Pre-existing job executing agent's binary was deleted after failed plugin.");
     // Fail accepting AIPs using a new agent
     String newAgentName = "dummy2";
     failAcceptingAIPs(10, 10, 5, newAgentName);
+    index.commit(IndexedPreservationAgent.class);
     IndexResult<IndexedPreservationAgent> findNewAgent = index.find(IndexedPreservationAgent.class,
       new Filter(
         new SimpleFilterParameter(RodaConstants.PRESERVATION_AGENT_ID, IdUtils.getUserAgentId(newAgentName, null))),
       new Sorter(), new Sublist(0, 0), List.of());
     Assert.assertEquals(findNewAgent.getTotalCount(), 0,
       "New job executing agent was not deleted after failed plugin.");
+    PreservationMetadata agentMetadata = mainModelService.retrievePreservationMetadata(
+      IdUtils.getUserAgentId(newAgentName, null), PreservationMetadata.PreservationMetadataType.AGENT);
+    boolean newAgentDoesntHaveBinary = false;
+    try {
+      mainModelService.getBinary(agentMetadata);
+    } catch (NotFoundException e) {
+      newAgentDoesntHaveBinary = true;
+    }
+    Assert.assertTrue(newAgentDoesntHaveBinary, "New agent has binary when it shouldn't after failed plugin.");
   }
 }

@@ -150,6 +150,7 @@ public class FailAcceptPlugin extends AbstractPlugin<AIP> {
       }
 
       index.commit(IndexedAIP.class, IndexedJob.class, IndexedReport.class, IndexedPreservationEvent.class);
+      throw new RuntimeException("Object processing logic finished without issue, but we gotta fail!");
     } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
       report.setPluginState(PluginState.FAILURE).setPluginDetails("Failed to update job counters");
     }
