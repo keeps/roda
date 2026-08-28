@@ -125,7 +125,7 @@ CREATE TABLE public.transactional_model_operation_log (
                                                           updated_at timestamp(6) without time zone,
                                                           transaction_id uuid NOT NULL,
                                                           CONSTRAINT transactional_model_operation_log_operation_state_check CHECK (((operation_state)::text = ANY ((ARRAY['PENDING'::character varying, 'RUNNING'::character varying, 'FAILURE'::character varying, 'SUCCESS'::character varying, 'ROLLED_BACK'::character varying, 'ROLLING_BACK'::character varying, 'ROLL_BACK_FAILURE'::character varying])::text[]))),
-    CONSTRAINT transactional_model_operation_log_operation_type_check CHECK (((operation_type)::text = ANY ((ARRAY['CREATE'::character varying, 'UPDATE'::character varying, 'DELETE'::character varying, 'READ'::character varying, 'CREATE_OR_UPDATE'::character varying, 'OPTIMISTIC_CREATE_IF_NOT_EXISTS'::character varying])::text[])))
+    CONSTRAINT transactional_model_operation_log_operation_type_check CHECK (((operation_type)::text = ANY ((ARRAY['CREATE'::character varying, 'UPDATE'::character varying, 'DELETE'::character varying, 'READ'::character varying, 'CREATE_OR_UPDATE'::character varying])::text[])))
 );
 
 
@@ -146,7 +146,7 @@ CREATE TABLE public.transactional_storage_path_consolidated_operation (
                                                                           version character varying(255),
                                                                           transaction_id uuid NOT NULL,
                                                                           CONSTRAINT transactional_storage_path_consolidated_o_operation_state_check CHECK (((operation_state)::text = ANY ((ARRAY['PENDING'::character varying, 'RUNNING'::character varying, 'FAILURE'::character varying, 'SUCCESS'::character varying, 'ROLLED_BACK'::character varying, 'ROLLING_BACK'::character varying, 'ROLL_BACK_FAILURE'::character varying])::text[]))),
-    CONSTRAINT transactional_storage_path_consolidated_op_operation_type_check CHECK (((operation_type)::text = ANY ((ARRAY['CREATE'::character varying, 'UPDATE'::character varying, 'DELETE'::character varying, 'READ'::character varying, 'CREATE_OR_UPDATE'::character varying,  'OPTIMISTIC_CREATE_IF_NOT_EXISTS'::character varying])::text[])))
+    CONSTRAINT transactional_storage_path_consolidated_op_operation_type_check CHECK (((operation_type)::text = ANY ((ARRAY['CREATE'::character varying, 'UPDATE'::character varying, 'DELETE'::character varying, 'READ'::character varying, 'CREATE_OR_UPDATE'::character varying])::text[])))
 );
 
 
