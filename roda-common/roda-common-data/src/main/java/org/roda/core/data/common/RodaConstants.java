@@ -48,6 +48,14 @@ public final class RodaConstants {
   public static final String CORE_SOLR_CLOUD_URLS = "core.solr.cloud.urls";
   public static final String CORE_SOLR_STEMMING_LANGUAGE = "core.solr.stemming.language";
 
+  public static final String CORE_INDEX_EMBEDDING_ENABLED = "core.index.embedding.enabled";
+  public static final String CORE_INDEX_EMBEDDING_BASE_URL = "core.index.embedding.base_url";
+  public static final String CORE_INDEX_EMBEDDING_API_KEY = "core.index.embedding.api_key";
+  public static final String CORE_INDEX_EMBEDDING_MODEL_NAME = "core.index.embedding.model_name";
+  public static final String CORE_INDEX_EMBEDDING_SOLR_MODEL = "core.index.embedding.solr_model";
+  public static final String CORE_INDEX_EMBEDDING_DIMENSIONS = "core.index.embedding.dimensions";
+  public static final String CORE_INDEX_EMBEDDING_DEFAULT_TOP_K = "core.index.embedding.default_top_k";
+
   public static final String CORE_EVENTS_ENABLED = "core.events.enabled";
   public static final String CORE_EVENTS_NOTIFIER_AND_HANDLER_ARE_THE_SAME = "core.events.notifier_and_handler_are_the_same";
   public static final String CORE_EVENTS_NOTIFIER_CLASS = "core.events.notifier_class";
@@ -1060,6 +1068,9 @@ public final class RodaConstants {
   public static final String INDEX_STATE = "state";
   public static final String INDEX_SEARCH = "search";
   public static final String INDEX_WILDCARD = "*";
+
+  public static final String INDEX_EMBEDDING_VECTOR = "embedding_vector";
+  public static final String INDEX_VECTORIZED = "vectorized_b";
 
   public static final String INDEX_INSTANCE_ID = "instanceId";
   public static final String INDEX_INSTANCE_NAME = "instanceName";

@@ -1000,17 +1000,19 @@ public class LdapUtility {
    */
   public void addRole(final String roleName) throws RoleAlreadyExistsException, GenericException {
     LdapName roleDN = LdapNameBuilder.newInstance(removeBaseDN(ldapRolesDN)).add(CN, roleName).build();
+
+    if (dnExists(roleDN)) {
+      throw new RoleAlreadyExistsException(roleName);
+    }
+
     LdapRole ldapRole = new LdapRole();
     ldapRole.setDn(roleDN);
     ldapRole.setCommonName(roleName);
+    ldapRole.setNew(true);
     try {
       ldapRole.addRoleOccupant(LdapUtils.newLdapName(rodaAdministratorsDN));
     } catch (InvalidNameException e) {
       throw new GenericException("Error adding RODA administrator user to role '" + roleName + "'", e);
-    }
-
-    if (!dnExists(roleDN)) {
-      ldapRole.setNew(true);
     }
 
     ldapRoleRepository.save(ldapRole);

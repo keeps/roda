@@ -1047,4 +1047,14 @@
         </analyzer>
     </fieldType>
 
+    <!-- Dense vector field for semantic/text-to-vector search (see solrconfig.xml for the
+         knn_text_to_vector query parser and https://solr.apache.org/guide/solr/latest/query-guide/text-to-vector.html).
+         vectorDimension MUST match the dimension of the embedding model configured via
+         core.index.embedding.dimensions - changing the embedding model after documents have
+         been vectorized requires reindexing/re-vectorizing all documents.
+         Vectors are populated by an external service on an asynchronous second pass, not by
+         RODA itself. -->
+    <fieldType name="knn_vector" class="solr.DenseVectorField" vectorDimension="768" similarityFunction="cosine" knnAlgorithm="hnsw" />
+
+
 </schema>

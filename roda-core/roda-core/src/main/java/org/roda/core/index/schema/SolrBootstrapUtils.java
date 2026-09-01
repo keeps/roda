@@ -8,26 +8,45 @@
 package org.roda.core.index.schema;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.GenericSolrRequest;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.schema.SchemaResponse.CopyFieldsResponse;
 import org.apache.solr.client.solrj.response.schema.SchemaResponse.DynamicFieldsResponse;
 import org.apache.solr.client.solrj.response.schema.SchemaResponse.FieldsResponse;
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class SolrBootstrapUtils {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SolrBootstrapUtils.class);
+  private static final String TEXT_TO_VECTOR_MODEL_STORE_PATH = "/schema/text-to-vector-model-store";
+  private static final String LANGCHAIN4J_OPENAI_MODEL_CLASS = "dev.langchain4j.model.openai.OpenAiEmbeddingModel";
+  private static final Set<String> EMBEDDING_FIELD_NAMES = Set.of(RodaConstants.INDEX_EMBEDDING_VECTOR,
+    RodaConstants.INDEX_VECTORIZED);
+  private static final String SOLRCONFIG_FILE_NAME = "solrconfig.xml";
+  private static final String EMBEDDING_BLOCK_BEGIN_MARKER = "<!-- RODA-EMBEDDING-BEGIN -->";
+  private static final String EMBEDDING_BLOCK_END_MARKER = "<!-- RODA-EMBEDDING-END -->";
 
   private static Map<String, Field> getFields(SolrClient client, String collectionName) throws GenericException {
 
@@ -76,8 +95,21 @@ public class SolrBootstrapUtils {
     Map<String, DynamicField> dynamicFields = getDynamicFields(client, collection.getIndexName());
     Set<CopyField> copyFields = getCopyFields(client, collection.getIndexName());
 
+    boolean embeddingEnabled = Boolean
+      .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.CORE_INDEX_EMBEDDING_ENABLED));
+
+    // Semantic search (embedding_vector/vectorized_b) is opt-in: skip both fields
+    // entirely on bootstrap unless core.index.embedding.enabled=true, so fresh
+    // instances get no explicit vector schema fields by default. Filtering by
+    // name (not by Field.TYPE_KNN_VECTOR) is required: vectorized_b is a plain
+    // boolean field and wouldn't otherwise be caught by a type-based check, but
+    // both fields must be gated together. See registerTextToVectorModel below
+    // for the separately-gated query-time model registration.
+    List<Field> collectionFields = collection.getFields().stream()
+      .filter(f -> embeddingEnabled || !EMBEDDING_FIELD_NAMES.contains(f.getName())).collect(Collectors.toList());
+
     SchemaBuilder b = new SchemaBuilder();
-    collection.getFields().forEach(f -> {
+    collectionFields.forEach(f -> {
       if (!fields.containsKey(f.getName())) {
         b.addField(f);
       } else if (!fields.get(f.getName()).isEquivalentTo(f)) {
@@ -111,6 +143,120 @@ public class SolrBootstrapUtils {
     } else {
       LOGGER.info("Collection {} is up to date", collection.getIndexName());
     }
+
+    boolean hasVectorField = collectionFields.stream().anyMatch(f -> Field.TYPE_KNN_VECTOR.equals(f.getType()));
+    if (hasVectorField) {
+      registerTextToVectorModel(client, collection.getIndexName());
+    }
+  }
+
+  /**
+   * Registers (or re-registers) the embedding model used for query-time
+   * text-to-vector search, so that {@code {!knn_text_to_vector model=...}}
+   * queries can resolve it. This only wires up query-time vectorization -
+   * index-time vectors are written by an external enrichment service, not by
+   * RODA. Best-effort: semantic search is an optional feature, so failures
+   * here are logged but must not prevent RODA from starting.
+   */
+  private static void registerTextToVectorModel(SolrClient client, String collectionName) {
+    boolean enabled = Boolean
+      .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.CORE_INDEX_EMBEDDING_ENABLED));
+    if (!enabled) {
+      return;
+    }
+
+    String solrModel = RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.CORE_INDEX_EMBEDDING_SOLR_MODEL);
+    String baseUrl = RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.CORE_INDEX_EMBEDDING_BASE_URL);
+    String modelName = RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.CORE_INDEX_EMBEDDING_MODEL_NAME);
+    String apiKey = RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.CORE_INDEX_EMBEDDING_API_KEY);
+
+    if (StringUtils.isBlank(solrModel) || StringUtils.isBlank(baseUrl) || StringUtils.isBlank(modelName)) {
+      LOGGER.warn(
+        "Semantic search is enabled (core.index.embedding.enabled=true) but base_url/model_name/solr_model "
+          + "are not fully configured; skipping text-to-vector model registration for collection {}",
+        collectionName);
+      return;
+    }
+
+    Map<String, Object> params = new LinkedHashMap<>();
+    params.put("baseUrl", baseUrl);
+    params.put("modelName", modelName);
+    // LangChain4j's OpenAI client rejects a null/absent apiKey even against
+    // auth-free servers, so always send a value.
+    params.put("apiKey", StringUtils.isNotBlank(apiKey) ? apiKey : "not-needed");
+
+    Map<String, Object> payload = new LinkedHashMap<>();
+    payload.put("class", LANGCHAIN4J_OPENAI_MODEL_CLASS);
+    payload.put("name", solrModel);
+    payload.put("params", params);
+
+    try {
+      byte[] body = new ObjectMapper().writeValueAsBytes(payload);
+      GenericSolrRequest request = new GenericSolrRequest(SolrRequest.METHOD.PUT, TEXT_TO_VECTOR_MODEL_STORE_PATH)
+        .withContent(body, "application/json");
+      request.setRequiresCollection(true);
+      request.process(client, collectionName);
+      LOGGER.info("Registered text-to-vector model '{}' for collection {}", solrModel, collectionName);
+    } catch (SolrServerException | IOException | RuntimeException e) {
+      LOGGER.warn(
+        "Could not register text-to-vector model '{}' for collection {} - semantic search queries against "
+          + "this collection will fail with an unknown model error until this is resolved (requires the "
+          + "language-models Solr module to be enabled, see docker-compose SOLR_MODULES)",
+        solrModel, collectionName, e);
+    }
+  }
+
+  /**
+   * Removes the text-to-vector {@code <lib>}/{@code <queryParser>} declarations
+   * (marked with RODA-EMBEDDING-BEGIN/END comments in solrconfig.xml) from the
+   * configset directory copied out of the classpath, unless
+   * core.index.embedding.enabled=true. Must run before the directory is
+   * uploaded to Zookeeper, otherwise every collection sharing this configset
+   * would require the language-models Solr module to be present, even when
+   * semantic search is disabled.
+   */
+  public static void pruneEmbeddingSolrConfigIfDisabled(Path configDirectory) throws GenericException {
+    boolean embeddingEnabled = Boolean
+      .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.CORE_INDEX_EMBEDDING_ENABLED));
+    if (embeddingEnabled) {
+      return;
+    }
+
+    Path solrConfigFile = configDirectory.resolve(SOLRCONFIG_FILE_NAME);
+    if (!Files.isRegularFile(solrConfigFile)) {
+      LOGGER.warn("Could not find {} under {} to prune embedding config", SOLRCONFIG_FILE_NAME, configDirectory);
+      return;
+    }
+
+    try {
+      String content = Files.readString(solrConfigFile, StandardCharsets.UTF_8);
+      String pruned = pruneEmbeddingBlocks(content);
+      if (!pruned.equals(content)) {
+        Files.writeString(solrConfigFile, pruned, StandardCharsets.UTF_8);
+        LOGGER.info("Semantic search is disabled ({}=false); removed text-to-vector lib/queryParser "
+          + "declarations from {}", RodaConstants.CORE_INDEX_EMBEDDING_ENABLED, solrConfigFile);
+      }
+    } catch (IOException e) {
+      throw new GenericException("Could not prune embedding config from " + solrConfigFile, e);
+    }
+  }
+
+  private static String pruneEmbeddingBlocks(String content) {
+    StringBuilder pruned = new StringBuilder();
+    int cursor = 0;
+    int beginIndex;
+    while ((beginIndex = content.indexOf(EMBEDDING_BLOCK_BEGIN_MARKER, cursor)) != -1) {
+      int endIndex = content.indexOf(EMBEDDING_BLOCK_END_MARKER, beginIndex);
+      if (endIndex == -1) {
+        LOGGER.warn("Found {} without a matching {}, leaving the rest of the file untouched",
+          EMBEDDING_BLOCK_BEGIN_MARKER, EMBEDDING_BLOCK_END_MARKER);
+        break;
+      }
+      pruned.append(content, cursor, beginIndex);
+      cursor = endIndex + EMBEDDING_BLOCK_END_MARKER.length();
+    }
+    pruned.append(content.substring(cursor));
+    return pruned.toString();
   }
 
   public static void bootstrapSchemas(SolrClient client) throws GenericException {

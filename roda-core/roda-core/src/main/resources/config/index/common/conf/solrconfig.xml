@@ -74,6 +74,20 @@
     -->
   <!-- <lib dir="${solr.install.dir:../../../..}/modules/ltr/lib" regex=".*\.jar" /> -->
 
+  <!-- language-models module: provides text-to-vector query/index-time vectorization
+       calling out to an external embedding API via LangChain4j. Requires the module to
+       also be enabled on the Solr node (SOLR_MODULES=language-models). See
+       https://solr.apache.org/guide/solr/latest/query-guide/text-to-vector.html
+
+       This block is opt-in: it is stripped from the configset uploaded to Zookeeper
+       by SolrBootstrapUtils unless core.index.embedding.enabled=true, so that
+       collections don't depend on the language-models module being present by
+       default. Do not change the RODA-EMBEDDING-BEGIN/END marker comments below,
+       they are matched literally by that stripping logic. -->
+  <!-- RODA-EMBEDDING-BEGIN -->
+  <lib dir="${solr.install.dir:../../../..}/modules/language-models/lib" regex=".*\.jar" />
+  <!-- RODA-EMBEDDING-END -->
+
   <!-- an exact 'path' can be used instead of a 'dir' to specify a
        specific jar file.  This will cause a serious error to be logged
        if it can't be loaded.
@@ -1101,6 +1115,17 @@
   <!--
      <queryParser name="myparser" class="com.mycompany.MyQParserPlugin"/>
     -->
+
+  <!-- Vectorizes free-text query strings on the fly using the model registered via
+       PUT /schema/text-to-vector-model-store (see SolrBootstrapUtils), then runs a KNN
+       search against a knn_vector field. Used by TextToVectorFilterParameter, e.g.:
+       {!knn_text_to_vector model=<solr_model> f=embedding_vector topK=10}free text query
+
+       Opt-in, stripped when disabled - see RODA-EMBEDDING-BEGIN comment near the
+       language-models <lib> declaration above for details. -->
+  <!-- RODA-EMBEDDING-BEGIN -->
+  <queryParser name="knn_text_to_vector" class="org.apache.solr.languagemodels.textvectorisation.search.TextToVectorQParserPlugin"/>
+  <!-- RODA-EMBEDDING-END -->
 
   <!-- Function Parsers
 

@@ -108,6 +108,7 @@ import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.OrFiltersParameters;
 import org.roda.core.data.v2.index.filter.ParentWhichFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.filter.TextToVectorFilterParameter;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
@@ -992,24 +993,33 @@ public class SolrUtils {
   private static void parseFilterParameter(StringBuilder ret, FilterParameter parameter,
     boolean prefixWithANDOperatorIfBuilderNotEmpty) throws RequestNotValidException {
     if (parameter instanceof SimpleFilterParameter simplePar) {
+      requireField(parameter, "name", simplePar.getName());
       appendExactMatch(ret, simplePar.getName(), simplePar.getValue(), true, prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof OneOfManyFilterParameter param) {
+      requireField(parameter, "name", param.getName());
       appendValuesUsingOROperator(ret, param.getName(), param.getValues(), prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof BasicSearchFilterParameter param) {
+      requireField(parameter, "name", param.getName());
       appendBasicSearch(ret, param.getName(), param.getValue(), "AND", prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof EmptyKeyFilterParameter param) {
+      requireField(parameter, "name", param.getName());
       appendANDOperator(ret, true);
       ret.append("(*:* NOT ").append(param.getName()).append(":*)");
     } else if (parameter instanceof DateRangeFilterParameter param) {
+      requireField(parameter, "name", param.getName());
       appendRange(ret, param.getName(), Date.class, param.getFromValue(), String.class,
         processToDate(param.getToValue(), param.getGranularity(), false), prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof DateIntervalFilterParameter param) {
+      requireField(parameter, "fromName", param.getFromName());
+      requireField(parameter, "toName", param.getToName());
       appendRangeInterval(ret, param.getFromName(), param.getToName(), param.getFromValue(), param.getToValue(),
         param.getGranularity(), prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof LongRangeFilterParameter param) {
+      requireField(parameter, "name", param.getName());
       appendRange(ret, param.getName(), Long.class, param.getFromValue(), Long.class, param.getToValue(),
         prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof NotSimpleFilterParameter notSimplePar) {
+      requireField(parameter, "name", notSimplePar.getName());
       appendNotExactMatch(ret, notSimplePar.getName(), notSimplePar.getValue(), true,
         prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof OrFiltersParameters || parameter instanceof AndFiltersParameters) {
@@ -1022,9 +1032,29 @@ public class SolrUtils {
       appendBlockJoinFilterParameter(ret, nestParentFilterParameter, prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof ChildOfFilterParameter nestChildOfFilterParameter) {
       appendBlockJoinChildrenFilterParameter(ret, nestChildOfFilterParameter, prefixWithANDOperatorIfBuilderNotEmpty);
+    } else if (parameter instanceof TextToVectorFilterParameter param) {
+      requireField(parameter, "field", param.getField());
+      requireField(parameter, "query", param.getQuery());
+      requireField(parameter, "model", param.getModel());
+      appendTextToVector(ret, param, prefixWithANDOperatorIfBuilderNotEmpty);
     } else {
       LOGGER.error("Unsupported filter parameter class: {}", parameter.getClass().getName());
       throw new RequestNotValidException("Unsupported filter parameter class: " + parameter.getClass().getName());
+    }
+  }
+
+  /**
+   * Validates a required String field of a {@link FilterParameter} before it reaches Solr query
+   * construction. Without this, a missing/misnamed field (e.g. a client sending "field" where a
+   * type expects "name") silently produces the literal text "null" in the built query string,
+   * which Solr then rejects with an opaque "undefined field: \"null\"" error that gives no hint
+   * about which request field was actually wrong.
+   */
+  private static void requireField(FilterParameter parameter, String fieldName, String value)
+    throws RequestNotValidException {
+    if (value == null || value.isBlank()) {
+      throw new RequestNotValidException(
+        parameter.getClass().getSimpleName() + " requires a non-empty '" + fieldName + "' field");
     }
   }
 
@@ -1076,6 +1106,31 @@ public class SolrUtils {
     if (prefixWithOROperatorIfBuilderNotEmpty && !ret.isEmpty()) {
       ret.append(" OR ");
     }
+  }
+
+  /**
+   * Renders a semantic-search clause vectorizing {@code parameter.getQuery()} at
+   * query time via Solr's {@code knn_text_to_vector} query parser (see
+   * https://solr.apache.org/guide/solr/latest/query-guide/text-to-vector.html),
+   * restricting results to the top-K nearest neighbours of the target
+   * {@code knn_vector} field.
+   */
+  private static void appendTextToVector(StringBuilder ret, TextToVectorFilterParameter parameter,
+    boolean prefixWithANDOperatorIfBuilderNotEmpty) {
+    appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
+    // The query text is passed via the "v" local param (quoted) rather than as trailing
+    // text after the local params block. Trailing text is only unambiguous for a single
+    // word - as soon as the free-text query contains a space, the outer query parser
+    // (this clause is combined with others via AND/OR into one larger query string) can
+    // split on it and try to resolve the extra words against the default search field,
+    // which RODA doesn't define, causing "undefined field _text_".
+    ret.append("({!knn_text_to_vector model=").append(parameter.getModel()).append(" f=")
+      .append(parameter.getField()).append(" topK=").append(parameter.getTopK()).append(" v='")
+      .append(escapeSolrLocalParamValue(parameter.getQuery())).append("'})");
+  }
+
+  private static String escapeSolrLocalParamValue(String value) {
+    return value.replace("\\", "\\\\").replace("'", "\\'");
   }
 
   private static void appendExactMatch(StringBuilder ret, String key, String value, boolean appendDoubleQuotes,

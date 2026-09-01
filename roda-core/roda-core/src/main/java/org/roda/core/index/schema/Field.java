@@ -33,6 +33,7 @@ public class Field {
   public static final String TYPE_INT = "pint";
   public static final String TYPE_DATE = "pdate";
   public static final String TYPE_STRING = "string";
+  public static final String TYPE_KNN_VECTOR = "knn_vector";
 
   public static final String FIELD_SEARCH = RodaConstants.INDEX_SEARCH;
 
