@@ -409,7 +409,18 @@ public class SolrUtils {
       return false;
     }
 
-    return filter.getParameters().stream().anyMatch(ChildOfFilterParameter.class::isInstance);
+    return filter.getParameters().stream().anyMatch(SolrUtils::isNestedDocumentsFilter);
+  }
+
+  private static boolean isNestedDocumentsFilter(FilterParameter parameter) {
+    if (parameter instanceof ChildOfFilterParameter) {
+      return true;
+    } else  {
+      if (parameter instanceof FiltersParameters filtersParameters){
+        return filtersParameters.getValues().stream().anyMatch(SolrUtils::isNestedDocumentsFilter);
+      }
+    }
+    return false;
   }
 
   /*
