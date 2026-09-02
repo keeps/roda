@@ -41,6 +41,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -2987,9 +2992,23 @@ public class DefaultModelService implements ModelService {
     notifyJobCreatedOrUpdated(job, false).failOnError();
   }
 
+  // Bound on how many reports of a single job are flushed to storage
+  // concurrently. Reports across different jobs are already flushed
+  // concurrently by the orchestrator (one flush call per finishing job); this
+  // only parallelizes the (potentially many) reports of one job.
+  private static final int JOB_REPORT_FLUSH_PARALLELISM = 8;
+
   /**
    * Flushes a job and its reports from the database to the file storage. This
    * method is called when a job reaches a final state.
+   *
+   * The job row is only marked as flushed here (its {@code flushedAt} field is
+   * set), not deleted: deleting it (and its reports) immediately would mean one
+   * extra DELETE statement/transaction per
+   * job, which becomes a bottleneck when many jobs finish around the same time
+   * (e.g. many SIPs being ingested concurrently) and compete with live ingest
+   * traffic for database connections and locks. The actual row removal is done
+   * later, in batches, by {@link JobFlushCleanupTask}.
    */
   private void flushJobToStorage(Job job)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
@@ -3001,19 +3020,68 @@ public class DefaultModelService implements ModelService {
     // Flush all reports for this job from DB to storage
     if (getReportRepository() != null) {
       List<Report> dbReports = getReportRepository().findByJobId(job.getId());
-      for (Report report : dbReports) {
-        String reportAsJson = JsonUtils.getJsonFromObject(report);
-        StoragePath reportPath = ModelUtils.getJobReportStoragePath(report.getJobId(), report.getId());
-        storage.updateBinaryContent(reportPath, new StringContentPayload(reportAsJson), false, true, false, null);
+      if (!dbReports.isEmpty()) {
+        flushReportsToStorage(dbReports);
       }
-      // Delete reports from DB
-      getReportRepository().deleteByJobId(job.getId());
     }
 
-    // Delete job from DB
+    // Mark job as flushed and persist its final state; actual DB cleanup (job +
+    // reports) happens later, in batches, via JobFlushCleanupTask. The full
+    // entity is saved here (not a partial "set flushedAt" update) so that a
+    // read of the DB row in the window before cleanup runs (e.g. via
+    // retrieveJob/listJobReports) still reflects the job's final state.
     JobRepository jobRepo = getJobRepository();
-    if (jobRepo != null && jobRepo.existsById(job.getId())) {
-      jobRepo.deleteById(job.getId());
+    if (jobRepo != null) {
+      job.setFlushedAt(new Date());
+      jobRepo.save(job);
+    }
+  }
+
+  /**
+   * Writes each report's JSON representation to file storage, in parallel
+   * (bounded by {@link #JOB_REPORT_FLUSH_PARALLELISM}), since storage I/O
+   * latency -- not database access -- dominates the cost of flushing a job with
+   * many reports.
+   */
+  private void flushReportsToStorage(List<Report> dbReports)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    int parallelism = Math.min(dbReports.size(), JOB_REPORT_FLUSH_PARALLELISM);
+    ExecutorService executor = Executors.newFixedThreadPool(parallelism);
+    try {
+      List<Future<Void>> futures = new ArrayList<>(dbReports.size());
+      for (Report report : dbReports) {
+        Callable<Void> task = () -> {
+          String reportAsJson = JsonUtils.getJsonFromObject(report);
+          StoragePath reportPath = ModelUtils.getJobReportStoragePath(report.getJobId(), report.getId());
+          storage.updateBinaryContent(reportPath, new StringContentPayload(reportAsJson), false, true, false, null);
+          return null;
+        };
+        futures.add(executor.submit(task));
+      }
+
+      for (Future<Void> future : futures) {
+        try {
+          future.get();
+        } catch (ExecutionException e) {
+          Throwable cause = e.getCause();
+          if (cause instanceof RequestNotValidException requestNotValidException) {
+            throw requestNotValidException;
+          } else if (cause instanceof NotFoundException notFoundException) {
+            throw notFoundException;
+          } else if (cause instanceof AuthorizationDeniedException authorizationDeniedException) {
+            throw authorizationDeniedException;
+          } else if (cause instanceof GenericException genericException) {
+            throw genericException;
+          } else {
+            throw new GenericException("Error flushing job report to storage", cause);
+          }
+        }
+      }
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new GenericException("Interrupted while flushing job reports to storage", e);
+    } finally {
+      executor.shutdown();
     }
   }
 

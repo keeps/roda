@@ -40,4 +40,15 @@ public interface ReportRepository extends JpaRepository<Report, String> {
    */
   @Transactional
   void deleteByJobId(String jobId);
+
+  /**
+   * Delete all reports associated with any of the given job IDs, in a single
+   * bulk statement. Used by the flush cleanup task to remove reports for many
+   * already-flushed jobs at once, instead of one DELETE per job.
+   *
+   * @param jobIds
+   *          the job IDs whose reports should be deleted
+   */
+  @Transactional
+  void deleteByJobIdIn(List<String> jobIds);
 }
