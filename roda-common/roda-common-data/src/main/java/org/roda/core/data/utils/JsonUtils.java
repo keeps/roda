@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.data.exceptions.GenericException;
@@ -47,6 +48,26 @@ public final class JsonUtils {
   private static final String JSON_ERROR_MESSAGE = "Error while parsing JSON";
   private static final String ERROR_TRANSFORMING_OBJECT_TO_JSON_STRING = "Error transforming object '{}' to json string";
 
+  // Jackson mappers are expensive to build (introspection, module registration)
+  // but are thread-safe for concurrent reads/writes once configured, so they
+  // are built once and reused rather than per call -- building one per call
+  // was measured to dominate the cost of hydrating rows with JSON-converted
+  // columns (e.g. Report.reports, Report.sourceObjectOriginalIds).
+  private static final JsonMapper PLAIN_MAPPER = JsonMapper.builder().build();
+  private static final JsonMapper DEFAULT_FILTERS_MAPPER = createJsonMapperBuilder().build();
+  private static final JsonMapper NON_EMPTY_MAPPER = createJsonMapperBuilder()
+    .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_EMPTY)).build();
+
+  // getJsonFromObject(Object, Class) needs a mapper configured with a mixin
+  // combination that depends on the object's runtime type; that combination is
+  // drawn from a small, bounded set, so mappers are built once per combination
+  // and cached rather than rebuilt on every call.
+  private record MixinCacheKey(boolean descriptiveMetadataMixin, boolean technicalMetadataMixin, Class<?> mixin,
+    Class<?> mixinTarget) {
+  }
+
+  private static final ConcurrentHashMap<MixinCacheKey, JsonMapper> MIXIN_MAPPER_CACHE = new ConcurrentHashMap<>();
+
   private JsonUtils() {
     // do nothing
   }
@@ -60,8 +81,7 @@ public final class JsonUtils {
   }
 
   public static byte[] toByteArray(Object object) {
-    JsonMapper mapper = createJsonMapperBuilder().build();
-    return mapper.writeValueAsBytes(object);
+    return DEFAULT_FILTERS_MAPPER.writeValueAsBytes(object);
   }
 
   public static <T> T readObjectFromFile(Path jsonFile, Class<T> objectClass) throws GenericException {
@@ -95,8 +115,7 @@ public final class JsonUtils {
   public static Map<String, String> getMapFromJson(String json) {
     Map<String, String> ret = new HashMap<>();
     try {
-      JsonMapper mapper = JsonMapper.builder().build();
-      ret = mapper.readValue(json, new TypeReference<Map<String, String>>() {});
+      ret = PLAIN_MAPPER.readValue(json, new TypeReference<Map<String, String>>() {});
     } catch (JacksonException e) {
       LOGGER.error("Error transforming json string to Map<String,String>", e);
     }
@@ -110,10 +129,7 @@ public final class JsonUtils {
   public static String getJsonFromObject(Object object, Class<?> mixin) {
     String ret = null;
     try {
-      JsonMapper.Builder builder = createJsonMapperBuilder();
-      addMixinsToBuilder(builder, object, mixin);
-      JsonMapper mapper = builder.build();
-
+      JsonMapper mapper = getMapperForMixins(object, mixin);
       ret = mapper.writeValueAsString(object);
     } catch (JacksonException e) {
       LOGGER.error(ERROR_TRANSFORMING_OBJECT_TO_JSON_STRING, object, e);
@@ -129,11 +145,7 @@ public final class JsonUtils {
           ret.append("\n");
         }
 
-        JsonMapper mapper = createJsonMapperBuilder()
-                .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_EMPTY))
-                .build();
-
-        ret.append(mapper.writer().writeValueAsString(object));
+        ret.append(NON_EMPTY_MAPPER.writer().writeValueAsString(object));
       } catch (JacksonException e) {
         LOGGER.error(ERROR_TRANSFORMING_OBJECT_TO_JSON_STRING, object, e);
       }
@@ -141,30 +153,50 @@ public final class JsonUtils {
     return ret.toString();
   }
 
-  private static void addMixinsToBuilder(JsonMapper.Builder builder, Object object, Class<?> mixin) {
-    if (!(object instanceof DescriptiveMetadata)) {
-      if (object instanceof List<?> objectList) {
-        if (!objectList.isEmpty() && !(objectList.getFirst() instanceof DescriptiveMetadata)) {
-          builder.addMixIn(DescriptiveMetadata.class, DescriptiveMetadataMixIn.class);
-        }
-      } else {
-        builder.addMixIn(DescriptiveMetadata.class, DescriptiveMetadataMixIn.class);
-      }
+  private static JsonMapper getMapperForMixins(Object object, Class<?> mixin) {
+    boolean needsDescriptiveMetadataMixin = needsDescriptiveMetadataMixin(object);
+    boolean needsTechnicalMetadataMixin = needsTechnicalMetadataMixin(object);
+    Class<?> mixinTarget = mixin != null ? object.getClass() : null;
+    MixinCacheKey key = new MixinCacheKey(needsDescriptiveMetadataMixin, needsTechnicalMetadataMixin, mixin,
+      mixinTarget);
+
+    return MIXIN_MAPPER_CACHE.computeIfAbsent(key, JsonUtils::buildMapperForMixins);
+  }
+
+  private static JsonMapper buildMapperForMixins(MixinCacheKey key) {
+    JsonMapper.Builder builder = createJsonMapperBuilder();
+
+    if (key.descriptiveMetadataMixin()) {
+      builder.addMixIn(DescriptiveMetadata.class, DescriptiveMetadataMixIn.class);
+    }
+    if (key.technicalMetadataMixin()) {
+      builder.addMixIn(TechnicalMetadata.class, TechnicalMetadataMixIn.class);
+    }
+    if (key.mixin() != null) {
+      builder.addMixIn(key.mixinTarget(), key.mixin());
     }
 
-    if (!(object instanceof TechnicalMetadata)) {
-      if (object instanceof List<?> objectList) {
-        if (!objectList.isEmpty() && !(objectList.getFirst() instanceof TechnicalMetadata)) {
-          builder.addMixIn(TechnicalMetadata.class, TechnicalMetadataMixIn.class);
-        }
-      } else {
-        builder.addMixIn(TechnicalMetadata.class, TechnicalMetadataMixIn.class);
-      }
-    }
+    return builder.build();
+  }
 
-    if (mixin != null) {
-      builder.addMixIn(object.getClass(), mixin);
+  private static boolean needsDescriptiveMetadataMixin(Object object) {
+    if (object instanceof DescriptiveMetadata) {
+      return false;
     }
+    if (object instanceof List<?> objectList) {
+      return !objectList.isEmpty() && !(objectList.getFirst() instanceof DescriptiveMetadata);
+    }
+    return true;
+  }
+
+  private static boolean needsTechnicalMetadataMixin(Object object) {
+    if (object instanceof TechnicalMetadata) {
+      return false;
+    }
+    if (object instanceof List<?> objectList) {
+      return !objectList.isEmpty() && !(objectList.getFirst() instanceof TechnicalMetadata);
+    }
+    return true;
   }
 
   public static <T> T getObjectFromJson(Path json, Class<T> objectClass) throws GenericException {
@@ -197,8 +229,7 @@ public final class JsonUtils {
 
   public static <T> T getObjectFromJson(String json, Class<T> objectClass) throws GenericException {
     try {
-      JsonMapper mapper = JsonMapper.builder().build();
-      return mapper.readValue(json, objectClass);
+      return PLAIN_MAPPER.readValue(json, objectClass);
     } catch (JacksonException e) {
       throw new GenericException(JSON_ERROR_MESSAGE, e);
     }
@@ -221,9 +252,8 @@ public final class JsonUtils {
 
   public static <T> List<T> getListFromJson(String json, Class<T> objectClass) throws GenericException {
     try {
-      JsonMapper mapper = JsonMapper.builder().build();
-      TypeFactory t = mapper.getTypeFactory();
-      return mapper.readValue(json, t.constructCollectionType(ArrayList.class, objectClass));
+      TypeFactory t = PLAIN_MAPPER.getTypeFactory();
+      return PLAIN_MAPPER.readValue(json, t.constructCollectionType(ArrayList.class, objectClass));
     } catch (JacksonException e) {
       throw new GenericException(JSON_ERROR_MESSAGE, e);
     }
@@ -231,8 +261,7 @@ public final class JsonUtils {
 
   public static JsonNode parseJson(String json) throws GenericException {
     try {
-      JsonMapper mapper = JsonMapper.builder().build();
-      return mapper.readTree(json);
+      return PLAIN_MAPPER.readTree(json);
     } catch (JacksonException e) {
       throw new GenericException(JSON_ERROR_MESSAGE, e);
     }
@@ -240,8 +269,7 @@ public final class JsonUtils {
 
   public static JsonNode parseJson(InputStream json) throws GenericException {
     try {
-      JsonMapper mapper = JsonMapper.builder().build();
-      return mapper.readTree(json);
+      return PLAIN_MAPPER.readTree(json);
     } catch (JacksonException e) {
       throw new GenericException(JSON_ERROR_MESSAGE, e);
     } finally {
@@ -252,8 +280,7 @@ public final class JsonUtils {
   public static String getJsonFromNode(JsonNode node) {
     String ret = null;
     try {
-      JsonMapper mapper = createJsonMapperBuilder().build();
-      ret = mapper.writeValueAsString(node);
+      ret = DEFAULT_FILTERS_MAPPER.writeValueAsString(node);
     } catch (JacksonException e) {
       LOGGER.error(ERROR_TRANSFORMING_OBJECT_TO_JSON_STRING, node, e);
     }

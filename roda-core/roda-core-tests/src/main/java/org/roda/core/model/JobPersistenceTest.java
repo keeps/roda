@@ -35,6 +35,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.repository.job.JobFlushCleanupTask;
 import org.roda.core.repository.job.JobRepository;
 import org.roda.core.repository.job.ReportRepository;
 import org.roda.core.security.LdapUtilityTestHelper;
@@ -71,6 +72,9 @@ public class JobPersistenceTest extends AbstractTestNGSpringContextTests {
 
   @Autowired
   private ReportRepository reportRepository;
+
+  @Autowired
+  private JobFlushCleanupTask jobFlushCleanupTask;
 
   @BeforeClass
   public void init() throws IOException, GenericException {
@@ -130,8 +134,9 @@ public class JobPersistenceTest extends AbstractTestNGSpringContextTests {
   }
 
   /**
-   * Test that updating a job to a final state (COMPLETED) flushes it from the database
-   * to file storage.
+   * Test that updating a job to a final state (COMPLETED) flushes it to file
+   * storage immediately, while its DB row (and its reports) are only marked as
+   * flushed -- actual DB removal is deferred to {@link JobFlushCleanupTask}.
    */
   @Test
   public void testJobFinalization() throws RODAException {
@@ -157,16 +162,32 @@ public class JobPersistenceTest extends AbstractTestNGSpringContextTests {
     job.setEndDate(new Date());
     model.createOrUpdateJob(job);
 
-    // Verify job is no longer in database (flushed to storage)
-    assertFalse(jobRepository.existsById(jobId), "Job should not exist in database after completion");
+    // Job row still exists right after flush -- deletion is deferred -- but is
+    // now marked as flushed
+    assertTrue(jobRepository.existsById(jobId), "Job row should still exist in database right after flush");
+    assertNotNull(jobRepository.findById(jobId).orElseThrow().getFlushedAt(),
+      "Job should be marked as flushed right after flush");
 
-    // Verify report is no longer in database
-    assertFalse(reportRepository.existsById(report.getId()), "Report should not exist in database after job completion");
+    // Report row is likewise still present right after flush
+    assertTrue(reportRepository.existsById(report.getId()), "Report row should still exist right after flush");
 
-    // Verify job can still be retrieved (from storage)
+    // Job can be retrieved with its up-to-date final state (not stale), whether
+    // read from the still-present DB row or, after cleanup, from storage
     Job retrievedJob = model.retrieveJob(jobId);
-    assertNotNull(retrievedJob, "Should be able to retrieve completed job from storage");
+    assertNotNull(retrievedJob, "Should be able to retrieve the completed job");
     assertEquals(retrievedJob.getState(), JOB_STATE.COMPLETED);
+
+    // Running the cleanup task now removes the flushed job and its reports
+    jobFlushCleanupTask.cleanFlushedJobs();
+
+    assertFalse(jobRepository.existsById(jobId), "Job should be removed from database after cleanup runs");
+    assertFalse(reportRepository.existsById(report.getId()),
+      "Report should be removed from database after cleanup runs");
+
+    // Job is still retrievable, now from storage
+    Job retrievedAfterCleanup = model.retrieveJob(jobId);
+    assertNotNull(retrievedAfterCleanup, "Should be able to retrieve completed job from storage after cleanup");
+    assertEquals(retrievedAfterCleanup.getState(), JOB_STATE.COMPLETED);
 
     // Clean up
     model.deleteJob(jobId);

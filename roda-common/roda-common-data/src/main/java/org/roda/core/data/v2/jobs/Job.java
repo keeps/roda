@@ -85,6 +85,11 @@ public class Job implements IsModelObject, HasId, HasInstanceID, HasInstanceName
   // job state details
   @Column(name = "state_details", columnDefinition = "TEXT")
   private String stateDetails = "";
+  // moment the job (and its reports) were flushed to file storage; null while
+  // the job is still running or hasn't been picked up by the flush cleanup task
+  @Column(name = "flushed_at")
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date flushedAt = null;
 
   // job instance id
   @Column(name = "instance_id")
@@ -255,6 +260,14 @@ public class Job implements IsModelObject, HasId, HasInstanceID, HasInstanceName
 
   public void setStateDetails(String stateDetails) {
     this.stateDetails = stateDetails;
+  }
+
+  public Date getFlushedAt() {
+    return flushedAt;
+  }
+
+  public void setFlushedAt(Date flushedAt) {
+    this.flushedAt = flushedAt;
   }
 
   public JobStats getJobStats() {
