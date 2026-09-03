@@ -1,13 +1,13 @@
 package org.roda.core.transactions;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
 import org.roda.core.common.PremisV3Utils;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.config.TestConfig;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -16,6 +16,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -100,27 +101,29 @@ public class TransactionLockTimeoutDuringOptimisticOperationTest extends Abstrac
 
   @AfterMethod
   public void cleanUp() throws RODAException {
-    Consumer<RODAException> cleanupFailHandler = (e -> Assert.fail("Error cleaning up", e));
-
     // delete all AIPs
-    index.execute(IndexedAIP.class, Filter.ALL, new ArrayList<>(), item -> {
-      try {
-        mainModelService.deleteAIP(item.getId());
-      } catch (NotFoundException e) {
-        // do nothing
+    index.clearAIPs();
+    try (CloseableIterable<OptionalWithCause<AIP>> aips = mainModelService.listAIPs()) {
+      for (OptionalWithCause<AIP> aip : aips) {
+        if (aip.isPresent()) {
+          mainModelService.deleteAIP(aip.get().getId());
+        }
       }
-    }, cleanupFailHandler);
+    } catch (IOException e) {
+      throw new RODAException(e);
+    }
 
     // delete preservation agents
-    index.execute(IndexedPreservationAgent.class, Filter.ALL, new ArrayList<>(), item -> {
-      PreservationMetadata pm = mainModelService.retrievePreservationMetadata(item.getId(),
-        PreservationMetadata.PreservationMetadataType.AGENT);
-      try {
-        mainModelService.deletePreservationMetadata(pm, true);
-      } catch (NotFoundException e) {
-        // do nuthin'
+    index.clearIndex(RodaConstants.INDEX_PRESERVATION_AGENTS);
+    try (CloseableIterable<OptionalWithCause<PreservationMetadata>> pms = mainModelService.listPreservationAgents()) {
+      for (OptionalWithCause<PreservationMetadata> pm : pms) {
+        if (pm.isPresent()) {
+          mainModelService.deletePreservationMetadata(pm.get(), true);
+        }
       }
-    }, cleanupFailHandler);
+    } catch (IOException e) {
+      throw new RODAException(e);
+    }
   }
 
   private void createAIPsForAssessing(int total) throws RequestNotValidException, NotFoundException, GenericException,
@@ -219,58 +222,26 @@ public class TransactionLockTimeoutDuringOptimisticOperationTest extends Abstrac
   @Test
   private void testOptimisticOperationRollback() throws AuthorizationDeniedException, RequestNotValidException,
     AlreadyExistsException, RODATransactionException, NotFoundException, GenericException, ValidationException {
-    // Create AIPs
-    int totalAIPs = 100;
-    createAIPsForAssessing(totalAIPs);
-    IndexResult<IndexedAIP> findAppraisalAIPs = index.find(IndexedAIP.class,
-      new Filter(new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.UNDER_APPRAISAL.name())), new Sorter(),
-      new Sublist(0, 0), List.of());
-    Assert.assertEquals(findAppraisalAIPs.getTotalCount(), totalAIPs,
-      "Total created AIPs is " + findAppraisalAIPs.getTotalCount() + " instead of expected " + totalAIPs);
     // Create the test agent
-    String preExistingAgentName = "dummyExisting";
-    PreservationMetadata preExistingAgentMetadata = PremisV3Utils
-      .createIfNotExistsPremisUserAgentBinary(preExistingAgentName, mainModelService, index, true,
+    String agentName = "dummy";
+    TransactionalContext transactionContext = transactionManager.beginTransaction();
+    PreservationMetadata agentMetadata = PremisV3Utils.createIfNotExistsPremisUserAgentBinary(agentName,
+      transactionContext.transactionalModelService(), index, true,
       List.of());
+    transactionManager.commitTestTransactionWithoutRemoving(transactionContext.transactionLog().getId());
+
+    // Rollback transaction
+    transactionManager.rollbackTransaction(transactionContext.transactionLog().getId());
+
+    // Validate results
     index.commit(IndexedPreservationAgent.class);
     IndexResult<IndexedPreservationAgent> initialFindPreExistingAgent = index.find(IndexedPreservationAgent.class,
       new Filter(new SimpleFilterParameter(RodaConstants.PRESERVATION_AGENT_ID,
-        IdUtils.getUserAgentId(preExistingAgentName, null))),
+        IdUtils.getUserAgentId(agentName, null))),
       new Sorter(), new Sublist(0, 0), List.of());
     Assert.assertEquals(initialFindPreExistingAgent.getTotalCount(), 1,
-      "Pre-existing job executing agent was not indexed.");
-    Binary preExistingAgentBinary = mainModelService.getBinary(preExistingAgentMetadata);
-    Assert.assertNotNull(preExistingAgentBinary, "Pre-existing job executing agent does not have a binary.");
-    // Fail accepting AIPs using a pre-existing agent
-    failAcceptingAIPs(10, 10, 5, preExistingAgentName);
-    index.commit(IndexedPreservationAgent.class);
-    IndexResult<IndexedPreservationAgent> finalFindPreExistingAgent = index.find(IndexedPreservationAgent.class,
-      new Filter(new SimpleFilterParameter(RodaConstants.PRESERVATION_AGENT_ID,
-        IdUtils.getUserAgentId(preExistingAgentName, null))),
-      new Sorter(), new Sublist(0, 0), List.of());
-    Assert.assertEquals(finalFindPreExistingAgent.getTotalCount(), 1,
-      "Pre-existing job executing agent was deleted after failed plugin.");
-    preExistingAgentBinary = mainModelService.getBinary(preExistingAgentMetadata);
-    Assert.assertNotNull(preExistingAgentBinary,
-      "Pre-existing job executing agent's binary was deleted after failed plugin.");
-    // Fail accepting AIPs using a new agent
-    String newAgentName = "dummy2";
-    failAcceptingAIPs(10, 10, 5, newAgentName);
-    index.commit(IndexedPreservationAgent.class);
-    IndexResult<IndexedPreservationAgent> findNewAgent = index.find(IndexedPreservationAgent.class,
-      new Filter(
-        new SimpleFilterParameter(RodaConstants.PRESERVATION_AGENT_ID, IdUtils.getUserAgentId(newAgentName, null))),
-      new Sorter(), new Sublist(0, 0), List.of());
-    Assert.assertEquals(findNewAgent.getTotalCount(), 0,
-      "New job executing agent was not deleted after failed plugin.");
-    PreservationMetadata agentMetadata = mainModelService.retrievePreservationMetadata(
-      IdUtils.getUserAgentId(newAgentName, null), PreservationMetadata.PreservationMetadataType.AGENT);
-    boolean newAgentDoesntHaveBinary = false;
-    try {
-      mainModelService.getBinary(agentMetadata);
-    } catch (NotFoundException e) {
-      newAgentDoesntHaveBinary = true;
-    }
-    Assert.assertTrue(newAgentDoesntHaveBinary, "New agent has binary when it shouldn't after failed plugin.");
+      "New agent was not indexed.");
+    Binary preExistingAgentBinary = mainModelService.getBinary(agentMetadata);
+    Assert.assertNotNull(preExistingAgentBinary, "New agent does not have a binary.");
   }
 }

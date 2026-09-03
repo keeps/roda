@@ -249,8 +249,14 @@ public interface StorageService {
    *          storage service.
    *
    */
-  Binary createBinaryIfNotExists(StoragePath storagePath, ContentPayload payload, boolean asReference)
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException;
+  default Binary createBinaryIfNotExists(StoragePath storagePath, ContentPayload payload, boolean asReference)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+    try {
+      return createBinary(storagePath, payload, asReference);
+    } catch (AlreadyExistsException e) {
+      return getBinary(storagePath);
+    }
+  }
 
   /**
    * Create a binary resource with a defined content with a generated id.
