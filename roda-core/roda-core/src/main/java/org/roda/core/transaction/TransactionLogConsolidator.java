@@ -53,7 +53,9 @@ public class TransactionLogConsolidator {
    */
   public static Map<StoragePathVersion, List<ConsolidatedOperation>> consolidateLogs(
     List<TransactionalStoragePathOperationLog> transactionsLogs) throws RequestNotValidException {
-    Map<StoragePathVersion, List<ConsolidatedOperation>> groupByStoragePath = groupByStoragePath(transactionsLogs);
+    List<TransactionalStoragePathOperationLog> filteredLogs = transactionsLogs.stream()
+      .filter(log -> !log.getOperationState().equals(OperationState.SKIPPED)).toList();
+    Map<StoragePathVersion, List<ConsolidatedOperation>> groupByStoragePath = groupByStoragePath(filteredLogs);
     Map<StoragePathVersion, List<ConsolidatedOperation>> consolidateTransaction = consolidateTransaction(
       groupByStoragePath);
     Set<StoragePathVersion> deletePaths = findDeletePaths(consolidateTransaction);
@@ -141,9 +143,10 @@ public class TransactionLogConsolidator {
         case READ:
           break;
 
-        case CREATE:
-          if (result.isEmpty() || result.getLast().operationType() != OperationType.CREATE) {
-            result.add(new ConsolidatedOperation(OperationType.CREATE, updatedAt, null));
+        case CREATE, OPTIMISTIC_CREATE_IF_NOT_EXISTS:
+          if (result.isEmpty() || (result.getLast().operationType() != OperationType.CREATE
+            && result.getLast().operationType() != OperationType.OPTIMISTIC_CREATE_IF_NOT_EXISTS)) {
+            result.add(new ConsolidatedOperation(op, updatedAt, null));
           }
           break;
 
@@ -199,7 +202,8 @@ public class TransactionLogConsolidator {
         continue;
       }
 
-      if ((curr == OperationType.CREATE || curr == OperationType.CREATE_OR_UPDATE) && next == OperationType.DELETE) {
+      if ((curr == OperationType.CREATE || curr == OperationType.CREATE_OR_UPDATE
+        || curr == OperationType.OPTIMISTIC_CREATE_IF_NOT_EXISTS) && next == OperationType.DELETE) {
         result.remove(i);
         result.remove(i);
         if (i > 0)
