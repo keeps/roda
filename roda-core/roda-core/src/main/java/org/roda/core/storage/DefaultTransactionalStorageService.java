@@ -935,7 +935,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
         } else if (operation.getOperationType() == OperationType.CREATE) {
           rollbackCreateOperation(operation);
         } else if (operation.getOperationType() == OperationType.OPTIMISTIC_CREATE_IF_NOT_EXISTS) {
-          rollbackOptimisticCreateIfNotExistsOperation(operation);
+          // rollbackOptimisticCreateIfNotExistsOperation(operation);
         } else if (operation.getOperationType() == OperationType.READ) {
           // do nothing for read operations
         }
@@ -971,22 +971,8 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
 
   public void rollbackOptimisticCreateIfNotExistsOperation(TransactionStoragePathConsolidatedOperation operation)
     throws RODATransactionException {
-    try {
-      StoragePath storagePath = DefaultStoragePath
-        .parse(StreamSupport.stream(Paths.get(operation.getStoragePath()).spliterator(), false).map(Path::toString)
-          .collect(Collectors.toList()));
-      if (operation.getPreviousVersion() != null) {
-        mainStorageService.deleteBinaryVersion(storagePath, operation.getVersion());
-      } else {
-        mainStorageService.deleteResource(storagePath);
-      }
-    } catch (NotFoundException e) {
-      // This is fine, since we're not locking we can't be sure that this hasn't
-      // already been done
-    } catch (AuthorizationDeniedException | GenericException | RequestNotValidException e) {
-      throw new RODATransactionException("[transactionId:" + transaction.getId()
-        + "] Failed to roll back create operation path at " + operation.getStoragePath(), e);
-    }
+    throw new RODATransactionException(
+      "[transactionId:" + transaction.getId() + "] Optimistic create if not exists roll back not supported");
   }
 
   public void rollbackUpdateOperation(TransactionStoragePathConsolidatedOperation operation)

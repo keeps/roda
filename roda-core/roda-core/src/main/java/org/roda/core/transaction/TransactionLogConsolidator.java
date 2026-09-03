@@ -143,15 +143,10 @@ public class TransactionLogConsolidator {
         case READ:
           break;
 
-        case CREATE:
-          if (result.isEmpty() || result.getLast().operationType() != OperationType.CREATE) {
-            result.add(new ConsolidatedOperation(OperationType.CREATE, updatedAt, null));
-          }
-          break;
-
-        case OPTIMISTIC_CREATE_IF_NOT_EXISTS:
-          if (result.isEmpty() || result.getLast().operationType() != OperationType.CREATE) {
-            result.add(new ConsolidatedOperation(OperationType.OPTIMISTIC_CREATE_IF_NOT_EXISTS, updatedAt, null));
+        case CREATE, OPTIMISTIC_CREATE_IF_NOT_EXISTS:
+          if (result.isEmpty() || (result.getLast().operationType() != OperationType.CREATE
+            && result.getLast().operationType() != OperationType.OPTIMISTIC_CREATE_IF_NOT_EXISTS)) {
+            result.add(new ConsolidatedOperation(op, updatedAt, null));
           }
           break;
 
