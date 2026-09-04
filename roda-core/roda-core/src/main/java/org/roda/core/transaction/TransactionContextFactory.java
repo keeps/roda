@@ -7,10 +7,11 @@
  */
 package org.roda.core.transaction;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import io.micrometer.core.annotation.Timed;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.config.ConfigurationManager;
 import org.roda.core.data.common.RodaConstants;
@@ -28,6 +29,8 @@ import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import io.micrometer.core.annotation.Timed;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -61,6 +64,24 @@ public class TransactionContextFactory {
       .getString(RodaConstants.CORE_STAGING_STORAGE_PATH, configurationManager.getStagingStoragePath().toString()));
 
     Path transactionalStoragePath = stagingStoragePath.resolve(transactionLog.getId().toString());
+
+    String newStorageService = configurationManager.getRodaConfiguration()
+      .getString(RodaConstants.CORE_STORAGE_NEW_SERVICE);
+    if (RodaConstants.CORE_STORAGE_FOLDER_SCATTERING_SERVICE_CLASS.equals(newStorageService)) {
+      try {
+        Class<?> storageClass = Class.forName(newStorageService);
+        Constructor<?> constructor = storageClass.getConstructor(Path.class, boolean.class, String.class,
+          boolean.class);
+        LOGGER.debug("Going to instantiate '{}' on '{}'", storageClass.getSimpleName(), transactionalStoragePath);
+
+        StorageService staging = (StorageService) constructor.newInstance(transactionalStoragePath, false, null, false);
+        return new DefaultTransactionalStorageService(mainStorageService, staging, transactionLog,
+          transactionLogService);
+      } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException
+        | InvocationTargetException e) {
+        LOGGER.warn("Error instantiating storage service defined on properties, falling back to a default service", e);
+      }
+    }
 
     RodaConstants.StorageType storageType = RodaConstants.StorageType
       .valueOf(configurationManager.getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_TYPE,

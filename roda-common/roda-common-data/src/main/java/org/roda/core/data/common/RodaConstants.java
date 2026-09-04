@@ -38,6 +38,7 @@ public final class RodaConstants {
    */
   public static final String CORE_STORAGE_TYPE = "core.storage.type";
   public static final String CORE_STORAGE_NEW_SERVICE = "core.storage.new_service";
+  public static final String CORE_STORAGE_FOLDER_SCATTERING_SERVICE_CLASS = "org.roda.core.storage.fs.FolderScatteringStorageService";
   public static final String CORE_STORAGE_FEDORA4_URL = "core.storage.fedora4.url";
   public static final String CORE_STORAGE_FEDORA4_USERNAME = "core.storage.fedora4.username";
   public static final String CORE_STORAGE_FEDORA4_PASSWORD = "core.storage.fedora4.password";

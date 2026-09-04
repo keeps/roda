@@ -291,7 +291,10 @@ public class Report implements IsModelObject, HasId, HasInstanceID {
   }
 
   public Date getDateCreated() {
-    return dateCreated;
+    // 20260904 mguimaraes: normalize to a plain Date, as Hibernate hydrates this
+    // field as a java.sql.Timestamp, whose equals() is asymmetric with Date
+    // (used when comparing against reports deserialized from JSON storage)
+    return dateCreated == null ? null : new Date(dateCreated.getTime());
   }
 
   public Report setDateCreated(Date dateCreated) {
@@ -300,7 +303,7 @@ public class Report implements IsModelObject, HasId, HasInstanceID {
   }
 
   public Date getDateUpdated() {
-    return dateUpdated;
+    return dateUpdated == null ? null : new Date(dateUpdated.getTime());
   }
 
   public Report setDateUpdated(Date dateUpdated) {
