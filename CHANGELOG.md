@@ -1,5 +1,28 @@
 # Changelog
 
+## v6.3.1 (07/09/2026)
+### :warning: Breaking Changes
+RODA 6.3.0 onwards will use Apache Solr 10 as indexing system. If you have an existing RODA implementation with Solr 9 you will need to [upgrade the Solr to version 10](https://solr.apache.org/guide/solr/latest/upgrade-notes/major-changes-in-solr-10.html) and then rebuild all indexes on RODA.
+
+#### Enhancements
+
+- Add support to visualise CSV and MD files in the integrated viewer #3730
+- Enable advanced search (level filter) on the AIP select dialog #3717
+- Database optimisations #3731
+
+#### Bug fixes
+
+- Support for other storage types initialisation of staging storage #3732
+- LDAP bootstrapping not working correctly for roles #3718
+
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v6.3.0 (03/08/2026)
 ### :warning: Breaking Changes
 RODA 6.3.0 onwards will use Apache Solr 10 as indexing system. If you have an existing RODA implementation with Solr 9 you will need to [upgrade the Solr to version 10](https://solr.apache.org/guide/solr/latest/upgrade-notes/major-changes-in-solr-10.html) and then rebuild all indexes on RODA.
@@ -397,16 +420,6 @@ To try out this version, check the [install instructions](https://github.com/kee
 #### Bug fixes
 
 - Roda fails to reindex due to problem with other metadata files #3218
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
-## v5.6.3 (23/05/2024)
-#### Bug fixes
-
-- Revert webjars-locator functionality
 
 ---
 
