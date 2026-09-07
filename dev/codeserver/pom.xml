@@ -16,6 +16,8 @@
         <rodaPath>..</rodaPath>
         <gwt.version>2.13.1</gwt.version>
         <roda.version>6.4.0-SNAPSHOT</roda.version>
+        <spring.version>7.0.9</spring.version>
+        <springboot.version>4.1.1</springboot.version>
     </properties>
 
     <dependencies>
@@ -113,24 +115,24 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
-            <version>7.0.7</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
-            <version>7.0.7</version>
+            <version>${spring.version}</version>
             <classifier>sources</classifier>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <version>4.0.6</version>
+            <version>${springboot.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <version>4.0.6</version>
+            <version>${springboot.version}</version>
             <classifier>sources</classifier>
         </dependency>
     </dependencies>
