@@ -101,7 +101,7 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
     fields.add(new Field(RodaConstants.FILE_REFERENCE_URL, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.FILE_REFERENCE_MANIFEST, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.FILE_EXTENSION, Field.TYPE_STRING));
-    fields.add(new Field(RodaConstants.FILE_FULLTEXT, Field.TYPE_TEXT).setMultiValued(false).setStored(false));
+    fields.add(new Field(RodaConstants.FILE_FULLTEXT, Field.TYPE_TEXT).setMultiValued(false));
     fields.add(new Field(RodaConstants.FILE_CREATING_APPLICATION_NAME, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.FILE_CREATING_APPLICATION_VERSION, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION, Field.TYPE_STRING));
