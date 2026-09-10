@@ -11,7 +11,6 @@ SET idle_in_transaction_session_timeout = 0;
 SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
@@ -22,10 +21,10 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- Name: job_reports; Type: TABLE; Schema: public; Owner: admin
+-- Name: job_reports; Type: TABLE
 --
 
-CREATE TABLE public.job_reports (
+CREATE TABLE job_reports (
                                     id character varying(255) NOT NULL,
                                     completion_percentage integer,
                                     date_created timestamp(6) without time zone,
@@ -58,13 +57,11 @@ CREATE TABLE public.job_reports (
 );
 
 
-ALTER TABLE public.job_reports OWNER TO admin;
-
 --
--- Name: jobs; Type: TABLE; Schema: public; Owner: admin
+-- Name: jobs; Type: TABLE
 --
 
-CREATE TABLE public.jobs (
+CREATE TABLE jobs (
                              id character varying(255) NOT NULL,
                              attachments_list text,
                              end_date timestamp(6) without time zone,
@@ -92,13 +89,11 @@ CREATE TABLE public.jobs (
 );
 
 
-ALTER TABLE public.jobs OWNER TO admin;
-
 --
--- Name: transaction_log; Type: TABLE; Schema: public; Owner: admin
+-- Name: transaction_log; Type: TABLE
 --
 
-CREATE TABLE public.transaction_log (
+CREATE TABLE transaction_log (
                                         id uuid NOT NULL,
                                         created_at timestamp(6) without time zone NOT NULL,
                                         request_id uuid,
@@ -110,13 +105,11 @@ CREATE TABLE public.transaction_log (
 );
 
 
-ALTER TABLE public.transaction_log OWNER TO admin;
-
 --
--- Name: transactional_model_operation_log; Type: TABLE; Schema: public; Owner: admin
+-- Name: transactional_model_operation_log; Type: TABLE
 --
 
-CREATE TABLE public.transactional_model_operation_log (
+CREATE TABLE transactional_model_operation_log (
                                                           id uuid NOT NULL,
                                                           created_at timestamp(6) without time zone NOT NULL,
                                                           lite_object text,
@@ -129,13 +122,11 @@ CREATE TABLE public.transactional_model_operation_log (
 );
 
 
-ALTER TABLE public.transactional_model_operation_log OWNER TO admin;
-
 --
--- Name: transactional_storage_path_consolidated_operation; Type: TABLE; Schema: public; Owner: admin
+-- Name: transactional_storage_path_consolidated_operation; Type: TABLE
 --
 
-CREATE TABLE public.transactional_storage_path_consolidated_operation (
+CREATE TABLE transactional_storage_path_consolidated_operation (
                                                                           id uuid NOT NULL,
                                                                           created_at timestamp(6) without time zone NOT NULL,
                                                                           operation_state character varying(255) NOT NULL,
@@ -150,13 +141,11 @@ CREATE TABLE public.transactional_storage_path_consolidated_operation (
 );
 
 
-ALTER TABLE public.transactional_storage_path_consolidated_operation OWNER TO admin;
-
 --
--- Name: transactional_storage_path_operation_log; Type: TABLE; Schema: public; Owner: admin
+-- Name: transactional_storage_path_operation_log; Type: TABLE
 --
 
-CREATE TABLE public.transactional_storage_path_operation_log (
+CREATE TABLE transactional_storage_path_operation_log (
                                                                  id uuid NOT NULL,
                                                                  created_at timestamp(6) without time zone NOT NULL,
                                                                  operation_state character varying(255) NOT NULL,
@@ -171,84 +160,82 @@ CREATE TABLE public.transactional_storage_path_operation_log (
 );
 
 
-ALTER TABLE public.transactional_storage_path_operation_log OWNER TO admin;
-
 --
--- Name: job_reports job_reports_pkey; Type: CONSTRAINT; Schema: public; Owner: admin
+-- Name: job_reports job_reports_pkey; Type: CONSTRAINT
 --
 
-ALTER TABLE ONLY public.job_reports
+ALTER TABLE ONLY job_reports
     ADD CONSTRAINT job_reports_pkey PRIMARY KEY (id);
 
 
 --
--- Name: jobs jobs_pkey; Type: CONSTRAINT; Schema: public; Owner: admin
+-- Name: jobs jobs_pkey; Type: CONSTRAINT
 --
 
-ALTER TABLE ONLY public.jobs
+ALTER TABLE ONLY jobs
     ADD CONSTRAINT jobs_pkey PRIMARY KEY (id);
 
 
 --
--- Name: transaction_log transaction_log_pkey; Type: CONSTRAINT; Schema: public; Owner: admin
+-- Name: transaction_log transaction_log_pkey; Type: CONSTRAINT
 --
 
-ALTER TABLE ONLY public.transaction_log
+ALTER TABLE ONLY transaction_log
     ADD CONSTRAINT transaction_log_pkey PRIMARY KEY (id);
 
 
 --
--- Name: transactional_model_operation_log transactional_model_operation_log_pkey; Type: CONSTRAINT; Schema: public; Owner: admin
+-- Name: transactional_model_operation_log transactional_model_operation_log_pkey; Type: CONSTRAINT
 --
 
-ALTER TABLE ONLY public.transactional_model_operation_log
+ALTER TABLE ONLY transactional_model_operation_log
     ADD CONSTRAINT transactional_model_operation_log_pkey PRIMARY KEY (id);
 
 
 --
--- Name: transactional_storage_path_consolidated_operation transactional_storage_path_consolidated_operation_pkey; Type: CONSTRAINT; Schema: public; Owner: admin
+-- Name: transactional_storage_path_consolidated_operation transactional_storage_path_consolidated_operation_pkey; Type: CONSTRAINT
 --
 
-ALTER TABLE ONLY public.transactional_storage_path_consolidated_operation
+ALTER TABLE ONLY transactional_storage_path_consolidated_operation
     ADD CONSTRAINT transactional_storage_path_consolidated_operation_pkey PRIMARY KEY (id);
 
 
 --
--- Name: transactional_storage_path_operation_log transactional_storage_path_operation_log_pkey; Type: CONSTRAINT; Schema: public; Owner: admin
+-- Name: transactional_storage_path_operation_log transactional_storage_path_operation_log_pkey; Type: CONSTRAINT
 --
 
-ALTER TABLE ONLY public.transactional_storage_path_operation_log
+ALTER TABLE ONLY transactional_storage_path_operation_log
     ADD CONSTRAINT transactional_storage_path_operation_log_pkey PRIMARY KEY (id);
 
 
 --
--- Name: idx_report_job_id; Type: INDEX; Schema: public; Owner: admin
+-- Name: idx_report_job_id; Type: INDEX
 --
 
-CREATE INDEX idx_report_job_id ON public.job_reports USING btree (job_id);
-
-
---
--- Name: transactional_model_operation_log fk67f6aqryq0kt4kseko94y53ri; Type: FK CONSTRAINT; Schema: public; Owner: admin
---
-
-ALTER TABLE ONLY public.transactional_model_operation_log
-    ADD CONSTRAINT fk67f6aqryq0kt4kseko94y53ri FOREIGN KEY (transaction_id) REFERENCES public.transaction_log(id);
+CREATE INDEX idx_report_job_id ON job_reports USING btree (job_id);
 
 
 --
--- Name: transactional_storage_path_consolidated_operation fkc97nbb5vxbp8kaxeco280p9mb; Type: FK CONSTRAINT; Schema: public; Owner: admin
+-- Name: transactional_model_operation_log fk67f6aqryq0kt4kseko94y53ri; Type: FK CONSTRAINT
 --
 
-ALTER TABLE ONLY public.transactional_storage_path_consolidated_operation
-    ADD CONSTRAINT fkc97nbb5vxbp8kaxeco280p9mb FOREIGN KEY (transaction_id) REFERENCES public.transaction_log(id);
+ALTER TABLE ONLY transactional_model_operation_log
+    ADD CONSTRAINT fk67f6aqryq0kt4kseko94y53ri FOREIGN KEY (transaction_id) REFERENCES transaction_log(id);
+
 
 --
--- Name: transactional_storage_path_operation_log fko951crqyu5425flp1q55ke9yg; Type: FK CONSTRAINT; Schema: public; Owner: admin
+-- Name: transactional_storage_path_consolidated_operation fkc97nbb5vxbp8kaxeco280p9mb; Type: FK CONSTRAINT
 --
 
-ALTER TABLE ONLY public.transactional_storage_path_operation_log
-    ADD CONSTRAINT fko951crqyu5425flp1q55ke9yg FOREIGN KEY (transaction_id) REFERENCES public.transaction_log(id);
+ALTER TABLE ONLY transactional_storage_path_consolidated_operation
+    ADD CONSTRAINT fkc97nbb5vxbp8kaxeco280p9mb FOREIGN KEY (transaction_id) REFERENCES transaction_log(id);
+
+--
+-- Name: transactional_storage_path_operation_log fko951crqyu5425flp1q55ke9yg; Type: FK CONSTRAINT
+--
+
+ALTER TABLE ONLY transactional_storage_path_operation_log
+    ADD CONSTRAINT fko951crqyu5425flp1q55ke9yg FOREIGN KEY (transaction_id) REFERENCES transaction_log(id);
 
 
 --
