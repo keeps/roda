@@ -404,6 +404,22 @@ public class FileStorageService implements StorageService {
   }
 
   @Override
+  public Binary createBinaryIfNotExists(StoragePath storagePath, ContentPayload payload, boolean asReference)
+    throws GenericException, RequestNotValidException, NotFoundException {
+    Path binPath = FSUtils.getEntityPath(basePath, storagePath);
+    // Try creating it
+    if (!FSUtils.exists(binPath)) {
+      try {
+        return createBinary(storagePath, payload, asReference);
+      } catch (AlreadyExistsException e) {
+        // do nothing
+      }
+    }
+    // Try returning existing binary
+    return getBinary(storagePath);
+  }
+
+  @Override
   public Binary createRandomBinary(StoragePath parentStoragePath, ContentPayload payload, boolean asReference)
     throws GenericException, RequestNotValidException {
     if (asReference) {

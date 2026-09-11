@@ -318,6 +318,39 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   }
 
   @Override
+  public Binary createBinaryIfNotExists(StoragePath storagePath, ContentPayload payload, boolean asReference)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath,
+      OperationType.OPTIMISTIC_CREATE_IF_NOT_EXISTS);
+
+    Binary ret;
+
+    try {
+      TransactionalStoragePathOperationLog anyDeletedStoragePathOperation = transactionLogService
+        .getAnyDeletedStoragePathOperation(transaction.getId(), storagePath.toString());
+      if (anyDeletedStoragePathOperation == null && mainStorageService.exists(storagePath)) {
+        ret = getBinary(storagePath);
+        updateOperationState(operationLog, OperationState.SKIPPED);
+        return ret;
+      }
+    } catch (RODATransactionException e) {
+      updateOperationState(operationLog, OperationState.FAILURE);
+      throw new GenericException(
+        "[transactionId:" + transaction.getId() + "] Failed to create or get binary for storage path: " + storagePath,
+        e);
+    }
+
+    try {
+      ret = stagingStorageService.createBinaryIfNotExists(storagePath, payload, asReference);
+      updateOperationState(operationLog, OperationState.SUCCESS);
+      return ret;
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
+      updateOperationState(operationLog, OperationState.FAILURE);
+      throw e;
+    }
+  }
+
+  @Override
   public Binary createRandomBinary(StoragePath parentStoragePath, ContentPayload payload, boolean asReference)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     TransactionalStoragePathOperationLog operationLog = registerOperation(parentStoragePath, OperationType.CREATE);
@@ -700,6 +733,8 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
           handleCreateOperation(storagePath, version);
         } else if (operationType == OperationType.CREATE_OR_UPDATE) {
           handleCreateUpdateOperation(storagePath, version);
+        } else if (operationType == OperationType.OPTIMISTIC_CREATE_IF_NOT_EXISTS) {
+          handleOptimisticCreateIfNotExistsOperation(storagePath, version);
         } else if (operationType == OperationType.READ) {
           LOGGER.debug("[transactionId:{}] Skipping read operation for storage path: {}", transaction.getId(),
             storagePath);
@@ -813,6 +848,37 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     }
   }
 
+  private void handleOptimisticCreateIfNotExistsOperation(StoragePath storagePath, String version)
+    throws RODATransactionException {
+    try {
+      if (version != null) {
+        LOGGER.info("[transactionId:{}] Creating binary version from staging to main storage service: {}",
+          transaction.getId(), storagePath);
+        mainStorageService.importBinaryVersion(stagingStorageService, storagePath, version);
+      } else {
+        LOGGER.info("[transactionId:{}] Moving resource from staging to main storage service: {}", transaction.getId(),
+          storagePath);
+        Class<? extends Entity> rootEntity = stagingStorageService.getEntity(storagePath);
+        // TODO: This is necessary to avoid recursive copies, we should handle it better
+        // in StorageServiceUtils
+        if (Container.class.isAssignableFrom(rootEntity)) {
+          mainStorageService.createContainer(storagePath);
+        } else if (Directory.class.isAssignableFrom(rootEntity)) {
+          mainStorageService.createDirectory(storagePath);
+        } else {
+          StorageServiceUtils.copyBetweenStorageServices(stagingStorageService, storagePath, mainStorageService,
+            storagePath, rootEntity);
+        }
+      }
+    } catch (AlreadyExistsException e) {
+      // do nothing
+    } catch (GenericException | RequestNotValidException | NotFoundException 
+      | AuthorizationDeniedException e) {
+      throw new RODATransactionException("[transactionId:" + transaction.getId()
+        + "] Failed to copy storage path from staging to main storage service: " + storagePath, e);
+    }
+  }
+
   private void copyMissingResourcesToStagingStorage(StoragePath storagePath)
     throws RequestNotValidException, RODATransactionException {
     if (!mainStorageService.exists(storagePath)) {
@@ -868,6 +934,8 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
           rollbackUpdateOperation(operation);
         } else if (operation.getOperationType() == OperationType.CREATE) {
           rollbackCreateOperation(operation);
+        } else if (operation.getOperationType() == OperationType.OPTIMISTIC_CREATE_IF_NOT_EXISTS) {
+          // rollbackOptimisticCreateIfNotExistsOperation(operation);
         } else if (operation.getOperationType() == OperationType.READ) {
           // do nothing for read operations
         }
@@ -899,6 +967,12 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
       throw new RODATransactionException("[transactionId:" + transaction.getId()
         + "] Failed to roll back create operation path at " + operation.getStoragePath(), e);
     }
+  }
+
+  public void rollbackOptimisticCreateIfNotExistsOperation(TransactionStoragePathConsolidatedOperation operation)
+    throws RODATransactionException {
+    throw new RODATransactionException(
+      "[transactionId:" + transaction.getId() + "] Optimistic create if not exists roll back not supported");
   }
 
   public void rollbackUpdateOperation(TransactionStoragePathConsolidatedOperation operation)
