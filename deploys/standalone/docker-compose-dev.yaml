@@ -12,7 +12,7 @@ services:
       - zookeeper_datalog:/datalog
 
   solr:
-    image: docker.io/solr:10.0.0
+    image: docker.io/solr:9
     container_name: solr
     restart: unless-stopped
     ports:
