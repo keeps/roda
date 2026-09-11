@@ -1604,19 +1604,24 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       operationLogs = operationRegistry.registerCreateOperationForPreservationMetadata(null, null, null, null, id,
         type);
     }
-    try {
-      PreservationMetadata ret = getModelService().createPreservationMetadata(type, id, payload, notify);
-      operationRegistry.updateOperationState(operationLogs, OperationState.SUCCESS);
-      return ret;
-    } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-      operationRegistry.updateOperationState(operationLogs, OperationState.FAILURE);
-      throw e;
-    } catch (AlreadyExistsException e) {
-      // if the agent already exists we do nothing register failure
-      if (!type.equals(PreservationMetadata.PreservationMetadataType.AGENT)) {
+
+    if (operationLogs.stream().noneMatch(log -> log.getOperationState().equals(OperationState.SKIPPED))) {
+      try {
+        PreservationMetadata ret = getModelService().createPreservationMetadata(type, id, payload, notify);
+        operationRegistry.updateOperationState(operationLogs, OperationState.SUCCESS);
+        return ret;
+      } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
         operationRegistry.updateOperationState(operationLogs, OperationState.FAILURE);
+        throw e;
+      } catch (AlreadyExistsException e) {
+        // if the agent already exists we do nothing register failure
+        if (!type.equals(PreservationMetadata.PreservationMetadataType.AGENT)) {
+          operationRegistry.updateOperationState(operationLogs, OperationState.FAILURE);
+        }
+        throw e;
       }
-      throw e;
+    } else {
+      return retrievePreservationMetadata(id, type);
     }
   }
 
