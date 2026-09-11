@@ -18,6 +18,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.LockingException;
+import org.roda.core.data.exceptions.NotLockableAtTheTimeException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteRODAObject;
@@ -255,10 +256,19 @@ public class TransactionalModelOperationRegistry {
           RODAInstanceUtils.getLocalInstanceIdentifier());
     }
 
+    boolean acquiredLock = false;
     if (aipID == null) {
-      acquireLockAndCheckPreconditions(PreservationMetadata.class, preservationID, operation);
+      acquiredLock = acquireLockAndCheckPreconditions(PreservationMetadata.class, preservationID, operation);
     }
-    return registerOperationForPreservationMetadata(aipID, representationId, path, fileID, preservationID, operation);
+    List<TransactionalModelOperationLog> ret = registerOperationForPreservationMetadata(aipID, representationId, path,
+      fileID, preservationID, operation);
+    if (!acquiredLock) {
+      for (TransactionalModelOperationLog log : ret) {
+        log.setOperationState(OperationState.SKIPPED);
+        updateOperationState(log, OperationState.SKIPPED);
+      }
+    }
+    return ret;
   }
 
   public List<TransactionalModelOperationLog> registerReadOperationForPreservationMetadata(String aipID,
@@ -471,17 +481,32 @@ public class TransactionalModelOperationRegistry {
     }
   }
 
-  private void acquireLockAndCheckPreconditions(Class<? extends IsRODAObject> clazz, String id, OperationType operation)
+  /**
+   * Check relevant lock acquisition preconditions, and acquire said lock
+   * 
+   * @param clazz
+   * @param id
+   * @param operation
+   * @return Whether the lock was acquired or not
+   * @throws AlreadyExistsException
+   * @throws RequestNotValidException
+   * @throws GenericException
+   */
+  private boolean acquireLockAndCheckPreconditions(Class<? extends IsRODAObject> clazz, String id,
+    OperationType operation)
     throws AlreadyExistsException, RequestNotValidException, GenericException {
     if (operation == OperationType.OPTIMISTIC_CREATE_IF_NOT_EXISTS) {
       // Verify if the object already exists
       try {
         checkIfEntityExistsAndThrowException(clazz, id);
-        acquireLock(clazz, id, operation);
+        return tryAcquireLock(clazz, id, operation);
       } catch (AlreadyExistsException e) {
         LOGGER.debug(
             "[transactionId:{}] Entity with ID {} already exists, will not create a new one. Lock not acquired.",
             transaction.getId(), id, e);
+        return false;
+      } catch (LockingException e) {
+        throw new GenericException(e);
       }
     } else {
       acquireLock(clazz, id, operation);
@@ -503,6 +528,7 @@ public class TransactionalModelOperationRegistry {
           throw e;
         }
       }
+      return true;
       // Cannot check pre-conditions for UPDATE or DELETE operations, such as checking
       // if the object exists in main storage, because some updates or deletes may
       // only be on the scope of staging and due to previous CREATE operations in
@@ -510,12 +536,20 @@ public class TransactionalModelOperationRegistry {
     }
   }
 
+  /**
+   * Attempts to acquire object lock, throwing runtime excepting if this fails.
+   * 
+   * @param objectClass
+   * @param id
+   * @param operation
+   * @param <T>
+   */
   private <T extends IsRODAObject> void acquireLock(Class<T> objectClass, String id, OperationType operation) {
     if (id == null) {
       throw new IllegalArgumentException("[transactionId:" + transaction.getId() + "] Object ID cannot be null");
     }
 
-    if (operation == OperationType.READ || operation == OperationType.OPTIMISTIC_CREATE_IF_NOT_EXISTS) {
+    if (operation == OperationType.READ) {
       // DO NOT acquire lock for these operation types
       return;
     }
@@ -533,6 +567,53 @@ public class TransactionalModelOperationRegistry {
       } catch (LockingException e) {
         throw new IllegalArgumentException(
           "[transactionId:" + transaction.getId() + "] Cannot acquire lock for object: " + liteRODAObject);
+      }
+    } else {
+      throw new IllegalArgumentException("[transactionId:" + transaction.getId()
+        + "] Cannot acquire lock for object ID: " + id + " of class: " + objectClass.getName());
+    }
+  }
+
+  /**
+   * Same as {@link acquireLock}, but uses tryLock, which does not wait for locks,
+   * and preserves thrown exceptions instead of throwing runtime exceptions.
+   * 
+   * @param objectClass
+   * @param id
+   * @param operation
+   * @param <T>
+   * @throws LockingException
+   * @return Boolean indicating whether the lock was acquired or not.
+   */
+  private <T extends IsRODAObject> boolean tryAcquireLock(Class<T> objectClass, String id, OperationType operation)
+    throws LockingException {
+    if (id == null) {
+      throw new LockingException("[transactionId:" + transaction.getId() + "] Object ID cannot be null");
+    }
+
+    if (operation == OperationType.READ) {
+      // DO NOT acquire lock for these operation types
+      return false;
+    }
+
+    if (!isLockableClass(objectClass)) {
+      throw new LockingException(
+        "[transactionId:" + transaction.getId() + "] Object class is not lockable: " + objectClass.getName());
+    }
+
+    Optional<LiteRODAObject> liteRODAObject = LiteRODAObjectFactory.get(objectClass, id);
+    if (liteRODAObject.isPresent()) {
+      String lite = liteRODAObject.get().getInfo();
+      try {
+        PluginHelper.tryLock(List.of(lite), transaction.getRequestId().toString());
+        return true;
+      } catch (NotLockableAtTheTimeException e) {
+        if (!operation.equals(OperationType.OPTIMISTIC_CREATE_IF_NOT_EXISTS)) {
+          throw e;
+        } else {
+          // If this is an optimistic operation, it's fine if someone has already locked.
+          return false;
+        }
       }
     } else {
       throw new IllegalArgumentException("[transactionId:" + transaction.getId()
