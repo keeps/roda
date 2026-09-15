@@ -741,6 +741,7 @@ public final class PluginHelper {
     list.add(Risk.class);
     list.add(LogEntry.class);
     list.add(RiskIncidence.class);
+    list.add(IndexedPreservationEvent.class);
     list.add(IndexedPreservationAgent.class);
     list.add(DIP.class);
     list.add(DisposalConfirmation.class);
