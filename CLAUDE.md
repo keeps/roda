@@ -196,8 +196,10 @@ mvn -f dev/codeserver gwt:codeserver -DrodaPath=$(pwd)
 
 ### Running Tests
 
+`roda-core-tests` does **not** need the `docker-compose-dev.yaml` stack manually started. Its `testng.xml` registers `RodaContainersLifecycleListener`, which provisions its own ephemeral Solr Cloud/ZooKeeper/PostgreSQL/etc. containers via Testcontainers for the JVM run and tears them down afterward. All that's required is a reachable Docker daemon (`docker info`). Manually starting the dev compose stack is only needed to run the app itself (`spring-boot:run`), not to run this module's tests — running both at once is safe, since Testcontainers uses independent container names/ports.
+
 ```bash
-# All tests (requires Docker services running)
+# All tests (Docker daemon must be reachable; infra is self-provisioned)
 mvn clean test
 
 # CI subset only (faster)
@@ -416,7 +418,7 @@ After changing `roda-core`, run `mvn install -Pcore -DskipTests` before building
 
 1. **GitHub Packages auth is required.** Maven build will fail without a valid `~/.m2/settings.xml` with a GitHub PAT having `read:packages`.
 
-2. **Always start Docker services before running tests.** Tests are integration tests — they need live Solr, PostgreSQL, ZooKeeper, and LDAP.
+2. **`roda-core-tests` provisions its own test infra via Testcontainers** (Solr Cloud, ZooKeeper, PostgreSQL, LDAP, etc.) — just make sure the Docker daemon is reachable (`docker info`). Do not manually start `docker-compose-dev.yaml` for this; it's only needed to run the app itself (`spring-boot:run`).
 
 3. **Use the correct Maven profile.**
    - Skip UI/GWT: use `-Pcore`
