@@ -37,7 +37,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import gov.loc.premis.v3.PremisComplexType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.joda.time.DateTime;
@@ -45,7 +44,6 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.characterization.model.TechnicalMetadata;
 import org.roda.core.common.characterization.model.TechnicalMetadataElement;
 import org.roda.core.common.characterization.model.TechnicalMetadataField;
-import org.roda.core.config.ConfigurationManager;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationAgentType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -1086,6 +1084,57 @@ public final class PremisV3Utils {
       } catch (NotFoundException e) {
         pm = model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
       }
+    }
+
+    return pm;
+  }
+
+  public static PreservationMetadata createIfNotExistsPremisUserAgentBinary(String username, ModelService model,
+    IndexService index, boolean notify, List<JobUserDetails> jobUserDetails)
+    throws GenericException, ValidationException, NotFoundException, RequestNotValidException,
+    AuthorizationDeniedException, AlreadyExistsException {
+    PreservationMetadata pm = null;
+
+    if (StringUtils.isNotBlank(username)) {
+      String id = IdUtils.getUserAgentId(username, RODAInstanceUtils.getLocalInstanceIdentifier());
+
+      try {
+        if (model.retrievePreservationAgent(id) != null) {
+          return model.retrievePreservationMetadata(id, PreservationMetadataType.AGENT);
+        }
+      } catch (NotFoundException e) {
+        // Continue
+      }
+
+      String fullName = "";
+      String extension = "";
+      String note = "";
+      String version = "";
+
+      if (jobUserDetails != null) {
+        for (JobUserDetails jobUserDetail : jobUserDetails) {
+          if (jobUserDetail.getUsername().equals(username)) {
+            fullName = jobUserDetail.getFullname();
+            note = jobUserDetail.getEmail();
+          }
+        }
+      } else {
+        try {
+          RODAMember member = index.retrieve(RODAMember.class, IdUtils.getUserId(username),
+            Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.MEMBERS_FULLNAME, RodaConstants.MEMBERS_EMAIL));
+
+          fullName = member.getFullName();
+          if (member instanceof User user) {
+            note = user.getEmail();
+          }
+        } catch (NotFoundException e) {
+          LOGGER.warn("Could not find user and add its details to the PREMIS agent", e);
+        }
+      }
+
+      ContentPayload agentPayload = PremisV3Utils.createPremisAgentBinary(id, fullName, PreservationAgentType.PERSON,
+        extension, note, version);
+      pm = model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
     }
 
     return pm;

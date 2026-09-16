@@ -336,6 +336,13 @@ public class RodaCoreFactory {
   public static void instantiateTest(boolean deploySolr, boolean deployLdap, boolean deployTransferredResourcesScanner,
     boolean deployOrchestrator, boolean deployPluginManager, boolean deployDefaultResources,
     boolean deployProtocolManager, LdapUtility ldapUtility) {
+    instantiateTest(deploySolr, deployLdap, deployTransferredResourcesScanner, deployOrchestrator, deployPluginManager,
+      deployDefaultResources, deployProtocolManager, ldapUtility, null);
+  }
+
+  public static void instantiateTest(boolean deploySolr, boolean deployLdap, boolean deployTransferredResourcesScanner,
+    boolean deployOrchestrator, boolean deployPluginManager, boolean deployDefaultResources,
+    boolean deployProtocolManager, LdapUtility ldapUtility, RODATransactionManager transactionManager) {
     INSTANTIATE_SOLR = deploySolr;
     INSTANTIATE_LDAP = deployLdap;
     INSTANTIATE_SCANNER = deployTransferredResourcesScanner;
@@ -344,6 +351,7 @@ public class RodaCoreFactory {
     INSTANTIATE_DEFAULT_RESOURCES = deployDefaultResources;
     INSTANTIATE_PROTOCOL_MANAGER = deployProtocolManager;
     RodaCoreFactory.ldapUtility = ldapUtility;
+    RodaCoreFactory.RODATransactionManager = transactionManager;
     instantiateTest();
   }
 
@@ -928,8 +936,7 @@ public class RodaCoreFactory {
 
   public static RODATransactionManager getTransactionManager() throws GenericException {
     if (nodeType.equals(NodeType.TEST)) {
-      // TODO: Handle test mode
-      return null;
+      return RODATransactionManager;
     }
     if (RODATransactionManager == null && !configurationManager.isLegacyImplementationEnabled()) {
       instantiateTransactionManager(nodeType);
