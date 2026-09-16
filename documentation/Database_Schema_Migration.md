@@ -143,14 +143,31 @@ Steps 3 and 4 touch different things — this one moves tables, step 4 writes on
 
 The migration scripts changed content, so their checksums changed. Flyway compares the checksum of each applied migration against the script it now finds, and refuses to start when they differ. `repair` command rewrites the stored checksums to match. Every row of type `SQL` is realigned; how many there are depends on your history. `repair` writes only to `flyway_schema_history` — it does not re-run any migration and **does not touch your data**.
 
-Extract the migration scripts from the release JAR. Use the JAR, not a source checkout: checksums are computed over file bytes, and even line endings differ.
+**Before you run it**, PostgreSQL must be running and RODA must be stopped, as set in **step 0** — Flyway takes a lock on the history table and the application would compete for it on startup. The other services play no part here and can be left as they are.
+
+**Take the scripts from the release you are deploying.** Their checksums must match the scripts the application will load, byte for byte.
+
+Download the JAR attached to the release:
+
+```bash
+curl -LO https://github.com/keeps/roda/releases/download/v6.4.0/roda-wui-6.4.0.jar
+```
+Or if you are using docker image, copy it from the image you are about to deploy:
+
+```bash
+id=$(docker create docker.io/keeps/roda:6.4.0) && docker cp "$id":/KEEPS/bin/roda-wui-6.4.0.jar . && docker rm "$id"
+```
+
+Then extract the migration scripts from it:
 
 ```bash
 mkdir -p /tmp/roda-migration
-unzip -j roda-wui-<version>.jar 'BOOT-INF/classes/db/migration/*.sql' -d /tmp/roda-migration
+unzip -j roda-wui-6.4.0.jar 'BOOT-INF/classes/db/migration/*.sql' -d /tmp/roda-migration
 ```
 
-Keep the password out of your shell history:
+**Which database user to run it as.** Use the one the application connects with — `spring.datasource.username`, or `SPRING_DATASOURCE_USERNAME` on a container. `repair` only writes to the history table, and that table belongs to that user because its own startup created it, so no additional privileges are needed. A superuser works too, but it can hide a permission problem that would then surface at startup instead.
+
+Keep the password out of your shell history. This is the password of the database user you will pass on to the command.
 
 ```bash
 read -s FLYWAY_PASSWORD && export FLYWAY_PASSWORD
@@ -180,6 +197,13 @@ Successfully repaired schema history table "<schema>"."flyway_schema_history"
 ```
 
 The first line is informational: it reports that no *failed* migration was found, which is the normal case — PostgreSQL rolls a failed migration back in full and leaves no row behind.
+
+> [!NOTE]
+> If `repair` fails with a permission error on the history table, that table was created by a different database user than the one you used. Find its owner and run the command as that user:
+>
+> ```sql
+> SELECT tableowner FROM pg_tables WHERE tablename = 'flyway_schema_history';
+> ```
 
 ---
 
