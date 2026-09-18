@@ -1,4 +1,4 @@
-# `fulltext` field fix in the `File` Solr collection (#3733 / #3734)
+# Solr `fulltext` field fix in the `File` collection (#3733 / #3734)
 
 ## What changed
 
