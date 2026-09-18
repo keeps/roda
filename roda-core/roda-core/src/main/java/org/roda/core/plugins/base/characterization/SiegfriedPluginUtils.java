@@ -284,7 +284,8 @@ public class SiegfriedPluginUtils {
     String representationId, String fileId, List<String> filePath, String warning) throws RequestNotValidException,
     GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
     // Mitigate previous incidences
-    for (RiskIncidence incidence : getPreviousSiegfriedIncidences(model, index, aipId, fileId)) {
+    for (RiskIncidence incidence : getPreviousSiegfriedIncidences(model, index, aipId, representationId, fileId,
+      filePath)) {
       incidence.setStatus(IncidenceStatus.MITIGATED);
       model.updateRiskIncidence(incidence, true);
     }
@@ -317,13 +318,16 @@ public class SiegfriedPluginUtils {
   }
 
   public static List<RiskIncidence> getPreviousSiegfriedIncidences(ModelService model, IndexService index,
-    String aipId, String fileId)
+    String aipId, String representationId, String fileId, List<String> filePath)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, NotFoundException {
     List<RiskIncidence> riskIncidences = new ArrayList<>();
     Filter filter = new Filter();
     List<FilterParameter> filterParameters = new ArrayList<>();
     filterParameters.add(new SimpleFilterParameter("riskId", RodaConstants.RISK_ID_SIEGFRIED_IDENTIFICATION_WARNING));
     filterParameters.add(new SimpleFilterParameter("aipId", aipId));
+    filterParameters.add(new SimpleFilterParameter("representationId", representationId));
+    filterParameters.add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED,
+      StringUtils.join(filePath, RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED_SEPARATOR)));
     filterParameters.add(new SimpleFilterParameter("fileId", fileId));
     filterParameters.add(new SimpleFilterParameter("status", IncidenceStatus.UNMITIGATED.name()));
     filter.add(filterParameters);
