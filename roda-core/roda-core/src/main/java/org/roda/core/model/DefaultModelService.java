@@ -3528,18 +3528,22 @@ public class DefaultModelService implements ModelService {
     throws AlreadyExistsException, NotFoundException, AuthorizationDeniedException, GenericException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    try {
+    if (riskIncidence.getId() == null) {
       riskIncidence.setId(IdUtils.createUUID());
-      riskIncidence.setDetectedOn(new Date());
-      riskIncidence.setUpdatedOn(new Date());
-      riskIncidence.setInstanceId(RODAInstanceUtils.getLocalInstanceIdentifier());
+    }
+    riskIncidence.setDetectedOn(new Date());
+    riskIncidence.setUpdatedOn(new Date());
+    riskIncidence.setInstanceId(RODAInstanceUtils.getLocalInstanceIdentifier());
 
-      String riskIncidenceAsJson = JsonUtils.getJsonFromObject(riskIncidence);
+    String riskIncidenceAsJson = JsonUtils.getJsonFromObject(riskIncidence);
+
+    try {
       StoragePath riskIncidencePath = ModelUtils.getRiskIncidenceStoragePath(riskIncidence.getId());
       storage.createBinary(riskIncidencePath, new StringContentPayload(riskIncidenceAsJson), false);
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException
       | AlreadyExistsException e) {
-      LOGGER.error("Error creating risk incidence in storage", e);
+      LOGGER.error("Storage error while creating risk incidence", e);
+      throw new GenericException(e);
     }
 
     notifyRiskIncidenceCreatedOrUpdated(riskIncidence, commit).failOnError();
