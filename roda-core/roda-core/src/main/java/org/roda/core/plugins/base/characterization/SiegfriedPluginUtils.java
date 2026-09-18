@@ -327,12 +327,24 @@ public class SiegfriedPluginUtils {
     filter.add(filterParameters);
     try (IterableIndexResult<RiskIncidence> results = index.findAll(RiskIncidence.class, filter, true,
       Arrays.asList("id", "status"))) {
-      for (RiskIncidence incidence : results) {
-        RiskIncidence modelIncidence = model.retrieveRiskIncidence(incidence.getId());
-        riskIncidences.add(modelIncidence);
-      }
+      riskIncidences = retrieveIndexedRiskIncidencesFromModel(model, results);
     } catch (IOException e) {
       LOGGER.error("Error finding file id {}'s associated risk incidences", fileId, e);
+    }
+    return riskIncidences;
+  }
+
+  private static List<RiskIncidence> retrieveIndexedRiskIncidencesFromModel(ModelService model,
+    IterableIndexResult<RiskIncidence> indexRiskIncidences)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException {
+    List<RiskIncidence> riskIncidences = new ArrayList<>();
+    for (RiskIncidence incidence : indexRiskIncidences) {
+      try {
+        RiskIncidence modelIncidence = model.retrieveRiskIncidence(incidence.getId());
+        riskIncidences.add(modelIncidence);
+      } catch (NotFoundException e) {
+        LOGGER.warn("Indexed risk incidence {} not found in model; skipping.", incidence.getId());
+      }
     }
     return riskIncidences;
   }
