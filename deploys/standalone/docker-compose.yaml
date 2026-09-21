@@ -88,7 +88,7 @@ services:
       - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
 
       # Spring configuration
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/roda_core_db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/roda_core_db?currentSchema=public
 
       # Solr Cloud configuration
       - RODA_CORE_SOLR_TYPE=CLOUD

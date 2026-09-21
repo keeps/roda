@@ -234,7 +234,7 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
     List<String> notes = new ArrayList<>();
     notes.add(RodaConstants.PRESERVATION_FORMAT_NOTE_MANUAL);
     List<RiskIncidence> siegfriedRiskIncidences = SiegfriedPluginUtils.getPreviousSiegfriedIncidences(model, index,
-      fileId);
+      aipId, representationId, fileId, filePath);
     if (!siegfriedRiskIncidences.isEmpty()) {
       if (clearIncidences) {
         for (RiskIncidence incidence : siegfriedRiskIncidences) {

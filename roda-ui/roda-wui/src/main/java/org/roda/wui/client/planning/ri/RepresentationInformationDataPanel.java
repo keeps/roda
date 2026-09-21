@@ -7,6 +7,7 @@
  */
 package org.roda.wui.client.planning.ri;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
@@ -18,7 +19,6 @@ import org.roda.core.data.v2.ri.RepresentationInformationCustomForm;
 import org.roda.core.data.v2.ri.RepresentationInformationFamily;
 import org.roda.core.data.v2.ri.RepresentationInformationFamilyOptions;
 import org.roda.core.data.v2.ri.RepresentationInformationSupport;
-import org.roda.wui.client.common.IncrementalFilterList;
 import org.roda.wui.client.common.IncrementalRelationList;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.forms.GenericDataForm;
@@ -57,7 +57,7 @@ public class RepresentationInformationDataPanel extends Composite
   private final ListBox family;
   private final FlowPanel extras;
   private final IncrementalRelationList relations;
-  private final IncrementalFilterList filters;
+  private List<String> filters;
   private final Button saveButton;
   private final Button cancelButton;
   private final String originalFamily;
@@ -70,8 +70,7 @@ public class RepresentationInformationDataPanel extends Composite
 
     // 1. Initialize custom lists/panels
     this.relations = new IncrementalRelationList(ri);
-    this.filters = new IncrementalFilterList();
-    this.filters.setVisible(false);
+    this.filters = ri.getFilters();
     this.extras = new FlowPanel();
 
     this.family = new ListBox();
@@ -129,7 +128,6 @@ public class RepresentationInformationDataPanel extends Composite
     });
 
     relations.addChangeHandler(event -> ValueChangeEvent.fire(this, getValue()));
-    filters.addChangeHandler(event -> ValueChangeEvent.fire(this, getValue()));
     form.addValueChangeHandler(event -> ValueChangeEvent.fire(this, getValue()));
 
     // 6. Initialize layout
@@ -237,16 +235,14 @@ public class RepresentationInformationDataPanel extends Composite
           && lastHistory.get(1).equals(RepresentationInformationNetwork.RESOLVER.getHistoryToken())
           && lastHistory.get(2).equals(RepresentationInformationAssociations.RESOLVER.getHistoryToken())) {
 
-          RepresentationInformationDataPanel.this.filters
-            .setFilters(Collections.singletonList(lastHistory.get(lastHistory.size() - 1)));
-
-          String[] filterParts = RepresentationInformationUtils
-            .breakFilterIntoParts(lastHistory.get(lastHistory.size() - 1));
+          String presetFilter = lastHistory.get(lastHistory.size() - 1);
+          String[] filterParts = RepresentationInformationUtils.breakFilterIntoParts(presetFilter);
 
           // Update model with the preset name based on association
           ri.setName(
             messages.representationInformationNameFromAssociation(filterParts[0], filterParts[1], filterParts[2]));
           setRepresentationInformation(ri); // Refresh
+          RepresentationInformationDataPanel.this.filters = new ArrayList<>(Collections.singletonList(presetFilter));
         }
 
         return null;
@@ -294,7 +290,7 @@ public class RepresentationInformationDataPanel extends Composite
     RepresentationInformation ri = form.getValue();
 
     ri.setRelations(relations.getValues());
-    ri.setFilters(filters.getFiltersValue());
+    ri.setFilters(filters);
 
     return ri;
   }
@@ -306,7 +302,7 @@ public class RepresentationInformationDataPanel extends Composite
   public void setRepresentationInformation(RepresentationInformation ri) {
     form.setModel(ri);
     this.relations.setRelationList(ri.getRelations());
-    this.filters.setFilters(ri.getFilters());
+    this.filters = ri.getFilters();
   }
 
   public void clear() {

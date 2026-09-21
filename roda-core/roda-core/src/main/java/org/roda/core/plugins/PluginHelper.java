@@ -741,6 +741,7 @@ public final class PluginHelper {
     list.add(Risk.class);
     list.add(LogEntry.class);
     list.add(RiskIncidence.class);
+    list.add(IndexedPreservationEvent.class);
     list.add(IndexedPreservationAgent.class);
     list.add(DIP.class);
     list.add(DisposalConfirmation.class);
@@ -1286,7 +1287,7 @@ public final class PluginHelper {
           "Could not get LITE for agent with ID: " + linkingIdentifierAgent.getValue());
       }
       if (!model.existsInStorage(agentLite.get())) {
-        PreservationMetadata pm = PremisV3Utils.createOrUpdatePremisUserAgentBinary(agentName, model, index, true,
+        PreservationMetadata pm = PremisV3Utils.createIfNotExistsPremisUserAgentBinary(agentName, model, index, true,
           jobUserDetails);
         if (pm != null) {
           agentIds.add(linkingIdentifierAgent);

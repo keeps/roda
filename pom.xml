@@ -131,6 +131,7 @@
         <scope.gwt-dev>provided</scope.gwt-dev>
         <logback.version>1.5.37</logback.version>
         <mockito.version>5.23.0</mockito.version>
+        <tomcat.version>11.0.25</tomcat.version>
     </properties>
     <profiles>
         <profile>
@@ -964,6 +965,21 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-tomcat</artifactId>
                 <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-core</artifactId>
+                <version>${tomcat.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-el</artifactId>
+                <version>${tomcat.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-websocket</artifactId>
+                <version>${tomcat.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

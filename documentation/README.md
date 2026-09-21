@@ -27,12 +27,18 @@ Among others articles, in this series of documentation you will find information
     - [External Authentication with CAS protocol](Central_Authentication_Service.md)
     - [Disposal feature](Disposal.md)
     - [Default AIP Permissions](Permissions.md)
+
 - Contributing
     - [Developers guide](Developers_Guide.md)
     - [Translation guide](Translation_Guide.md)
     - [Documentation guide](Documentation_Guide.md)
     - [Publishing plugins](Publishing_plugins.md)
-- [Troubleshooting](Troubleshooting.md)
+  
+- Troubleshooting & Upgrades
+  - [General troubleshooting](Troubleshooting.md)
+  - [Database: Schema migration](Database_Schema_Migration.md)
+  - [Solr: Fulltext field fix](Solr_Fulltext_Field_Fix.md)
+  
 - [FAQ](FAQ.md)
 - [History](History.md)
 - [License](LICENSE.md)

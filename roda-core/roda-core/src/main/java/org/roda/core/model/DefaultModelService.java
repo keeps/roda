@@ -66,6 +66,7 @@ import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
 import org.roda.core.common.notifications.NotificationProcessor;
 import org.roda.core.common.validation.ValidationUtils;
+import org.roda.core.config.SpringContext;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.NodeType;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -163,6 +164,8 @@ import org.roda.core.model.utils.ResourceParseUtils;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.base.ingest.PermissionUtils;
 import org.roda.core.protocols.Protocol;
+import org.roda.core.repository.job.JobRepository;
+import org.roda.core.repository.job.ReportRepository;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.storage.BinaryVersion;
@@ -187,9 +190,6 @@ import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.HTTPUtility;
 import org.roda.core.util.IdUtils;
 import org.roda.core.util.RESTClientUtility;
-import org.roda.core.config.SpringContext;
-import org.roda.core.repository.job.JobRepository;
-import org.roda.core.repository.job.ReportRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1986,7 +1986,11 @@ public class DefaultModelService implements ModelService {
     pm.setInstanceId(RODAInstanceUtils.getLocalInstanceIdentifier());
 
     StoragePath binaryPath = ModelUtils.getPreservationMetadataStoragePath(pm);
-    storage.createBinary(binaryPath, payload, false);
+    if (type.equals(PreservationMetadataType.AGENT)) {
+      storage.createBinaryIfNotExists(binaryPath, payload, false);
+    } else {
+      storage.createBinary(binaryPath, payload, false);
+    }
 
     AIP updatedAIP = null;
     if (aipId != null) {
@@ -3524,18 +3528,22 @@ public class DefaultModelService implements ModelService {
     throws AlreadyExistsException, NotFoundException, AuthorizationDeniedException, GenericException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    try {
+    if (riskIncidence.getId() == null) {
       riskIncidence.setId(IdUtils.createUUID());
-      riskIncidence.setDetectedOn(new Date());
-      riskIncidence.setUpdatedOn(new Date());
-      riskIncidence.setInstanceId(RODAInstanceUtils.getLocalInstanceIdentifier());
+    }
+    riskIncidence.setDetectedOn(new Date());
+    riskIncidence.setUpdatedOn(new Date());
+    riskIncidence.setInstanceId(RODAInstanceUtils.getLocalInstanceIdentifier());
 
-      String riskIncidenceAsJson = JsonUtils.getJsonFromObject(riskIncidence);
+    String riskIncidenceAsJson = JsonUtils.getJsonFromObject(riskIncidence);
+
+    try {
       StoragePath riskIncidencePath = ModelUtils.getRiskIncidenceStoragePath(riskIncidence.getId());
       storage.createBinary(riskIncidencePath, new StringContentPayload(riskIncidenceAsJson), false);
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException
       | AlreadyExistsException e) {
-      LOGGER.error("Error creating risk incidence in storage", e);
+      LOGGER.error("Storage error while creating risk incidence", e);
+      throw new GenericException(e);
     }
 
     notifyRiskIncidenceCreatedOrUpdated(riskIncidence, commit).failOnError();
