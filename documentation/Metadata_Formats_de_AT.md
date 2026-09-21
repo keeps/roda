@@ -102,6 +102,7 @@ Die Indexmap-Datei muss im Konfigurationsordner unter `[RODA_HOME]/config/crossw
 
 Das folgende Beispiel zeigt ein Index-Mapping für das einfache Dublin Core-Beispiel.
 
+{% raw %}
 ```
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="2.0"
@@ -301,6 +302,7 @@ Die von diesem Stylesheet erzeugte Ausgabe ist ein [Solr-Dokument](https://wiki.
 <field name="creator_txt">{{creator}}</field>
 </doc>
 ```
+{% endraw %}
 
 ### Visualisierung
 
@@ -559,6 +561,7 @@ Die Aktivität _Bearbeitung_ wird durch eine Konfigurationsdatei unterstützt, d
 
 Formulartemplates muss im Konfigurationsordner unter `[RODA_HOME]/config/templates/` hinzugefügt werden. Das folgende Beispiel zeigt, wie eine Vorlagendatei mit Anmerkungen kombiniert werden kann, die zur Darstellung des Metadaten-Editors verwendet werden.
 
+{% raw %}
 ```
 {{~field name="title" order='2' auto-generate='title' label="{'en': 'Title'}" xpath="//*:title/string()"}}
 {{~field name="id" order='1' auto-generate='id' label="{'en': 'ID'}" xpath="//*:identifier/string()"}}
@@ -586,6 +589,7 @@ Formulartemplates muss im Konfigurationsordner unter `[RODA_HOME]/config/templat
 ```
 
 Die Formularvorlagendateien basieren auf der leistungsfähigen [Handlebars-Engine] (http://handlebarsjs.com). Jedes Feld, das im Metadaten-Editor angezeigt werden soll, sollte am Anfang der Datei durch ein _field_-Handle identifiziert werden (z.B. `{{~field name="title"~}}`). Es gibt mehrere Optionen, mit denen die Art und Weise, wie die einzelnen Felder angezeigt werden, geändert werden kann. Diese Optionen sind Schlüssel-Wert-Paare, z. B. `label="Titel der Arbeit"`, wobei der Schlüssel der Name der Option und der Wert der Wert ist, der dieser Option gegeben wird.
+{% endraw %}
 
 Die verfügbaren Optionen, die das Verhalten der Felder ändern, sind:
 
@@ -644,6 +648,7 @@ crosswalks.dissemination.html.ead.level.item=Item
 
 #### Beispiel für ein "Listen"-Feld
 
+{% raw %}
  {{~field
 name="statusDescription"
 order="470"
@@ -655,10 +660,11 @@ optionsLabelI18nKeyPrefix="crosswalks.dissemination.html.ead.statusDescription"
 label="{'en': 'Status description', 'pt_PT': 'Estado da descrição'}"
 xpath="/*:ead/*:archdesc/*:odd[@type='statusDescription']/*:p/string()"
 ~}}
+{% endraw %}
 
 Das folgende Beispiel zeigt, wie die Tags verwendet werden können:
 
- {{~file name="title" order="1" type="text" label="Template title" mandatory="true" auto-generate="title"~}}
+{% raw %} {{~file name="title" order="1" type="text" label="Template title" mandatory="true" auto-generate="title"~}}{% endraw %}
 
 ## Aktivieren des neuen Formats
 

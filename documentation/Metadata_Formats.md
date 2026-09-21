@@ -167,7 +167,9 @@ The following is an example of an Index map for the Simple Dublin Core example.
     </xsl:for-each>
     <xsl:if test="count(date)  &gt; 0">
       <xsl:if test="count(date)  &lt; 2">
+{% raw %}
         <xsl:analyze-string regex="^\d{{4}}-\d{{2}}-\d{{2}}$"
+{% endraw %}
         select="date[1]/text()">
         <xsl:matching-substring>
           <xsl:variable name="date">
@@ -187,7 +189,9 @@ The following is an example of an Index map for the Simple Dublin Core example.
       </xsl:analyze-string>
       </xsl:if>
       <xsl:if test="count(date)  &gt; 1">
+{% raw %}
         <xsl:analyze-string regex="^\d{{4}}-\d{{2}}-\d{{2}}$" select="date[1]/text()">
+{% endraw %}
           <xsl:matching-substring>
             <xsl:variable name="date">
               <xsl:value-of select="regex-group(0)" />
@@ -199,7 +203,9 @@ The following is an example of an Index map for the Simple Dublin Core example.
             </xsl:if>
           </xsl:matching-substring>
         </xsl:analyze-string>
+{% raw %}
         <xsl:analyze-string regex="^\d{{4}}-\d{{2}}-\d{{2}}$" select="date[2]/text()">
+{% endraw %}
           <xsl:matching-substring>
             <xsl:variable name="date">
               <xsl:value-of select="regex-group(0)" />
@@ -294,11 +300,13 @@ The output produced by this stylesheet is a [Solr document](https://wiki.apache.
 
 ```
 <doc>
+{% raw %}
   <field name="title">{{title}}</field>
   <field name="title_txt">{{title}}</field>
   <field name="description">{{description}}</field>
   <field name="description_txt">{{description}}</field>
   <field name="creator_txt">{{creator}}</field>
+{% endraw %}
 </doc>
 ```
 

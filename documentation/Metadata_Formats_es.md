@@ -167,7 +167,9 @@ The following is an example of an Index map for the Simple Dublin Core example.
     </xsl:for-each>
     <xsl:if test="count(date)  &gt; 0">
       <xsl:if test="count(date)  &lt; 2">
+{% raw %}
         <xsl:analyze-string regex="^\d{{4}}-\d{{2}}-\d{{2}}$"
+{% endraw %}
         select="date[1]/text()">
         <xsl:matching-substring>
           <xsl:variable name="date">
@@ -187,7 +189,9 @@ The following is an example of an Index map for the Simple Dublin Core example.
       </xsl:analyze-string>
       </xsl:if>
       <xsl:if test="count(date)  &gt; 1">
+{% raw %}
         <xsl:analyze-string regex="^\d{{4}}-\d{{2}}-\d{{2}}$" select="date[1]/text()">
+{% endraw %}
           <xsl:matching-substring>
             <xsl:variable name="date">
               <xsl:value-of select="regex-group(0)" />
@@ -199,7 +203,9 @@ The following is an example of an Index map for the Simple Dublin Core example.
             </xsl:if>
           </xsl:matching-substring>
         </xsl:analyze-string>
+{% raw %}
         <xsl:analyze-string regex="^\d{{4}}-\d{{2}}-\d{{2}}$" select="date[2]/text()">
+{% endraw %}
           <xsl:matching-substring>
             <xsl:variable name="date">
               <xsl:value-of select="regex-group(0)" />
@@ -294,11 +300,13 @@ The output produced by this stylesheet is a [Solr document](https://wiki.apache.
 
 ```
 <doc>
+{% raw %}
   <field name="title">{{title}}</field>
   <field name="title_txt">{{title}}</field>
   <field name="description">{{description}}</field>
   <field name="description_txt">{{description}}</field>
   <field name="creator_txt">{{creator}}</field>
+{% endraw %}
 </doc>
 ```
 
@@ -560,6 +568,7 @@ The _Editing_ activity is supported by a configuration file that will instruct t
 Form templates should be added to the configuration under the folder `[RODA_HOME]/config/templates/`. The following example shows how a template file can be combined with annotations that will be used to render the metadata editor.
 
 ```
+{% raw %}
 {{~field name="title"   order='2' auto-generate='title' label="{'en': 'Title'}" xpath="//*:title/string()"}}
 {{~field name="id"      order='1' auto-generate='id' label="{'en': 'ID'}" xpath="//*:identifier/string()"}}
 {{~field name="creator"   label="{'en': 'Creator'}" xpath="//*:creator/string()"}}
@@ -586,6 +595,7 @@ Form templates should be added to the configuration under the folder `[RODA_HOME
 ```
 
 The Form template files are based on the the powerful [Handlebars engine](http://handlebarsjs.com). Each field that is expected to be shown in the metadata editor should be identified in the beginning of the file by a _field_ handle (e.g. `{{~field name="title"~}}`). There are several options that can be used to modify the way each field is displayed. These options are a key-value pairs, e.g. `label="Title of work"`, where the key is the name of the option and the value is the value that will be given to that option.
+{% endraw %}
 
 The available options that alter the fields' behavior are:
 
@@ -644,7 +654,9 @@ The available options that alter the fields' behavior are:
 
 #### Full example of a "list" field
 
+{% raw %}
     {{~field
+{% endraw %}
       name="statusDescription"
       order="470"
       type="list"
@@ -658,7 +670,9 @@ The available options that alter the fields' behavior are:
 
 The following is an example of how the tags can be used:
 
+{% raw %}
     {{~file name="title" order="1" type="text" label="Template title" mandatory="true" auto-generate="title"~}}
+{% endraw %}
 
 ## Activate the new format
 

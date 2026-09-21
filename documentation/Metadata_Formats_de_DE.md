@@ -167,7 +167,9 @@ Das folgende Beispiel zeigt ein Index-Mapping für das einfache Dublin Core-Beis
     </xsl:for-each>
     <xsl:if test="count(date)  &gt; 0">
       <xsl:if test="count(date)  &lt; 2">
+{% raw %}
         <xsl:analyze-string regex="^\d{{4}}-\d{{2}}-\d{{2}}$"
+{% endraw %}
         select="date[1]/text()">
         <xsl:matching-substring>
           <xsl:variable name="date">
@@ -187,7 +189,9 @@ Das folgende Beispiel zeigt ein Index-Mapping für das einfache Dublin Core-Beis
       </xsl:analyze-string>
       </xsl:if>
       <xsl:if test="count(date)  &gt; 1">
+{% raw %}
         <xsl:analyze-string regex="^\d{{4}}-\d{{2}}-\d{{2}}$" select="date[1]/text()">
+{% endraw %}
           <xsl:matching-substring>
             <xsl:variable name="date">
               <xsl:value-of select="regex-group(0)" />
@@ -199,7 +203,9 @@ Das folgende Beispiel zeigt ein Index-Mapping für das einfache Dublin Core-Beis
             </xsl:if>
           </xsl:matching-substring>
         </xsl:analyze-string>
+{% raw %}
         <xsl:analyze-string regex="^\d{{4}}-\d{{2}}-\d{{2}}$" select="date[2]/text()">
+{% endraw %}
           <xsl:matching-substring>
             <xsl:variable name="date">
               <xsl:value-of select="regex-group(0)" />
@@ -294,11 +300,13 @@ Die von diesem Stylesheet erzeugte Ausgabe ist ein [Solr-Dokument](https://wiki.
 
 ```
 <doc>
+{% raw %}
 <field name="title">{{title}}</field>
 <field name="title_txt">{{title}}</field>
 <field name="description">{{description}}</field>
 <field name="description_txt">{{description}}</field>
 <field name="creator_txt">{{creator}}</field>
+{% endraw %}
 </doc>
 ```
 
@@ -560,6 +568,7 @@ Die Aktivität _Bearbeitung_ wird durch eine Konfigurationsdatei unterstützt, d
 Formulartemplates muss im Konfigurationsordner unter `[RODA_HOME]/config/templates/` hinzugefügt werden. Das folgende Beispiel zeigt, wie eine Vorlagendatei mit Anmerkungen kombiniert werden kann, die zur Darstellung des Metadaten-Editors verwendet werden.
 
 ```
+{% raw %}
 {{~field name="title" order='2' auto-generate='title' label="{'en': 'Title'}" xpath="//*:title/string()"}}
 {{~field name="id" order='1' auto-generate='id' label="{'en': 'ID'}" xpath="//*:identifier/string()"}}
 {{~field name="creator" label="{'en': 'Creator'}" xpath="//*:creator/string()"}}
@@ -586,6 +595,7 @@ Formulartemplates muss im Konfigurationsordner unter `[RODA_HOME]/config/templat
 ```
 
 Die Formularvorlagendateien basieren auf der leistungsfähigen [Handlebars-Engine] (http://handlebarsjs.com). Jedes Feld, das im Metadaten-Editor angezeigt werden soll, sollte am Anfang der Datei durch ein _field_-Handle identifiziert werden (z.B. `{{~field name="title"~}}`). Es gibt mehrere Optionen, mit denen die Art und Weise, wie die einzelnen Felder angezeigt werden, geändert werden kann. Diese Optionen sind Schlüssel-Wert-Paare, z. B. `label="Titel der Arbeit"`, wobei der Schlüssel der Name der Option und der Wert der Wert ist, der dieser Option gegeben wird.
+{% endraw %}
 
 Die verfügbaren Optionen, die das Verhalten der Felder ändern, sind:
 
@@ -644,7 +654,9 @@ crosswalks.dissemination.html.ead.level.item=Item
 
 #### Beispiel für ein "Listen"-Feld
 
+{% raw %}
  {{~field
+{% endraw %}
 name="statusDescription"
 order="470"
 type="list"
@@ -658,7 +670,9 @@ xpath="/*:ead/*:archdesc/*:odd[@type='statusDescription']/*:p/string()"
 
 Das folgende Beispiel zeigt, wie die Tags verwendet werden können:
 
+{% raw %}
  {{~file name="title" order="1" type="text" label="Template title" mandatory="true" auto-generate="title"~}}
+{% endraw %}
 
 ## Aktivieren des neuen Formats
 

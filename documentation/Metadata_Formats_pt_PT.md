@@ -167,7 +167,9 @@ O seguinte exemplo demonstra um ficheiro de mapa de índices para a metainforma�
     </xsl:for-each>
     <xsl:if test="count(date)  &gt; 0">
       <xsl:if test="count(date)  &lt; 2">
+{% raw %}
         <xsl:analyze-string regex="^\d{{4}}-\d{{2}}-\d{{2}}$"
+{% endraw %}
         select="date[1]/text()">
         <xsl:matching-substring>
           <xsl:variable name="date">
@@ -187,7 +189,9 @@ O seguinte exemplo demonstra um ficheiro de mapa de índices para a metainforma�
       </xsl:analyze-string>
       </xsl:if>
       <xsl:if test="count(date)  &gt; 1">
+{% raw %}
         <xsl:analyze-string regex="^\d{{4}}-\d{{2}}-\d{{2}}$" select="date[1]/text()">
+{% endraw %}
           <xsl:matching-substring>
             <xsl:variable name="date">
               <xsl:value-of select="regex-group(0)" />
@@ -199,7 +203,9 @@ O seguinte exemplo demonstra um ficheiro de mapa de índices para a metainforma�
             </xsl:if>
           </xsl:matching-substring>
         </xsl:analyze-string>
+{% raw %}
         <xsl:analyze-string regex="^\d{{4}}-\d{{2}}-\d{{2}}$" select="date[2]/text()">
+{% endraw %}
           <xsl:matching-substring>
             <xsl:variable name="date">
               <xsl:value-of select="regex-group(0)" />
@@ -294,11 +300,13 @@ O resultado produzido é um [documento Solr](https://wiki.apache.org/solr/Update
 
 ```
 <doc>
+{% raw %}
   <field name="title">{{title}}</field>
   <field name="title_txt">{{title}}</field>
   <field name="description">{{description}}</field>
   <field name="description_txt">{{description}}</field>
   <field name="creator_txt">{{creator}}</field>
+{% endraw %}
 </doc>
 ```
 
@@ -588,7 +596,9 @@ O modelo de formulário deverá ser adicionado à pasta de configuração `[RODA
 ```
 <!--- {% endraw %} --->
 
+{% raw %}
 O modelo de formulário é baseado no [Handlebars](http://handlebarsjs.com). Cada campo que é esperado ser mostrado no editor de metainformação deve ser identificado no início do ficheiro por _campo_ (p.e. `{{~field name="title"~}}`). Existem diferentes opções que podem ser usadas para modificar a forma como cada campo é mostrado. Estas opções são pares de chave-valor, p.e. `label="Title of work"`, onde a chave é o nome da opção e o valor é o valor para aquela opção.
+{% endraw %}
 
 As opções disponíveis que alteram o comportamento dos campos são:
 
