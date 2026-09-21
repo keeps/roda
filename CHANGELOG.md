@@ -1,5 +1,35 @@
 # Changelog
 
+## v6.4.0 (21/09/2026)
+### :warning: Breaking Changes
+RODA 6.3.0 onwards will use Apache Solr 10 as indexing system. If you have an existing RODA implementation with Solr 9 you will need to [upgrade the Solr to version 10](https://solr.apache.org/guide/solr/latest/upgrade-notes/major-changes-in-solr-10.html) and then rebuild all indexes on RODA.
+
+> [!WARNING]
+> **Flyway migration scripts.** The scripts under `db/migration` changed (schema is now taken from the database connection instead of being hardcoded), so their checksums changed too. **Any installation that already ran a 6.2.x release needs a Flyway `repair` step before starting 6.4.0**, or it will refuse to start. Follow the [Database Schema Migration Guide](https://github.com/keeps/roda/blob/master/documentation/Database_Schema_Migration.md).
+
+#### Enhancements
+
+- Add `create if not exists` operation and `tryLock` for optimistic create, improving concurrency safety on AIP/representation creation (9531e94, 1cdec54)
+- Make Flyway migration scripts schema agnostic (#3736)
+
+#### Bug fixes
+
+- Fix `fulltext` field being wiped by partial Solr updates on the `File` collection (#3734)
+- Fix AIP unlinking from representation information when editing representation information (4c7766b)
+- Fix reindex all not running the preservation repository event index (6dcc549)
+- Fix RiskIncidence creation to properly fail and preserve the argument ID (#3742)
+- Fix incidence lookup filters (#3741)
+- Improve tests and fix optimistic create functionality (d97e0dc)
+
+#### Security
+
+- Several dependency upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v6.3.1 (07/09/2026)
 ### :warning: Breaking Changes
 RODA 6.3.0 onwards will use Apache Solr 10 as indexing system. If you have an existing RODA implementation with Solr 9 you will need to [upgrade the Solr to version 10](https://solr.apache.org/guide/solr/latest/upgrade-notes/major-changes-in-solr-10.html) and then rebuild all indexes on RODA.
@@ -410,16 +440,6 @@ To try out this version, check the [install instructions](https://github.com/kee
 #### Bug fixes
 
 - Roda fails to resolve other metadata with folders #3219
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
-## v5.6.4 (06/06/2024)
-#### Bug fixes
-
-- Roda fails to reindex due to problem with other metadata files #3218
 
 ---
 
