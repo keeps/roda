@@ -155,7 +155,7 @@ curl -LO https://github.com/keeps/roda/releases/download/v6.4.0/roda-wui-6.4.0.j
 Or if you are using docker image, copy it from the image you are about to deploy:
 
 ```bash
-id=$(docker create docker.io/keeps/roda:6.4.0) && docker cp "$id":/KEEPS/bin/roda-wui-6.4.0.jar . && docker rm "$id"
+id=$(docker create docker.io/keeps/roda:v6.4.0) && docker cp "$id":/KEEPS/bin/roda-wui-6.4.0.jar . && docker rm "$id"
 ```
 
 Then extract the migration scripts from it:
