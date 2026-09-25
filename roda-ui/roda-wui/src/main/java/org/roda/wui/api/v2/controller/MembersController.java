@@ -282,7 +282,10 @@ public class MembersController implements MembersRestService, Exportable {
 
     try {
       // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
+      User user = requestContext.getUser();
+      if (!isCurrentUser(user, name.startsWith("user-") ? name.substring("user-".length()) : null)) {
+        controllerAssistant.checkRoles(user);
+      }
 
       if (name.startsWith("user-")) {
         return membersService.retrieveUser(name.substring("user-".length()));
@@ -355,7 +358,11 @@ public class MembersController implements MembersRestService, Exportable {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      controllerAssistant.checkRoles(requestContext.getUser());
+      // check user permissions
+      User user = requestContext.getUser();
+      if (!isAccessKeyOwner(user, accessKeyId)) {
+        controllerAssistant.checkRoles(user);
+      }
       RodaCoreFactory.getModelService().deleteAccessKey(accessKeyId);
       return null;
     } catch (RODAException e) {
@@ -374,7 +381,11 @@ public class MembersController implements MembersRestService, Exportable {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      controllerAssistant.checkRoles(requestContext.getUser());
+      // check user permissions
+      User user = requestContext.getUser();
+      if (!isCurrentUser(user, username)) {
+        controllerAssistant.checkRoles(user);
+      }
       if (membersService.retrieveUser(username).getId() == null) {
         throw new NotFoundException("User not found");
       }
@@ -400,7 +411,11 @@ public class MembersController implements MembersRestService, Exportable {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      controllerAssistant.checkRoles(requestContext.getUser());
+      // check user permissions
+      User user = requestContext.getUser();
+      if (!isAccessKeyOwner(user, accessKeyId)) {
+        controllerAssistant.checkRoles(user);
+      }
       AccessKey accessKey = RodaCoreFactory.getModelService().retrieveAccessKey(accessKeyId);
       accessKey.setKey(null);
       return accessKey;
@@ -454,14 +469,17 @@ public class MembersController implements MembersRestService, Exportable {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      controllerAssistant.checkRoles(requestContext.getUser());
+      // check user permissions
+      User user = requestContext.getUser();
+      if (!isAccessKeyOwner(user, id)) {
+        controllerAssistant.checkRoles(user);
+      }
       if (regenerateAccessKeyRequest.getExpirationDate().before(new Date())) {
         throw new RequestNotValidException("Expiration date must be after current date");
       }
 
       AccessKey accessKey = RodaCoreFactory.getModelService().retrieveAccessKey(id);
-      accessKey
-        .setKey(JwtUtils.generateToken(accessKey.getUserName(), regenerateAccessKeyRequest.getExpirationDate()));
+      accessKey.setKey(JwtUtils.generateToken(accessKey.getUserName(), regenerateAccessKeyRequest.getExpirationDate()));
       return RodaCoreFactory.getModelService().updateAccessKey(accessKey, requestContext.getUser().getName());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
@@ -479,7 +497,11 @@ public class MembersController implements MembersRestService, Exportable {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      controllerAssistant.checkRoles(requestContext.getUser());
+      // check user permissions
+      User user = requestContext.getUser();
+      if (!isCurrentUser(user, id)) {
+        controllerAssistant.checkRoles(user);
+      }
 
       if (accessKeyRequest.getExpirationDate() == null || accessKeyRequest.getExpirationDate().before(new Date())) {
         throw new RequestNotValidException("Expiration date must be after current date");
@@ -509,7 +531,11 @@ public class MembersController implements MembersRestService, Exportable {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      controllerAssistant.checkRoles(requestContext.getUser());
+      // check user permissions
+      User user = requestContext.getUser();
+      if (!isAccessKeyOwner(user, accessKeyId)) {
+        controllerAssistant.checkRoles(user);
+      }
 
       AccessKey accessKey = RodaCoreFactory.getModelService().retrieveAccessKey(accessKeyId);
       accessKey.setStatus(AccessKeyStatus.REVOKED);
@@ -774,7 +800,10 @@ public class MembersController implements MembersRestService, Exportable {
 
     try {
       // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
+      User user = requestContext.getUser();
+      if (!isCurrentUser(user, id)) {
+        controllerAssistant.checkRoles(user);
+      }
       // delegate
       return membersService.getGroupFromUser(id);
     } catch (RODAException e) {
@@ -838,7 +867,10 @@ public class MembersController implements MembersRestService, Exportable {
 
     try {
       // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
+      User user = requestContext.getUser();
+      if (!isCurrentUser(user, userOperations.getUser() != null ? userOperations.getUser().getId() : null)) {
+        controllerAssistant.checkRoles(user);
+      }
       // delegate
       return membersService.updateMyUser(requestContext.getUser(), userOperations.getUser(),
         userOperations.getPassword(), userOperations.getValues());
@@ -1045,5 +1077,20 @@ public class MembersController implements MembersRestService, Exportable {
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
     // delegate
     return ApiUtils.okResponse(indexService.exportToCSV(findRequestString, RODAMember.class));
+  }
+
+  private static boolean isCurrentUser(User user, String userId) {
+    return user != null && !user.isGuest() && userId != null && userId.equals(user.getId());
+  }
+
+  private static boolean isAccessKeyOwner(User user, String accessKeyId) {
+    if (user == null || user.isGuest()) {
+      return false;
+    }
+    try {
+      return isCurrentUser(user, RodaCoreFactory.getModelService().retrieveAccessKey(accessKeyId).getUserName());
+    } catch (RODAException e) {
+      return false;
+    }
   }
 }
