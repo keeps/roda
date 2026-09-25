@@ -27,6 +27,12 @@ public class PermissionClientUtils {
     // do nothing
   }
 
+  public static boolean isCurrentUser(String userId) {
+    Optional<User> authenticatedUser = UserLogin.getInstance().getCachedUser();
+    return userId != null && authenticatedUser.isPresent() && !authenticatedUser.get().isGuest()
+      && userId.equals(authenticatedUser.get().getId());
+  }
+
   public static boolean hasPermissions(String... methods) {
     return hasPermissions(Arrays.asList(methods), null);
   }

@@ -29,6 +29,7 @@ public class UpdateUserRequest implements Serializable {
 
   private User user;
   private SecureString password;
+  private SecureString currentPassword;
   private Set<MetadataValue> values;
 
   public UpdateUserRequest(User user, SecureString password, Set<MetadataValue> values) {
@@ -65,5 +66,13 @@ public class UpdateUserRequest implements Serializable {
 
   public void setPassword(SecureString password) {
     this.password = password;
+  }
+
+  public SecureString getCurrentPassword() {
+    return currentPassword;
+  }
+
+  public void setCurrentPassword(SecureString currentPassword) {
+    this.currentPassword = currentPassword;
   }
 }

@@ -7,17 +7,21 @@
  */
 package org.roda.wui.client.common.actions;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import config.i18n.client.ClientMessages;
-
-import org.roda.core.data.v2.user.RODAMember;
-import org.roda.wui.client.common.actions.model.ActionableBundle;
-import org.roda.wui.client.common.actions.model.ActionableGroup;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.user.RODAMember;
+import org.roda.wui.client.common.actions.model.ActionableBundle;
+import org.roda.wui.client.common.actions.model.ActionableGroup;
+import org.roda.wui.client.common.utils.PermissionClientUtils;
+import org.roda.wui.common.client.tools.ConfigurationManager;
+
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -51,6 +55,12 @@ public class RODAMemberToolbarActions extends AbstractActionable<RODAMember> {
 
   @Override
   public CanActResult userCanAct(Action<RODAMember> action, RODAMember object) {
+    boolean casEnabled = ConfigurationManager.getBoolean(false, RodaConstants.UI_FILTER_CAS_ENABLED);
+    boolean selfServiceAction = RODAMemberAction.NEW_ACCESS_KEY.equals(action)
+      || (RODAMemberAction.CHANGE_PASSWORD.equals(action) && !casEnabled);
+    if (selfServiceAction && object != null && object.isUser() && PermissionClientUtils.isCurrentUser(object.getId())) {
+      return new CanActResult(true, CanActResult.Reason.USER, messages.reasonUserLacksPermission());
+    }
     return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
   }
 
@@ -103,7 +113,8 @@ public class RODAMemberToolbarActions extends AbstractActionable<RODAMember> {
     // ACTIONS
     ActionableGroup<RODAMember> actionableGroup = new ActionableGroup<>(messages.manage(), "btn-edit");
     actionableGroup.addButton(messages.editUserAction(), RODAMemberAction.EDIT, ActionImpact.UPDATED, "btn-edit");
-    actionableGroup.addButton(messages.userDataChangePassword(), RODAMemberAction.CHANGE_PASSWORD, ActionImpact.UPDATED, "btn-password");
+    actionableGroup.addButton(messages.userDataChangePassword(), RODAMemberAction.CHANGE_PASSWORD, ActionImpact.UPDATED,
+      "btn-password");
 
     actionableGroup.addButton(messages.editUserActivate(), RODAMemberAction.ACTIVATE, ActionImpact.UPDATED,
       "btn-enable-user");

@@ -127,6 +127,45 @@ public class LdapUtilityTest extends AbstractTestNGSpringContextTests {
   }
 
   @Test
+  public void modifySelfUserWithoutPasswordKeepsPassword() throws EmailAlreadyExistsException, GenericException,
+    NotFoundException, IllegalOperationException, AuthenticationDeniedException {
+    assertModifySelfUserKeepsPassword(null);
+  }
+
+  @Test
+  public void modifySelfUserWithEmptyPasswordKeepsPassword() throws EmailAlreadyExistsException, GenericException,
+    NotFoundException, IllegalOperationException, AuthenticationDeniedException {
+    assertModifySelfUserKeepsPassword(new SecureString());
+  }
+
+  private void assertModifySelfUserKeepsPassword(SecureString newPassword) throws EmailAlreadyExistsException,
+    GenericException, NotFoundException, IllegalOperationException, AuthenticationDeniedException {
+    User user = addTestUser();
+    SecureString pass = new SecureString("123456".toCharArray());
+    ldapUtility.setUserPassword(user.getName(), pass);
+    user.setFullName("Other user");
+    ldapUtility.modifySelfUser(user, newPassword);
+
+    User authenticatedUser = ldapUtility.getAuthenticatedUser(user.getName(), pass.toString());
+    assertNotNull(authenticatedUser);
+    removeTestUser();
+  }
+
+  @Test
+  public void modifySelfUserWithNewPasswordReplacesIt() throws EmailAlreadyExistsException, GenericException,
+    NotFoundException, IllegalOperationException, AuthenticationDeniedException {
+    User user = addTestUser();
+    SecureString pass = new SecureString("123456".toCharArray());
+    ldapUtility.setUserPassword(user.getName(), pass);
+    ldapUtility.modifySelfUser(user, new SecureString("654321".toCharArray()));
+
+    assertNotNull(ldapUtility.getAuthenticatedUser(user.getName(), "654321"));
+    Assert.assertThrows(AuthenticationDeniedException.class,
+      () -> ldapUtility.getAuthenticatedUser(user.getName(), "123456"));
+    removeTestUser();
+  }
+
+  @Test
   public void listLdapGroups() throws GenericException {
     List<Group> groups = ldapUtility.getGroups();
     assertEquals(3, groups.size());

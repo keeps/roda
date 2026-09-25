@@ -1731,9 +1731,13 @@ public interface ClientMessages extends Messages {
 
   String passwordConfirmation();
 
+  String currentPassword();
+
   String passwordNote();
 
   String userDataChangePassword();
+
+  String changePasswordSuccess();
 
   String fullname();
 
