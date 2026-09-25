@@ -496,7 +496,7 @@ public class LdapUtility {
   public User modifyUser(final User modifiedUser, final boolean changeExtra)
     throws NotFoundException, IllegalOperationException, EmailAlreadyExistsException, GenericException {
     modifyUser(modifiedUser, null, true, false, changeExtra);
-    return getUser(modifiedUser.getName());
+    return getUser(modifiedUser.getId());
   }
 
   /**
@@ -549,7 +549,7 @@ public class LdapUtility {
   public User modifySelfUser(final User modifiedUser, SecureString newPassword)
     throws NotFoundException, EmailAlreadyExistsException, IllegalOperationException, GenericException {
     modifyUser(modifiedUser, newPassword, false, false, true);
-    return getUser(modifiedUser.getName());
+    return getUser(modifiedUser.getId());
   }
 
   /**
@@ -1357,7 +1357,7 @@ public class LdapUtility {
 
     try {
       final User currentEmailOwner = getUserWithEmail(modifiedUser.getEmail());
-      if (currentEmailOwner != null && !modifiedUser.getName().equals(currentEmailOwner.getName())) {
+      if (currentEmailOwner != null && !modifiedUser.getId().equals(currentEmailOwner.getId())) {
         throw new EmailAlreadyExistsException(
           "The email address " + modifiedUser.getEmail() + " is already used by another user.");
       }

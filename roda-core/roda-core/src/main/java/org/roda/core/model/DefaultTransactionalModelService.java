@@ -3614,6 +3614,12 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   @Override
+  public AccessKey regenerateAccessKey(AccessKey accessKey, Date expirationDate, String updatedBy)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    return getModelService().regenerateAccessKey(accessKey, expirationDate, updatedBy);
+  }
+
+  @Override
   public void deleteAccessKey(String accessKeyId)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
     getModelService().deleteAccessKey(accessKeyId);

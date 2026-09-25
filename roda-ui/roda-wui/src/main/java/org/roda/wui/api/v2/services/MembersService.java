@@ -203,7 +203,18 @@ public class MembersService {
     newUser.setDirectRoles(oldUser.getDirectRoles());
     newUser.setAllRoles(oldUser.getAllRoles());
     newUser.setGroups(oldUser.getGroups());
+    keepTokens(newUser, oldUser);
     return newUser;
+  }
+
+  private static void keepTokens(User newUser, User oldUser) {
+    if (oldUser == null) {
+      return;
+    }
+    newUser.setResetPasswordToken(oldUser.getResetPasswordToken());
+    newUser.setResetPasswordTokenExpirationDate(oldUser.getResetPasswordTokenExpirationDate());
+    newUser.setEmailConfirmationToken(oldUser.getEmailConfirmationToken());
+    newUser.setEmailConfirmationTokenExpirationDate(oldUser.getEmailConfirmationTokenExpirationDate());
   }
 
   public User retrieveUser(String username) throws GenericException {
@@ -403,6 +414,7 @@ public class MembersService {
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
     request.getUser().setExtra(request.getValues());
+    keepTokens(request.getUser(), model.retrieveUser(request.getUser().getId()));
     User modifiedUser = RodaCoreFactory.getModelService().updateUser(request.getUser(), request.getPassword(), true);
     PremisV3Utils.createOrUpdatePremisUserAgentBinary(request.getUser().getName(), model, index, false);
     RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
@@ -419,8 +431,10 @@ public class MembersService {
 
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
+    modifiedUser.setId(user.getId());
+    modifiedUser.setName(user.getName());
     modifiedUser.setExtra(extra);
-    User currentUser = model.retrieveUser(modifiedUser.getName());
+    User currentUser = model.retrieveUser(user.getName());
     User resetUser = resetUser(modifiedUser, currentUser);
 
     User finalModifiedUser = model.updateMyUser(resetUser, password, true);
@@ -502,7 +516,8 @@ public class MembersService {
         user.setEmailConfirmationTokenExpirationDate(DateTime.now().plusDays(1).toDateTimeISO().toInstant().toString());
 
         try {
-          user = updateUser(new UpdateUserRequest(user, null, null));
+          user = RodaCoreFactory.getModelService().updateUser(user, null, true);
+          RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
           // 20170523 hsilva: need to set ip address for registering the action
           // as the above method returns a new instante of the modified user
           user.setIpAddress(ipAddress);

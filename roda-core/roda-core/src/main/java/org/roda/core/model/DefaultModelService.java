@@ -5485,6 +5485,18 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
+  public AccessKey regenerateAccessKey(AccessKey accessKey, Date expirationDate, String updatedBy)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    String plainTextToken = JwtUtils.generateToken(accessKey.getUserName(), expirationDate);
+    accessKey.setKey(CryptographyUtils.hashTokenSHA256(plainTextToken));
+    accessKey.setExpirationDate(expirationDate);
+    updateAccessKey(accessKey, updatedBy);
+
+    accessKey.setKey(plainTextToken);
+    return accessKey;
+  }
+
+  @Override
   public void deleteAccessKey(String accessKeyId)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
