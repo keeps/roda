@@ -7,7 +7,6 @@
  */
 package org.roda.wui.client.management.access;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeyStatus;
@@ -22,6 +21,7 @@ import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.Humanize;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
@@ -31,6 +31,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -41,7 +42,6 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
-import org.roda.wui.common.client.widgets.Toast;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -54,10 +54,16 @@ public class AccessKeyTablePanel extends Composite {
 
   private BasicTablePanel<AccessKey> table;
   private String username;
+  private boolean readOnly;
 
   public AccessKeyTablePanel(String username) {
+    this(username, false);
+  }
+
+  public AccessKeyTablePanel(String username, boolean readOnly) {
     initWidget(uiBinder.createAndBindUi(this));
     this.username = username;
+    this.readOnly = readOnly;
 
     // Call the new unified refresh method
     refresh();
@@ -261,7 +267,7 @@ public class AccessKeyTablePanel extends Composite {
   }
 
   private boolean showActionsColumn() {
-    return PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_REGENERATE_ACCESS_TOKEN,
+    return !readOnly && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_REGENERATE_ACCESS_TOKEN,
       RodaConstants.PERMISSION_METHOD_DELETE_ACCESS_TOKEN, RodaConstants.PERMISSION_METHOD_REVOKE_ACCESS_TOKEN);
   }
 
