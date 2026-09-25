@@ -2624,7 +2624,7 @@ public class DefaultModelService implements ModelService {
     boolean writeIsAllowed = RodaCoreFactory.checkIfWriteIsAllowed(nodeType);
 
     try {
-      if (password != null) {
+      if (password != null && !password.isEmpty()) {
         UserUtility.getLdapUtility().setUserPassword(user.getId(), password);
       }
 
@@ -5481,6 +5481,18 @@ public class DefaultModelService implements ModelService {
     storage.updateBinaryContent(accessKeysStoragePath, new StringContentPayload(accessKeyAsJson), false, false, false,
       null);
 
+    return accessKey;
+  }
+
+  @Override
+  public AccessKey regenerateAccessKey(AccessKey accessKey, Date expirationDate, String updatedBy)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    String plainTextToken = JwtUtils.generateToken(accessKey.getUserName(), expirationDate);
+    accessKey.setKey(CryptographyUtils.hashTokenSHA256(plainTextToken));
+    accessKey.setExpirationDate(expirationDate);
+    updateAccessKey(accessKey, updatedBy);
+
+    accessKey.setKey(plainTextToken);
     return accessKey;
   }
 
