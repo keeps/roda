@@ -7,8 +7,8 @@
  */
 package org.roda.wui.client.management.members.tabs;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.FlowPanel;
+import java.util.List;
+
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.actions.Actionable;
@@ -19,18 +19,25 @@ import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.panels.GenericMetadataCardPanel;
 import org.roda.wui.client.management.access.AccessKeyTablePanel;
 
-import java.util.List;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.FlowPanel;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 public class AccessKeysTab extends GenericMetadataCardPanel<RODAMember> {
   private final AsyncCallback<Actionable.ActionImpact> parentActionCallback;
+  private final boolean readOnly;
   private AccessKeyTablePanel tablePanel;
 
   public AccessKeysTab(RODAMember member, AsyncCallback<Actionable.ActionImpact> actionCallback) {
+    this(member, actionCallback, false);
+  }
+
+  public AccessKeysTab(RODAMember member, AsyncCallback<Actionable.ActionImpact> actionCallback, boolean readOnly) {
     super();
     this.parentActionCallback = actionCallback;
+    this.readOnly = readOnly;
 
     // This template method automatically calls createHeaderWidget() and
     // buildFields()
@@ -39,7 +46,7 @@ public class AccessKeysTab extends GenericMetadataCardPanel<RODAMember> {
 
   @Override
   protected FlowPanel createHeaderWidget(RODAMember member) {
-    if (member == null) {
+    if (member == null || readOnly) {
       return null;
     }
 
@@ -77,7 +84,7 @@ public class AccessKeysTab extends GenericMetadataCardPanel<RODAMember> {
       User user = (User) member;
 
       // Initialize the table panel with the user's ID
-      tablePanel = new AccessKeyTablePanel(user.getId());
+      tablePanel = new AccessKeyTablePanel(user.getId(), readOnly);
 
       // Since a table is usually full-width and doesn't need a "Label: Value" flexbox
       // layout,
