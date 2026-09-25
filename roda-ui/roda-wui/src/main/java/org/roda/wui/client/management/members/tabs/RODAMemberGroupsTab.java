@@ -7,21 +7,12 @@
  */
 package org.roda.wui.client.management.members.tabs;
 
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.ScrollPanel;
-import config.i18n.client.ClientMessages;
+import java.util.List;
+import java.util.Set;
+
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
-
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.ui.FlowPanel;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.actions.Actionable;
@@ -33,11 +24,23 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.utils.ActionMenuCell;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
 import org.roda.wui.client.common.panels.GenericMetadataCardPanel;
+import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.widgets.Toast;
 
-import java.util.List;
-import java.util.Set;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.ScrollPanel;
+
+import config.i18n.client.ClientMessages;
 
 /**
  *
@@ -49,13 +52,20 @@ public class RODAMemberGroupsTab extends GenericMetadataCardPanel<RODAMember> {
   private final String id;
   private final RODAMember member;
   private final AsyncCallback<Actionable.ActionImpact> actionCallback;
+  private final boolean readOnly;
   private FlowPanel groupsPanel;
 
   public RODAMemberGroupsTab(RODAMember member, AsyncCallback<Actionable.ActionImpact> actionCallback) {
+    this(member, actionCallback, false);
+  }
+
+  public RODAMemberGroupsTab(RODAMember member, AsyncCallback<Actionable.ActionImpact> actionCallback,
+    boolean readOnly) {
     super();
     this.member = member;
     this.id = member.getId();
     this.actionCallback = actionCallback;
+    this.readOnly = readOnly;
 
     // This template method automatically calls createHeaderWidget() and
     // buildFields()
@@ -64,7 +74,7 @@ public class RODAMemberGroupsTab extends GenericMetadataCardPanel<RODAMember> {
 
   @Override
   protected FlowPanel createHeaderWidget(RODAMember member) {
-    if (member == null) {
+    if (member == null || readOnly) {
       return null;
     }
 
@@ -327,10 +337,19 @@ public class RODAMemberGroupsTab extends GenericMetadataCardPanel<RODAMember> {
     };
   }
 
+  private boolean canManageMembers() {
+    return !readOnly && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_UPDATE_USER);
+  }
+
   private BasicTablePanel<Group> getBasicTableForUsers(Set<Group> groups) {
     if (groups.isEmpty()) {
       return new BasicTablePanel<>(messages.noItemsToDisplay(messages.distributedInstanceLabel()));
     } else {
+      if (!canManageMembers()) {
+        return new BasicTablePanel<>(groups.iterator(),
+          new BasicTablePanel.ColumnInfo<Group>(messages.groupFullname(), 15, getFullNameColumn()),
+          new BasicTablePanel.ColumnInfo<Group>(messages.groupName(), 15, getNameColumn()));
+      }
       return new BasicTablePanel<>(groups.iterator(),
         new BasicTablePanel.ColumnInfo<Group>(messages.groupFullname(), 15, getFullNameColumn()),
         new BasicTablePanel.ColumnInfo<Group>(messages.groupName(), 15, getNameColumn()),
