@@ -53,8 +53,8 @@ public class RODAMemberToolbarActions extends AbstractActionable<RODAMember> {
 
   @Override
   public CanActResult userCanAct(Action<RODAMember> action, RODAMember object) {
-    if (RODAMemberAction.NEW_ACCESS_KEY.equals(action) && object != null && object.isUser()
-      && PermissionClientUtils.isCurrentUser(object.getId())) {
+    if ((RODAMemberAction.NEW_ACCESS_KEY.equals(action) || RODAMemberAction.CHANGE_PASSWORD.equals(action))
+      && object != null && object.isUser() && PermissionClientUtils.isCurrentUser(object.getId())) {
       return new CanActResult(true, CanActResult.Reason.USER, messages.reasonUserLacksPermission());
     }
     return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());

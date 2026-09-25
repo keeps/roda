@@ -867,7 +867,10 @@ public class MembersController implements MembersRestService, Exportable {
 
     try {
       // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
+      User user = requestContext.getUser();
+      if (!isCurrentUser(user, userOperations.getUser() != null ? userOperations.getUser().getId() : null)) {
+        controllerAssistant.checkRoles(user);
+      }
       // delegate
       return membersService.updateMyUser(requestContext.getUser(), userOperations.getUser(),
         userOperations.getPassword(), userOperations.getValues());
@@ -1076,11 +1079,6 @@ public class MembersController implements MembersRestService, Exportable {
     return ApiUtils.okResponse(indexService.exportToCSV(findRequestString, RODAMember.class));
   }
 
-  /**
-   * Whether the given user id refers to the (non-guest) user making the request.
-   * Used to allow read-only access to one's own data without the member/access
-   * key read roles.
-   */
   private static boolean isCurrentUser(User user, String userId) {
     return user != null && !user.isGuest() && userId != null && userId.equals(user.getId());
   }
