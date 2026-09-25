@@ -45,7 +45,7 @@ public class ProfileTabs extends Tabs {
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.showAccessKeyTitle()), new TabContentBuilder() {
       @Override
       public Widget buildTabWidget() {
-        return new AccessKeysTab(user, null, true);
+        return new AccessKeysTab(user, null);
       }
     });
   }

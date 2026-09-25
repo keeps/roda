@@ -267,8 +267,9 @@ public class AccessKeyTablePanel extends Composite {
   }
 
   private boolean showActionsColumn() {
-    return !readOnly && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_REGENERATE_ACCESS_TOKEN,
-      RodaConstants.PERMISSION_METHOD_DELETE_ACCESS_TOKEN, RodaConstants.PERMISSION_METHOD_REVOKE_ACCESS_TOKEN);
+    return !readOnly && (PermissionClientUtils.isCurrentUser(username)
+      || PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_REGENERATE_ACCESS_TOKEN,
+        RodaConstants.PERMISSION_METHOD_DELETE_ACCESS_TOKEN, RodaConstants.PERMISSION_METHOD_REVOKE_ACCESS_TOKEN));
   }
 
   private BasicTablePanel<AccessKey> getBasicTableForAccessKey(AccessKeys accessKeys) {

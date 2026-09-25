@@ -7,17 +7,19 @@
  */
 package org.roda.wui.client.common.actions;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import config.i18n.client.ClientMessages;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
+import org.roda.wui.client.common.utils.PermissionClientUtils;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -51,6 +53,10 @@ public class RODAMemberToolbarActions extends AbstractActionable<RODAMember> {
 
   @Override
   public CanActResult userCanAct(Action<RODAMember> action, RODAMember object) {
+    if (RODAMemberAction.NEW_ACCESS_KEY.equals(action) && object != null && object.isUser()
+      && PermissionClientUtils.isCurrentUser(object.getId())) {
+      return new CanActResult(true, CanActResult.Reason.USER, messages.reasonUserLacksPermission());
+    }
     return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
   }
 
