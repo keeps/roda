@@ -14,10 +14,13 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.Messages;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
@@ -25,6 +28,7 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -74,7 +78,7 @@ import org.slf4j.LoggerFactory;
 public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(AIPCorruptionRiskAssessmentPlugin.class);
 
-  private static List<String> risks;
+  private static final List<String> risks;
 
   static {
     risks = new ArrayList<>();
@@ -104,6 +108,13 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
   @Override
   public String getVersionImpl() {
     return "1.0";
+  }
+
+  @Override
+  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
+    super.setParameterValues(parameters);
+
+    parameters.put(RodaConstants.PLUGIN_PARAM_SKIP_ROLLBACK_ON_VALIDATION_FAILURE, this.getClass().getName());
   }
 
   @Override
@@ -365,7 +376,14 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
       Risk risk = PluginHelper.createRiskIfNotExists(model, riskId, getClass().getClassLoader());
       RiskIncidence incidence = new RiskIncidence();
       incidence.setDetectedOn(new Date());
-      incidence.setDetectedBy(this.getName());
+
+      String serverLanguage = RodaCoreFactory.getConfigurationManager().getConfigurationString("core.language.default",
+        "en");
+      Locale locale = Locale.forLanguageTag(serverLanguage);
+      Messages messages = RodaCoreFactory.getI18NMessages(locale);
+      String translation = messages.getTranslation(this.getName(), "File integrity verifier");
+
+      incidence.setDetectedBy(translation);
       incidence.setRiskId(riskId);
       incidence.setAipId(aipId);
       incidence.setRepresentationId(representationId);
@@ -468,11 +486,11 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_RISK_ASSESSMENT);
+    return List.of(RodaConstants.PLUGIN_CATEGORY_RISK_ASSESSMENT);
   }
 
   @Override
   public List<Class<AIP>> getObjectClasses() {
-    return Arrays.asList(AIP.class);
+    return List.of(AIP.class);
   }
 }
