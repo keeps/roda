@@ -90,7 +90,7 @@ public class DescriptiveMetadataHistory extends Composite {
           if (lockError != null) {
             callback.onFailure(lockError);
           } else if (!Boolean.TRUE.equals(locked)) {
-            GWT.log("DescriptiveMetadataHistory lock result: " + locked);
+
             HistoryUtils.newHistory(BrowseTop.RESOLVER, aipId);
             Toast.showInfo(messages.editDescMetadataLockedTitle(), messages.editDescMetadataLockedText());
             callback.onSuccess(null);
