@@ -29,6 +29,11 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-maven-
+      - name: Expand GWT permutations
+        run: |
+          GWT_MODULE=roda-ui/roda-wui/src/main/java/org/roda/wui/RodaWUI.gwt.xml
+          grep -q '<collapse-all-properties />' "$GWT_MODULE"
+          sed -i 's#<collapse-all-properties />#<!--collapse-all-properties/-->#' "$GWT_MODULE"
       - name: Install clamdscan
         run: sudo apt-get update && sudo apt-get install clamdscan -y
       - name: Run tests & install
