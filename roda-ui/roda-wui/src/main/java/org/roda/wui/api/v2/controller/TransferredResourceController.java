@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.generics.LongResponse;
@@ -224,6 +225,41 @@ public class TransferredResourceController implements TransferredResourceRestSer
           RodaConstants.CONTROLLER_FILENAME_PARAM, fileName, RodaConstants.CONTROLLER_SUCCESS_PARAM, true);
         return transferredResourceService.createTransferredResourceFile(parentUUID, fileName, resource.getInputStream(),
           commit);
+      }
+    });
+  }
+
+  @PostMapping(path = "/create/resource/ingest", produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.CREATED)
+  @Operation(summary = "Create transferred resource and ingest it", description = "Uploads a SIP and creates an ingest job for it in a single call. "
+    + "The optional webhook receives an HTTP POST with the job as JSON when the job finishes (or only when it fails, if the ingest parameter "
+    + "'parameter.notification_when_failed' is true). The webhook must match one of the origins configured in "
+    + "'core.notification.webhook.allowed_destinations' and must not resolve to an internal address; otherwise the request is rejected. "
+    + "Without auto-accept, the job finishes with the AIPs waiting for appraisal.", responses = {
+      @ApiResponse(responseCode = "201", description = "Ingest job created", content = @Content(schema = @Schema(implementation = Job.class))),
+      @ApiResponse(responseCode = "400", description = "Invalid webhook, plugin or parameters; nothing was stored", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+      @ApiResponse(responseCode = "409", description = "Already exists", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  public Job createTransferredResourceAndIngest(
+    @Parameter(description = "The id of the parent") @RequestParam(name = "parent-uuid", required = false) String parentUUID,
+    @Parameter(content = @Content(mediaType = "multipart/form-data", schema = @Schema(implementation = MultipartFile.class)), description = "The SIP file") @RequestPart(value = "resource") MultipartFile resource,
+    @Parameter(description = "Ingest plugin id (defaults to org.roda.core.plugins.base.ingest.v2.ConfigurableIngestPlugin)") @RequestParam(name = "plugin", required = false) String plugin,
+    @Parameter(description = "Ingest plugin parameters, as a JSON object with string values (e.g. {\"parameter.do_auto_accept\": \"true\"})") @RequestParam(name = "parameters", required = false) String parameters,
+    @Parameter(description = "URL called when the ingest job finishes") @RequestParam(name = "webhook", required = false) String webhook) {
+
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<Job>() {
+      @Override
+      public Job process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException, IOException {
+        String fileName = resource.getOriginalFilename();
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_PATH_PARAM, parentUUID,
+          RodaConstants.CONTROLLER_FILENAME_PARAM, fileName);
+        // this method's roles cover the upload; creating the job needs the same roles as creating it directly
+        if (!UserUtility.hasPermissions(requestContext.getUser(), RodaConstants.PERMISSION_METHOD_CREATE_JOB)) {
+          throw new AuthorizationDeniedException("The user '" + requestContext.getUser().getId()
+            + "' does not have all needed permissions to create a job");
+        }
+        return transferredResourceService.createTransferredResourceAndIngest(requestContext.getUser(), parentUUID,
+          fileName, resource.getInputStream(), plugin, parameters, webhook);
       }
     });
   }

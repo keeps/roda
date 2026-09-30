@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.hc.client5.http.SystemDefaultDnsResolver;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.RequestConfig;
@@ -29,6 +30,7 @@ import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.util.Timeout;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.notifications.Notification;
@@ -47,14 +49,26 @@ public class HTTPNotificationProcessor implements NotificationProcessor {
 
   private String endpoint;
   private Map<String, Object> scope;
+  private final boolean restricted;
   private final Counter notificationSentWithSuccess;
   private final Counter notificationSentWithFailure;
   private final Histogram notificationSentWithSuccessHisto;
   private final Histogram notificationSentWithFailureHisto;
 
   public HTTPNotificationProcessor(String endpoint, Map<String, Object> scope) {
+    this(endpoint, scope, false);
+  }
+
+  /**
+   * @param restricted
+   *          when true, the endpoint is re-validated against the allowed webhook
+   *          destinations, only public addresses are connected to and redirects
+   *          are not followed
+   */
+  public HTTPNotificationProcessor(String endpoint, Map<String, Object> scope, boolean restricted) {
     this.endpoint = endpoint;
     this.scope = scope;
+    this.restricted = restricted;
     this.notificationSentWithSuccess = RodaCoreFactory.getMetrics()
       .counter(MetricRegistry.name(HTTPNotificationProcessor.class.getSimpleName(), "notificationSentWithSuccess"));
     this.notificationSentWithFailure = RodaCoreFactory.getMetrics()
@@ -103,16 +117,28 @@ public class HTTPNotificationProcessor implements NotificationProcessor {
   }
 
   private boolean post(String endpoint, String content, int timeout) {
+    if (restricted) {
+      try {
+        WebhookUrlValidator.validate(endpoint);
+      } catch (RequestNotValidException e) {
+        LOGGER.warn("Webhook notification not sent: {}", e.getMessage());
+        return false;
+      }
+    }
+
     boolean success = true;
     Timeout timeoutConfig = Timeout.of(timeout, TimeUnit.MILLISECONDS);
     ConnectionConfig connectionConfig = ConnectionConfig.custom().setConnectTimeout(timeoutConfig)
       .setSocketTimeout(timeoutConfig).build();
     RequestConfig requestConfig = RequestConfig.custom().setResponseTimeout(timeoutConfig)
-      .setConnectionRequestTimeout(timeoutConfig).build();
+      .setConnectionRequestTimeout(timeoutConfig).setRedirectsEnabled(!restricted).build();
 
     try (CloseableHttpClient httpclient = HttpClients.custom()
-      .setConnectionManager(
-        PoolingHttpClientConnectionManagerBuilder.create().setDefaultConnectionConfig(connectionConfig).build())
+      .setConnectionManager(PoolingHttpClientConnectionManagerBuilder.create()
+        .setDefaultConnectionConfig(connectionConfig)
+        .setDnsResolver(
+          restricted ? WebhookUrlValidator.PUBLIC_ONLY_DNS_RESOLVER : SystemDefaultDnsResolver.INSTANCE)
+        .build())
       .setDefaultRequestConfig(requestConfig).build()) {
       HttpPost httppost = new HttpPost(endpoint);
       httppost.setConfig(requestConfig);

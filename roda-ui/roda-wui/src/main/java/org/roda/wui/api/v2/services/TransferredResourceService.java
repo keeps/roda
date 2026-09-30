@@ -18,16 +18,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
+import org.roda.core.common.notifications.WebhookUrlValidator;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ConsumesOutputStream;
 import org.roda.core.data.v2.StreamResponse;
@@ -42,21 +46,41 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.JobParallelism;
+import org.roda.core.data.v2.jobs.JobPriority;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
+import org.roda.core.plugins.base.ingest.v2.ConfigurableIngestPlugin;
+import org.roda.core.plugins.base.ingest.v2.MinimalIngestPlugin;
 import org.roda.core.plugins.base.maintenance.DeleteRODAObjectPlugin;
 import org.roda.core.plugins.base.maintenance.MovePlugin;
+import org.roda.core.plugins.base.notifications.HttpGenericNotification;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 
 @Service
 public class TransferredResourceService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TransferredResourceService.class);
+
+  // ingest plugins that honour the HTTP notification endpoint parameter
+  private static final Set<String> WEBHOOK_INGEST_PLUGINS = Set.of(ConfigurableIngestPlugin.class.getName(),
+    MinimalIngestPlugin.class.getName());
+  private static final String GENERIC_HTTP_NOTIFICATION_PARAMETERS_PREFIX = "parameter.notification."
+    + HttpGenericNotification.class.getSimpleName() + ".";
+
+  @Autowired
+  private JobService jobService;
 
   public List<TransferredResource> retrieveSelectedTransferredResource(IndexService index, SelectedItems<TransferredResource> selected)
     throws GenericException, RequestNotValidException {
@@ -147,6 +171,72 @@ public class TransferredResourceService {
     }
 
     return transferredResource;
+  }
+
+  /**
+   * Validates the whole request before storing anything, then stores the file
+   * and creates an ingest job for it. If the job cannot be created, the stored
+   * file is removed.
+   */
+  public Job createTransferredResourceAndIngest(User user, String parentUUID, String fileName, InputStream inputStream,
+    String plugin, String parametersJson, String webhook) throws RODAException {
+    String pluginId = StringUtils.isBlank(plugin) ? ConfigurableIngestPlugin.class.getName() : plugin;
+    Map<String, String> pluginParameters = parsePluginParameters(parametersJson);
+
+    if (StringUtils.isNotBlank(webhook)) {
+      if (!WEBHOOK_INGEST_PLUGINS.contains(pluginId)) {
+        throw new RequestNotValidException("A webhook can only be used with the plugins " + WEBHOOK_INGEST_PLUGINS);
+      }
+      WebhookUrlValidator.validate(webhook);
+      pluginParameters.put(RodaConstants.NOTIFICATION_HTTP_ENDPOINT, webhook);
+      pluginParameters.put(RodaConstants.NOTIFICATION_HTTP_ENDPOINT_RESTRICTED, Boolean.TRUE.toString());
+    }
+
+    Job job = new Job();
+    job.setPlugin(pluginId);
+    job.setPluginParameters(pluginParameters);
+    job.setPriority(JobPriority.MEDIUM);
+    job.setParallelism(JobParallelism.NORMAL);
+    job.setSourceObjects(SelectedItemsList.create(TransferredResource.class, new ArrayList<>()));
+    jobService.validateAndSetJobInformation(user, job);
+    if (job.getPluginType() != PluginType.INGEST) {
+      throw new RequestNotValidException("Plugin '" + pluginId + "' is not an ingest plugin");
+    }
+
+    TransferredResource transferredResource = createTransferredResourceFile(parentUUID, fileName, inputStream, true);
+    job.setSourceObjects(SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()));
+    try {
+      return jobService.createJob(job, true);
+    } catch (RODAException | RuntimeException e) {
+      try {
+        RodaCoreFactory.getTransferredResourcesScanner()
+          .deleteTransferredResource(Collections.singletonList(transferredResource.getUUID()));
+      } catch (RODAException deleteException) {
+        LOGGER.error("Could not remove transferred resource '{}' after failing to create its ingest job",
+          transferredResource.getUUID(), deleteException);
+      }
+      throw e;
+    }
+  }
+
+  private static Map<String, String> parsePluginParameters(String parametersJson) throws RequestNotValidException {
+    Map<String, String> pluginParameters = new HashMap<>();
+    if (StringUtils.isNotBlank(parametersJson)) {
+      try {
+        pluginParameters.putAll(
+          JsonMapper.builder().build().readValue(parametersJson, new TypeReference<Map<String, String>>() {}));
+      } catch (JacksonException e) {
+        throw new RequestNotValidException("Parameters must be a JSON object with string values");
+      }
+    }
+
+    // the webhook must only be set through the validated webhook parameter
+    for (String key : pluginParameters.keySet()) {
+      if (RodaConstants.NOTIFICATION_HTTP_ENDPOINT.equals(key) || key.startsWith(GENERIC_HTTP_NOTIFICATION_PARAMETERS_PREFIX)) {
+        throw new RequestNotValidException("Parameter '" + key + "' is not allowed, use the webhook parameter instead");
+      }
+    }
+    return pluginParameters;
   }
 
   public Job moveTransferredResource(User user, SelectedItems<TransferredResource> selected,
