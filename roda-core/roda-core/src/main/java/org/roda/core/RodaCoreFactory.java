@@ -17,18 +17,14 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URL;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -104,6 +100,7 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
@@ -135,7 +132,7 @@ import org.roda.core.plugins.orchestrate.PekkoEmbeddedPluginOrchestrator;
 import org.roda.core.protocols.Protocol;
 import org.roda.core.protocols.ProtocolManager;
 import org.roda.core.protocols.ProtocolManagerException;
-import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.Container;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceWrapper;
@@ -737,73 +734,86 @@ public class RodaCoreFactory {
 
   private static void instantiateDefaultObjects() {
     if (INSTANTIATE_DEFAULT_RESOURCES) {
-      try (CloseableIterable<Resource> resources = storage.listResourcesUnderContainer(DefaultStoragePath.parse(""),
-        true)) {
-
-        Iterator<Resource> resourceIterator = resources.iterator();
-        boolean hasFileResources = false;
-
-        while (resourceIterator.hasNext() && !hasFileResources) {
-          Resource resource = resourceIterator.next();
-          if (!resource.isDirectory()
-            && !resource.getStoragePath().getContainerName().equals(RodaConstants.STORAGE_CONTAINER_PRESERVATION)) {
-            hasFileResources = true;
-          }
-        }
-
-        if (!hasFileResources) {
+      try {
+        if (!storageHasFileResources()) {
+          // defaults are extracted to a temporary folder and copied from there
+          // through the storage abstraction, so they reach any storage type
+          Path defaultsFolder = Files.createTempDirectory(getWorkingDirectory(), RodaConstants.CORE_DEFAULT_FOLDER);
           try {
-            RodaUtils.copyFilesFromClasspath(RodaConstants.CORE_DEFAULT_FOLDER + "/",
-              configurationManager.getRodaHomePath(), true);
-          } catch (IOException e) {
-            instantiatedWithoutErrors = false;
-          }
-          Path staticDataDefaultFolder = configurationManager.getRodaHomePath()
-            .resolve(RodaConstants.CORE_DEFAULT_FOLDER).resolve(RodaConstants.CORE_DATA_FOLDER);
-          Path targetPath = configurationManager.getRodaHomePath().resolve(RodaConstants.CORE_DATA_FOLDER);
+            RodaUtils.copyFilesFromClasspath(RodaConstants.CORE_DEFAULT_FOLDER + "/", defaultsFolder, true);
+            Path defaultStorageFolder = defaultsFolder.resolve(RodaConstants.CORE_DATA_FOLDER)
+              .resolve(RodaConstants.CORE_STORAGE_FOLDER);
 
-          // TODO: We should avoid using FileSystem if we want to add support for other
-          // storage types
-          if (FSUtils.exists(staticDataDefaultFolder)) {
-            try {
-              Files.walkFileTree(staticDataDefaultFolder, new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) {
-                  try {
-                    if (dir.equals(staticDataDefaultFolder)
-                      || dir.equals(staticDataDefaultFolder.resolve(RodaConstants.CORE_STORAGE_FOLDER))) {
-                      return FileVisitResult.CONTINUE;
-                    } else {
-                      Path storageDir = targetPath.resolve(staticDataDefaultFolder.relativize(dir));
-                      if (Files.exists(storageDir)) {
-                        FSUtils.deletePath(storageDir);
-                      }
-
-                      FSUtils.copy(dir, storageDir, true);
-                      return FileVisitResult.SKIP_SUBTREE;
-                    }
-                  } catch (NotFoundException | GenericException | AlreadyExistsException e) {
-                    LOGGER.error("Could not copy directory {}", dir, e);
-                    return FileVisitResult.SKIP_SUBTREE;
-                  }
-                }
-              });
-            } catch (IOException e) {
-              throw new GenericException("Cannot load static default objects", e);
+            if (FSUtils.exists(defaultStorageFolder)) {
+              copyDefaultObjectsToStorage(new FileStorageService(defaultStorageFolder, false, null, false));
             }
+          } catch (IOException e) {
+            LOGGER.error("Cannot copy default objects from classpath", e);
+            instantiatedWithoutErrors = false;
+          } finally {
+            FSUtils.deletePathQuietly(defaultsFolder);
           }
 
-          // 20160712 hsilva: it needs to be this way as the resources are
-          // copied to the file system and storage can be of a different type
-          // (e.g. fedora)
-          FileStorageService fileStorageService = new FileStorageService(configurationManager.getStoragePath());
-
-          getIndexService().reindexRisks(fileStorageService);
-          getIndexService().reindexRepresentationInformation(fileStorageService);
+          getIndexService().reindexRisks(storage);
+          getIndexService().reindexRepresentationInformation(storage);
         }
       } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
-        | IOException e) {
+        | AlreadyExistsException | IOException e) {
         LOGGER.error("Cannot load default objects", e);
+      }
+    }
+  }
+
+  /**
+   * Checks each container instead of listing from the storage root, as not all
+   * storage types support listing from an empty path. Resources in the
+   * preservation container are not taken into account.
+   */
+  private static boolean storageHasFileResources()
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException, IOException {
+    try (CloseableIterable<Container> containers = storage.listContainers()) {
+      for (Container container : containers) {
+        StoragePath containerPath = container.getStoragePath();
+        if (RodaConstants.STORAGE_CONTAINER_PRESERVATION.equals(containerPath.getContainerName())) {
+          continue;
+        }
+
+        try (CloseableIterable<Resource> resources = storage.listResourcesUnderContainer(containerPath, true)) {
+          for (Resource resource : resources) {
+            if (!resource.isDirectory()) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  private static void copyDefaultObjectsToStorage(StorageService defaultStorage) throws AuthorizationDeniedException,
+    RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException, IOException {
+    try (CloseableIterable<Container> containers = defaultStorage.listContainers()) {
+      for (Container container : containers) {
+        StoragePath containerPath = container.getStoragePath();
+        if (!storage.exists(containerPath)) {
+          storage.createContainer(containerPath);
+        }
+
+        try (CloseableIterable<Resource> resources = defaultStorage.listResourcesUnderContainer(containerPath,
+          false)) {
+          for (Resource resource : resources) {
+            StoragePath resourcePath = resource.getStoragePath();
+            if (storage.exists(resourcePath)) {
+              LOGGER.warn("Default object {} already exists in storage, skipping it", resourcePath);
+              continue;
+            }
+            try {
+              storage.copy(defaultStorage, resourcePath, resourcePath);
+            } catch (AlreadyExistsException | GenericException | RequestNotValidException | NotFoundException e) {
+              LOGGER.error("Could not copy default object {}", resourcePath, e);
+            }
+          }
+        }
       }
     }
   }
