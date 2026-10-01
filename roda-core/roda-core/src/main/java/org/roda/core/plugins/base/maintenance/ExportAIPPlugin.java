@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.ExportType;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -67,7 +68,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
       PluginParameter
         .getBuilder(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER, "plugin.exportAipPlugin.parameter.destinationFolder.name",
           PluginParameterType.STRING)
-        .withDefaultValue("/tmp/export")
+        .withDefaultValue(RodaCoreFactory.getProperty("core.plugins.exportAipPlugin.defaultOutputFolder", "/tmp/export"))
         .withDescription("plugin.exportAipPlugin.parameter.destinationFolder.description").build());
 
     pluginParameters.put(PLUGIN_PARAM_EXPORT_TYPE,
