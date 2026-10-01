@@ -131,7 +131,7 @@
         <scope.gwt-dev>provided</scope.gwt-dev>
         <logback.version>1.5.37</logback.version>
         <mockito.version>5.23.0</mockito.version>
-        <tomcat.version>11.0.25</tomcat.version>
+        <tomcat.version>11.0.26</tomcat.version>
     </properties>
     <profiles>
         <profile>
