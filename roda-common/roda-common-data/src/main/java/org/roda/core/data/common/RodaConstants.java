@@ -10,12 +10,8 @@ package org.roda.core.data.common;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
-import org.roda.core.data.v2.disposal.schedule.DisposalActionCode;
-import org.roda.core.data.v2.disposal.schedule.DisposalScheduleState;
-import org.roda.core.data.v2.disposal.schedule.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 
 public final class RodaConstants {
@@ -963,8 +959,7 @@ public final class RodaConstants {
       "org.roda.core.data.v2.risks.RiskIncidence", "org.roda.core.data.v2.ri.RepresentationInformation",
       "org.roda.core.data.v2.ip.TransferredResource", "org.roda.core.data.v2.user.User",
       "org.roda.core.data.v2.user.Group", "org.roda.core.data.v2.user.RODAMember",
-      "org.roda.core.data.v2.disposal.hold.DisposalHold",
-      "org.roda.core.data.v2.disposal.schedule.DisposalSchedule",
+      "org.roda.core.data.v2.disposal.hold.DisposalHold", "org.roda.core.data.v2.disposal.schedule.DisposalSchedule",
       "org.roda.core.data.v2.disposal.rule.DisposalRule",
       "org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation", "org.roda.core.data.v2.user.RodaPrincipal",
       "org.roda.core.data.v2.ip.AIP", "org.roda.core.data.v2.risks.Risk", "org.roda.core.events.pekko.CRDTWrapper",
@@ -1215,6 +1210,7 @@ public final class RodaConstants {
   public static final String REPOSITORY_PERMISSIONS_TRANSFER_UPDATE = "transfer.update";
 
   public static final String REPOSITORY_PERMISSIONS_JOB_MANAGE = "job.manage";
+  public static final String REPOSITORY_PERMISSIONS_JOB_MANAGE_RESTRICTED = "job.manage.restricted";
   public static final String REPOSITORY_PERMISSIONS_JOB_READ = "job.read";
 
   public static final String REPOSITORY_PERMISSIONS_MEMBER_MANAGE = "member.manage";
@@ -1337,7 +1333,7 @@ public final class RodaConstants {
   public static final String DISPOSAL_SCHEDULE_SCOPE_NOTES = "scopeNotes";
   public static final String DISPOSAL_SCHEDULE_STATE = "state";
   public static final String DISPOSAL_SCHEDULE_ACTION = "action";
-  public static final String DISPOSAL_SCHEDULE_RETENTION_PERIOD_INTERVAL_CODE =  "retentionPeriodIntervalCode";
+  public static final String DISPOSAL_SCHEDULE_RETENTION_PERIOD_INTERVAL_CODE = "retentionPeriodIntervalCode";
   public static final String DISPOSAL_SCHEDULE_RETENTION_PERIOD_DURATION = "retentionPeriodDuration";
   public static final String DISPOSAL_SCHEDULE_FULL_RETENTION_PERIOD = "fullRetentionPeriodPeriod";
 
@@ -1423,7 +1419,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_AIP_ID = "parameter.aip_id";
   public static final String PLUGIN_PARAMS_ID = "parameter.id";
   public static final String PLUGIN_PARAMS_PERMISSIONS_JSON = "parameter.permissions_json";
-  public static final String PLUGIN_PARAMS_ENABLE_TECHMD_VALIDATION =  "parameter.enable_techmd_validation";
+  public static final String PLUGIN_PARAMS_ENABLE_TECHMD_VALIDATION = "parameter.enable_techmd_validation";
   public static final String PLUGIN_PARAMS_DETAILS = "parameter.details";
   public static final String PLUGIN_PARAMS_OUTCOME_TEXT = "parameter.outcome_text";
   public static final String PLUGIN_PARAMS_EVENT_DESCRIPTION = "parameter.event_description";
@@ -2180,6 +2176,7 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_UPDATE_AIP_PERMISSIONS = "org.roda.wui.api.v2.controller.AIPController.updatePermissions";
   public static final String PERMISSION_METHOD_UPDATE_DIP_PERMISSIONS = "org.roda.wui.api.v2.controller.DIPController.updatePermissions";
   public static final String PERMISSION_METHOD_CREATE_JOB = "org.roda.wui.api.v2.controller.JobsController.createJob";
+  public static final String PERMISSION_METHOD_CREATE_JOB_ON_AIPS = "org.roda.wui.api.v2.controller.JobsController.createJobOnAIPs";
   public static final String PERMISSION_METHOD_LIST_JOB = "org.roda.wui.api.v2.controller.JobsController.getJobFromModel";
   public static final String PERMISSION_METHOD_APPRAISAL = "org.roda.wui.api.v2.controller.AIPController.appraisal";
   public static final String PERMISSION_METHOD_CHANGE_AIP_TYPE = "org.roda.wui.api.v2.controller.AIPController.changeAIPType";
