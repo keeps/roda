@@ -7,8 +7,7 @@
  */
 package org.roda.wui.client.management.members.tabs;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.FlowPanel;
+import java.util.List;
 
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.actions.Actionable;
@@ -18,7 +17,8 @@ import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.panels.GenericMetadataCardPanel;
 
-import java.util.List;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.FlowPanel;
 
 /**
  *
@@ -27,11 +27,18 @@ import java.util.List;
 public class RODAMemberPermissionsTab extends GenericMetadataCardPanel<RODAMember> {
 
   private final AsyncCallback<Actionable.ActionImpact> parentActionCallback;
+  private final boolean readOnly;
   private PermissionsPanel permissionsTablePanel;
 
   public RODAMemberPermissionsTab(RODAMember member, AsyncCallback<Actionable.ActionImpact> actionCallback) {
+    this(member, actionCallback, false);
+  }
+
+  public RODAMemberPermissionsTab(RODAMember member, AsyncCallback<Actionable.ActionImpact> actionCallback,
+    boolean readOnly) {
     super();
     this.parentActionCallback = actionCallback;
+    this.readOnly = readOnly;
 
     // This template method automatically calls createHeaderWidget() and
     // buildFields()
@@ -40,7 +47,7 @@ public class RODAMemberPermissionsTab extends GenericMetadataCardPanel<RODAMembe
 
   @Override
   protected FlowPanel createHeaderWidget(RODAMember member) {
-    if (member == null) {
+    if (member == null || readOnly) {
       return null;
     }
 

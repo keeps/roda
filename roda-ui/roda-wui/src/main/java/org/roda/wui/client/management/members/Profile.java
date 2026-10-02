@@ -12,15 +12,13 @@ package org.roda.wui.client.management.members;
 
 import java.util.List;
 
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FocusPanel;
 import org.roda.core.data.v2.user.User;
+import org.roda.wui.client.browse.tabs.ProfileTabs;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoActionsToolbar;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.main.BreadcrumbUtils;
-import org.roda.wui.client.management.members.tabs.RODAMemberDetailsPanel;
 import org.roda.wui.common.client.HistoryResolver;
 
 import com.google.gwt.core.client.GWT;
@@ -28,6 +26,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -94,7 +93,7 @@ public class Profile extends Composite {
   @UiField
   TitlePanel title;
   @UiField
-  FlowPanel content;
+  ProfileTabs browseTab;
 
   public Profile(User user) {
     initWidget(uiBinder.createAndBindUi(this));
@@ -110,7 +109,7 @@ public class Profile extends Composite {
     title.setIconClass("User");
     title.addStyleName("mb-16");
 
-    content.add(new RODAMemberDetailsPanel(user));
+    browseTab.init(user);
 
     keyboardFocus.setFocus(true);
     keyboardFocus.addStyleName("browse");
