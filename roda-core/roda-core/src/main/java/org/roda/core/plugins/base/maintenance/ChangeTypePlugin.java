@@ -134,11 +134,13 @@ public class ChangeTypePlugin<T extends IsRODAObject> extends AbstractPlugin<T> 
         jobPluginInfo.incrementObjectsProcessed(state);
         reportItem.setPluginState(state);
 
-        StringBuilder outcomeText = new StringBuilder().append("The AIP '").append(aip.getId())
-          .append("' changed its type from '").append(aip.getType()).append("' to '").append(newType).append("'.");
+        String outcomeText = PluginHelper.getPreservationEventText("plugin.changeTypePlugin.event.aipTypeChanged",
+          "The AIP '{0}' changed its type from '{1}' to '{2}'.", aip.getId(), aip.getType(), newType);
 
-        model.createUpdateAIPEvent(aip.getId(), null, null, null, PreservationEventType.UPDATE, EVENT_DESCRIPTION,
-          state, outcomeText.toString(), details, job.getUsername(), true, null);
+        model.createUpdateAIPEvent(aip.getId(), null, null, null,
+          PluginHelper.getPreservationEventType(ChangeTypePlugin.class, PreservationEventType.UPDATE),
+          PluginHelper.getPreservationEventText("preservationEvent.common.updateObject", EVENT_DESCRIPTION), state,
+          outcomeText, details, job.getUsername(), true, null);
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
       }
@@ -162,13 +164,15 @@ public class ChangeTypePlugin<T extends IsRODAObject> extends AbstractPlugin<T> 
         jobPluginInfo.incrementObjectsProcessed(state);
         reportItem.setPluginState(state);
 
-        StringBuilder outcomeText = new StringBuilder().append("The representation '").append(representation.getId())
-          .append(" of AIP ").append(representation.getAipId()).append("' changed its type from '")
-          .append(representation.getType()).append("' to '").append(newType).append("'.");
+        String outcomeText = PluginHelper.getPreservationEventText(
+          "plugin.changeTypePlugin.event.representationTypeChanged",
+          "The representation '{0} of AIP {1}' changed its type from '{2}' to '{3}'.", representation.getId(),
+          representation.getAipId(), representation.getType(), newType);
 
         model.createUpdateAIPEvent(representation.getAipId(), representation.getId(), null, null,
-          PreservationEventType.UPDATE, EVENT_DESCRIPTION, state, outcomeText.toString(), details, job.getUsername(),
-          true, null);
+          PluginHelper.getPreservationEventType(ChangeTypePlugin.class, PreservationEventType.UPDATE),
+          PluginHelper.getPreservationEventText("preservationEvent.common.updateObject", EVENT_DESCRIPTION), state,
+          outcomeText, details, job.getUsername(), true, null);
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
       }
@@ -208,17 +212,19 @@ public class ChangeTypePlugin<T extends IsRODAObject> extends AbstractPlugin<T> 
 
   @Override
   public String getPreservationEventDescription() {
-    return "Updates object type";
+    return PluginHelper.getPreservationEventText("plugin.changeTypePlugin.event.description", "Updates object type");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The object type were successfully updated";
+    return PluginHelper.getPreservationEventText("plugin.changeTypePlugin.event.success",
+      "The object type were successfully updated");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "The object type were not successfully updated";
+    return PluginHelper.getPreservationEventText("plugin.changeTypePlugin.event.failure",
+      "The object type were not successfully updated");
   }
 
   @Override

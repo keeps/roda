@@ -136,7 +136,8 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Apply disposal hold to AIP";
+    return PluginHelper.getPreservationEventText("plugin.applyDisposalHoldToAIPPlugin.event.description",
+      "Apply disposal hold to AIP");
   }
 
   @Override
@@ -205,7 +206,9 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
 
       if (disposalHolds.size() != disposalHoldIds.size()) {
         state = PluginState.FAILURE;
-        String details = "Failed to retrieve one or more disposal holds " + disposalHoldIds;
+        String details = PluginHelper.getPreservationEventText(
+          "plugin.applyDisposalHoldToAIPPlugin.event.retrieveHoldsFailed",
+          "Failed to retrieve one or more disposal holds {0}", disposalHoldIds);
         reportItem.setPluginState(state).setPluginDetails(details);
         outcomeTexts.add(details);
       } else if (StringUtils.isNotBlank(aip.getDisposalConfirmationId())) {
@@ -215,8 +218,10 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
           disposalHoldIds, aip.getId());
         reportItem.setPluginState(state).setPluginDetails("Error applying disposal hold to AIP '" + aip.getId()
           + "': This AIP is part of a disposal confirmation report and an hold cannot be applied");
-        outcomeTexts.add("Applying disposal holds " + disposalHoldIds + " failed for AIP '" + aip.getId()
-          + "'; This AIP is part of a disposal confirmation report and an hold cannot be applied");
+        outcomeTexts.add(PluginHelper.getPreservationEventText(
+          "plugin.applyDisposalHoldToAIPPlugin.event.partOfDisposalConfirmation",
+          "Applying disposal holds {0} failed for AIP '{1}'; This AIP is part of a disposal confirmation report and an hold cannot be applied",
+          disposalHoldIds, aip.getId()));
       } else {
         if (override) {
           DisposalHoldPluginUtils.disassociateAllDisposalHoldsFromAIP(model, state, aip, cachedJob, reportItem);
@@ -231,8 +236,10 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
               LOGGER.info(
                 "Applying disposal hold '{}' to AIP '{}' was skipped because it is already on the same disposal hold",
                 holdId, aip.getId());
-              String skippedText = "Applying disposal hold '" + holdId + "' to AIP '" + aip.getId()
-                + "' was skipped because it is already on the same disposal hold";
+              String skippedText = PluginHelper.getPreservationEventText(
+                "plugin.applyDisposalHoldToAIPPlugin.event.alreadyOnHold",
+                "Applying disposal hold '{0}' to AIP '{1}' was skipped because it is already on the same disposal hold",
+                holdId, aip.getId());
               reportItem.addPluginDetails(skippedText);
               outcomeTexts.add(skippedText);
             } else {
@@ -244,8 +251,9 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
             | IllegalOperationException e) {
             hasFailedHold = true;
             LOGGER.error("Error applying disposal hold {} to AIP '{}': {}", holdId, aip.getId(), e.getMessage(), e);
-            String failedText = "Error applying disposal hold '" + holdId + "' to AIP '" + aip.getId() + "': "
-              + e.getMessage();
+            String failedText = PluginHelper.getPreservationEventText(
+              "plugin.applyDisposalHoldToAIPPlugin.event.applyHoldError",
+              "Error applying disposal hold '{0}' to AIP '{1}': {2}", holdId, aip.getId(), e.getMessage());
             reportItem.addPluginDetails(failedText);
             outcomeTexts.add(failedText);
           }
@@ -270,8 +278,9 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
             state = PluginState.FAILURE;
             LOGGER.error("Error persisting disposal holds {} for AIP '{}': {}", disposalHoldIds, aip.getId(),
               e.getMessage(), e);
-            String failedText = "Error persisting disposal holds " + disposalHoldIds + " for AIP '" + aip.getId()
-              + "': " + e.getMessage();
+            String failedText = PluginHelper.getPreservationEventText(
+              "plugin.applyDisposalHoldToAIPPlugin.event.persistHoldsError",
+              "Error persisting disposal holds {0} for AIP '{1}': {2}", disposalHoldIds, aip.getId(), e.getMessage());
             reportItem.addPluginDetails(failedText);
             outcomeTexts.add(failedText);
           }
@@ -312,7 +321,8 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
     reportItem.setPluginState(state).addPluginDetails("Disposal hold '" + disposalHold.getTitle() + "' (" + holdId
       + ") was successfully applied to AIP '" + aip.getId() + "'");
 
-    return PluginHelper.createOutcomeTextForDisposalHold("was successfully applied to AIP", holdId,
+    return PluginHelper.createOutcomeTextForDisposalHold(PluginHelper.getPreservationEventText(
+      "plugin.applyDisposalHoldToAIPPlugin.event.successfullyApplied", "was successfully applied to AIP"), holdId,
       disposalHold.getTitle());
   }
 
@@ -338,16 +348,19 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
           if (override) {
             for (DisposalHoldAIPMetadata hold : holds) {
               if (transitiveAIP.removeTransitiveHold(hold.getId())) {
-                String outcomeLiftText = "Transitive disposal holds " + holdsIdList.toString()
-                  + " are disassociated from AIP " + transitiveAIP.getId();
+                String outcomeLiftText = PluginHelper.getPreservationEventText(
+                  "plugin.applyDisposalHoldToAIPPlugin.event.transitiveHoldsDisassociated",
+                  "Transitive disposal holds {0} are disassociated from AIP {1}", holdsIdList, transitiveAIP.getId());
                 model.createEvent(transitiveAIP.getId(), null, null, null, POLICY_ASSIGNMENT,
-                  LiftDisposalHoldPlugin.getStaticName(), null, null, state, outcomeLiftText, "",
+                  PluginHelper.getPreservationEventText(LiftDisposalHoldPlugin.getStaticName(), "Lift disposal hold"),
+                  null, null, state, outcomeLiftText, "",
                   cachedJob.getUsername(), true, null);
               }
             }
           }
           model.updateAIP(transitiveAIP, cachedJob.getUsername());
-          outcomeText = PluginHelper.createOutcomeTextForDisposalHold("Transitive applied with success",
+          outcomeText = PluginHelper.createOutcomeTextForDisposalHold(PluginHelper.getPreservationEventText(
+            "plugin.applyDisposalHoldToAIPPlugin.event.transitiveApplied", "Transitive applied with success"),
             disposalHold.getId(), disposalHold.getTitle());
           reportItem.setPluginState(state).addPluginDetails(outcomeText);
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
@@ -356,7 +369,8 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
           jobPluginInfo.incrementObjectsProcessedWithFailure();
           reportItem.setPluginState(PluginState.FAILURE)
             .setPluginDetails("Error applying disposal schedule " + indexedAIP.getId() + ": " + e.getMessage());
-          outcomeText = PluginHelper.createOutcomeTextForDisposalHold(" failed to be applied to AIP",
+          outcomeText = PluginHelper.createOutcomeTextForDisposalHold(PluginHelper.getPreservationEventText(
+            "plugin.applyDisposalHoldToAIPPlugin.event.failedToBeApplied", " failed to be applied to AIP"),
             disposalHold.getId(), disposalHold.getTitle());
         } finally {
           report.addReport(reportItem);

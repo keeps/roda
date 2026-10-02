@@ -169,17 +169,20 @@ public class ChangeRodaMemberStatusPlugin<T extends RODAMember> extends Abstract
 
   @Override
   public String getPreservationEventDescription() {
-    return "Changes RODA user status";
+    return PluginHelper.getPreservationEventText("plugin.changeRodaMemberStatusPlugin.event.description",
+      "Changes RODA user status");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The RODA user status were successfully updated";
+    return PluginHelper.getPreservationEventText("plugin.changeRodaMemberStatusPlugin.event.success",
+      "The RODA user status were successfully updated");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "The RODA user status were not successfully updated";
+    return PluginHelper.getPreservationEventText("plugin.changeRodaMemberStatusPlugin.event.failure",
+      "The RODA user status were not successfully updated");
   }
 
   @Override

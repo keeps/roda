@@ -123,7 +123,8 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Lift disposal hold";
+    return PluginHelper.getPreservationEventText("plugin.liftDisposalHoldPlugin.event.description",
+      "Lift disposal hold");
   }
 
   @Override
@@ -202,7 +203,8 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<Void> {
           outcomeText = "";
           count += children;
         } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-          outcomeText = "Error lifting disposal hold" + disposalHoldId + " from AIP " + indexedAIP.getId();
+          outcomeText = PluginHelper.getPreservationEventText("plugin.liftDisposalHoldPlugin.event.liftHoldError",
+            "Error lifting disposal hold{0} from AIP {1}", disposalHoldId, indexedAIP.getId());
           LOGGER.error("Error lifting disposal hold '{}' from '{}': {}", disposalHoldId, indexedAIP.getId(),
             e.getMessage(), e);
           state = PluginState.FAILURE;
@@ -257,7 +259,9 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<Void> {
         outcomeText = "";
       } catch (AuthorizationDeniedException e) {
         state = PluginState.FAILURE;
-        outcomeText = "Can't retrieve AIP " + aipId + " for lifting transitive hold " + holdId + ".";
+        outcomeText = PluginHelper.getPreservationEventText(
+          "plugin.liftDisposalHoldPlugin.event.retrieveAIPForTransitiveLiftFailed",
+          "Can't retrieve AIP {0} for lifting transitive hold {1}.", aipId, holdId);
         LOGGER.debug(outcomeText, e);
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         reportItem.setPluginState(state).setPluginDetails(

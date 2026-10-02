@@ -160,17 +160,20 @@ public class AddRepresentationInformationFilterPlugin extends AbstractPlugin<Rep
 
   @Override
   public String getPreservationEventDescription() {
-    return "Add representation information filter";
+    return PluginHelper.getPreservationEventText("plugin.addRepresentationInformationFilterPlugin.event.description",
+      "Add representation information filter");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Representation information filter was added successfully";
+    return PluginHelper.getPreservationEventText("plugin.addRepresentationInformationFilterPlugin.event.success",
+      "Representation information filter was added successfully");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Representation information filter failed to add";
+    return PluginHelper.getPreservationEventText("plugin.addRepresentationInformationFilterPlugin.event.failure",
+      "Representation information filter failed to add");
   }
 
   @Override

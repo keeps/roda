@@ -165,12 +165,13 @@ public class UpdatePermissionsPlugin<T extends IsRODAObject> extends AbstractPlu
         }
       }
 
-      outcome = "AIP " + aip.getId() + " permissions were updated and all sublevels too";
+      outcome = PluginHelper.getPreservationEventText("plugin.updatePermissionsPlugin.event.aipPermissionsUpdated",
+        "AIP {0} permissions were updated and all sublevels too", aip.getId());
     } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
       state = PluginState.FAILURE;
       reportItem.addPluginDetails("Could not update AIP permissions: " + e.getMessage());
-      outcome = "AIP " + aip.getId() + " or some of its child permissions were not successfully updated: "
-        + e.getMessage();
+      outcome = PluginHelper.getPreservationEventText("plugin.updatePermissionsPlugin.event.aipPermissionsNotUpdated",
+        "AIP {0} or some of its child permissions were not successfully updated: {1}", aip.getId(), e.getMessage());
     } finally {
       reportItem.setPluginState(state);
       report.addReport(reportItem);
@@ -179,8 +180,9 @@ public class UpdatePermissionsPlugin<T extends IsRODAObject> extends AbstractPlu
 
       List<LinkingIdentifier> sources = Arrays
         .asList(PluginHelper.getLinkingIdentifier(aip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
-      model.createEvent(aip.getId(), null, null, null, PreservationEventType.UPDATE, getPreservationEventDescription(),
-        sources, null, state, outcome, details, job.getUsername(), true, null);
+      model.createEvent(aip.getId(), null, null, null,
+        PluginHelper.getPreservationEventType(UpdatePermissionsPlugin.class, PreservationEventType.UPDATE),
+        getPreservationEventDescription(), sources, null, state, outcome, details, job.getUsername(), true, null);
     }
   }
 
@@ -235,17 +237,20 @@ public class UpdatePermissionsPlugin<T extends IsRODAObject> extends AbstractPlu
 
   @Override
   public String getPreservationEventDescription() {
-    return "Updates AIP or DIP permissions recursively";
+    return PluginHelper.getPreservationEventText("plugin.updatePermissionsPlugin.event.description",
+      "Updates AIP or DIP permissions recursively");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "AIP or DIP permissions update was successful";
+    return PluginHelper.getPreservationEventText("plugin.updatePermissionsPlugin.event.success",
+      "AIP or DIP permissions update was successful");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "AIP or DIP permissions update failed";
+    return PluginHelper.getPreservationEventText("plugin.updatePermissionsPlugin.event.failure",
+      "AIP or DIP permissions update failed");
   }
 
   @Override

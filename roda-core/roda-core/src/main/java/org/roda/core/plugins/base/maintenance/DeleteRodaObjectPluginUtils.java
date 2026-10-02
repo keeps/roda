@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.dips.DIPUtils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -134,18 +135,24 @@ public class DeleteRodaObjectPluginUtils {
     String outcomeText;
 
     if (entityName.equals(AIP.class.getSimpleName())) {
-      outcomeText = entityName + " [id: " + entityId
-        + "] has not been manually deleted due to be associated to a disposal " + disposalType;
+      outcomeText = PluginHelper.getPreservationEventText(
+        "preservationEvent.deleteRodaObjectPluginUtils.notDeletedDueToDisposal",
+        "{0} [id: {1}] has not been manually deleted due to be associated to a disposal {2}", entityName, entityId,
+        disposalType);
     } else {
-      outcomeText = entityName + " [id: " + entityId + "] has not been manually deleted due to parent AIP [id: "
-        + parentId + "] be associated to a disposal " + disposalType;
+      outcomeText = PluginHelper.getPreservationEventText(
+        "preservationEvent.deleteRodaObjectPluginUtils.notDeletedDueToParentDisposal",
+        "{0} [id: {1}] has not been manually deleted due to parent AIP [id: {2}] be associated to a disposal {3}",
+        entityName, entityId, parentId, disposalType);
     }
 
     List<LinkingIdentifier> sources = new ArrayList<>();
     sources.add(PluginHelper.getLinkingIdentifier(entityId, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
-    model.createEvent(entityId, null, null, null, RodaConstants.PreservationEventType.DELETION, EVENT_DESCRIPTION,
-      sources, null, reportItem.getPluginState(), outcomeText, details, job.getUsername(), true, null);
+    model.createEvent(entityId, null, null, null,
+      PluginHelper.getPreservationEventType(DeleteRODAObjectPlugin.class, PreservationEventType.DELETION),
+      PluginHelper.getPreservationEventText("preservationEvent.common.deleteObject", EVENT_DESCRIPTION), sources, null,
+      reportItem.getPluginState(), outcomeText, details, job.getUsername(), true, null);
   }
 
   private static void processAIP(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo,
@@ -207,14 +214,17 @@ public class DeleteRodaObjectPluginUtils {
               processLinkedDIP(childAip, index, model, report, reportItem, jobPluginInfo, job, plugin);
               model.deleteAIP(childAIP.getId());
 
-              outcomeText = PluginHelper.createOutcomeTextForAIP(childAIP, "has been manually deleted");
+              outcomeText = PluginHelper.createOutcomeTextForAIP(childAIP, PluginHelper
+                .getPreservationEventText("preservationEvent.deleteRodaObjectPluginUtils.deleted",
+                  "has been manually deleted"));
               List<LinkingIdentifier> sources = new ArrayList<>();
               sources.add(
                 PluginHelper.getLinkingIdentifier(childAIP.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
-              model.createEvent(childAIP.getId(), null, null, null, RodaConstants.PreservationEventType.DELETION,
-                EVENT_DESCRIPTION, sources, null, PluginState.SUCCESS, outcomeText, details, job.getUsername(), true,
-                null);
+              model.createEvent(childAIP.getId(), null, null, null,
+                PluginHelper.getPreservationEventType(DeleteRODAObjectPlugin.class, PreservationEventType.DELETION),
+                PluginHelper.getPreservationEventText("preservationEvent.common.deleteObject", EVENT_DESCRIPTION),
+                sources, null, PluginState.SUCCESS, outcomeText, details, job.getUsername(), true, null);
             }
           }
         } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
@@ -244,25 +254,33 @@ public class DeleteRodaObjectPluginUtils {
         processLinkedDIP(aip, index, model, report, reportItem, jobPluginInfo, job, plugin);
         model.deleteAIP(aip.getId());
         if (item != null) {
-          outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has been manually deleted");
+          outcomeText = PluginHelper.createOutcomeTextForAIP(item, PluginHelper.getPreservationEventText(
+            "preservationEvent.deleteRodaObjectPluginUtils.deleted", "has been manually deleted"));
         } else {
-          outcomeText = "Archival Information Package [id: " + aip.getId() + "] has been manually deleted";
+          outcomeText = PluginHelper.getPreservationEventText(
+            "preservationEvent.deleteRodaObjectPluginUtils.aipDeleted",
+            "Archival Information Package [id: {0}] has been manually deleted", aip.getId());
         }
       } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
         reportItem.setPluginState(PluginState.FAILURE);
         reportItem.addPluginDetails("Could not delete AIP: " + e.getMessage());
         if (item != null) {
-          outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has not been manually deleted");
+          outcomeText = PluginHelper.createOutcomeTextForAIP(item, PluginHelper.getPreservationEventText(
+            "preservationEvent.deleteRodaObjectPluginUtils.notDeleted", "has not been manually deleted"));
         } else {
-          outcomeText = "Archival Information Package [id: " + aip.getId() + "] has not been manually deleted";
+          outcomeText = PluginHelper.getPreservationEventText(
+            "preservationEvent.deleteRodaObjectPluginUtils.aipNotDeleted",
+            "Archival Information Package [id: {0}] has not been manually deleted", aip.getId());
         }
       }
 
       List<LinkingIdentifier> sources = new ArrayList<>();
       sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
-      model.createEvent(aip.getId(), null, null, null, RodaConstants.PreservationEventType.DELETION, EVENT_DESCRIPTION,
-        sources, null, reportItem.getPluginState(), outcomeText, details, job.getUsername(), true, null);
+      model.createEvent(aip.getId(), null, null, null,
+        PluginHelper.getPreservationEventType(DeleteRODAObjectPlugin.class, PreservationEventType.DELETION),
+        PluginHelper.getPreservationEventText("preservationEvent.common.deleteObject", EVENT_DESCRIPTION), sources,
+        null, reportItem.getPluginState(), outcomeText, details, job.getUsername(), true, null);
     }
   }
 
@@ -328,8 +346,9 @@ public class DeleteRodaObjectPluginUtils {
     reportItem.setPluginState(state);
 
     model.createEvent(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-      RodaConstants.PreservationEventType.DELETION, EVENT_DESCRIPTION, sources, null, state,
-      reportItem.getPluginDetails(), details, job.getUsername(), true, null);
+      PluginHelper.getPreservationEventType(DeleteRODAObjectPlugin.class, PreservationEventType.DELETION),
+      PluginHelper.getPreservationEventText("preservationEvent.common.deleteObject", EVENT_DESCRIPTION), sources, null,
+      state, reportItem.getPluginDetails(), details, job.getUsername(), true, null);
 
   }
 
@@ -455,9 +474,13 @@ public class DeleteRodaObjectPluginUtils {
 
         String outcomeText;
         if (state.equals(PluginState.SUCCESS)) {
-          outcomeText = "The representation '" + representation.getId() + "' has been manually deleted.";
+          outcomeText = PluginHelper.getPreservationEventText(
+            "preservationEvent.deleteRodaObjectPluginUtils.representationDeleted",
+            "The representation '{0}' has been manually deleted.", representation.getId());
         } else {
-          outcomeText = "The representation '" + representation.getId() + "' has not been manually deleted.";
+          outcomeText = PluginHelper.getPreservationEventText(
+            "preservationEvent.deleteRodaObjectPluginUtils.representationNotDeleted",
+            "The representation '{0}' has not been manually deleted.", representation.getId());
         }
 
         List<LinkingIdentifier> sources = new ArrayList<>();
@@ -465,8 +488,9 @@ public class DeleteRodaObjectPluginUtils {
           RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
         model.createEvent(representation.getAipId(), representation.getId(), null, null,
-          RodaConstants.PreservationEventType.DELETION, EVENT_DESCRIPTION, sources, null, state, outcomeText, details,
-          job.getUsername(), true, null);
+          PluginHelper.getPreservationEventType(DeleteRODAObjectPlugin.class, PreservationEventType.DELETION),
+          PluginHelper.getPreservationEventText("preservationEvent.common.deleteObject", EVENT_DESCRIPTION), sources,
+          null, state, outcomeText, details, job.getUsername(), true, null);
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       state = PluginState.FAILURE;

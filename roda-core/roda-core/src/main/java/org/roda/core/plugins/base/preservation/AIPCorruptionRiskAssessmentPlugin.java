@@ -441,17 +441,20 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Computed the fixity information of files inside the AIP and compared to fixity information recorded in preservation metadata";
+    return PluginHelper.getPreservationEventText("plugin.aipCorruptionRiskAssessmentPlugin.event.description",
+      "Computed the fixity information of files inside the AIP and compared to fixity information recorded in preservation metadata");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Fixity of files inside the AIP has been assessed and there was no evidence of corruption";
+    return PluginHelper.getPreservationEventText("plugin.aipCorruptionRiskAssessmentPlugin.event.success",
+      "Fixity of files inside the AIP has been assessed and there was no evidence of corruption");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Test of the fixity information of files inside AIPs failed";
+    return PluginHelper.getPreservationEventText("plugin.aipCorruptionRiskAssessmentPlugin.event.failure",
+      "Test of the fixity information of files inside AIPs failed");
   }
 
   @Override

@@ -117,7 +117,8 @@ public class RepresentationService {
   public Representation createRepresentation(RequestContext requestContext, String aipId, String representationId,
     String type, String details) throws GenericException, AuthorizationDeniedException, RequestNotValidException,
     NotFoundException, AlreadyExistsException {
-    String eventDescription = "The process of creating an object of the repository.";
+    String eventDescription = PluginHelper.getPreservationEventText("preservationEvent.common.createObject",
+      "The process of creating an object of the repository.");
 
     User user = requestContext.getUser();
     ModelService model = requestContext.getModelService();
@@ -131,16 +132,22 @@ public class RepresentationService {
       targets.add(PluginHelper.getLinkingIdentifier(aipId, representation.getId(),
         RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
 
-      String outcomeText = "The representation '" + representationId + "' has been manually created";
-      model.createEvent(aipId, null, null, null, RodaConstants.PreservationEventType.CREATION, eventDescription, null,
-        targets, PluginState.SUCCESS, outcomeText, details, user.getName(), true, null);
+      String outcomeText = PluginHelper.getPreservationEventText("preservationEvent.representationService.representationCreated",
+        "The representation '{0}' has been manually created", representationId);
+      model.createEvent(aipId, null, null, null,
+        PluginHelper.getPreservationEventTypeFromProperty("core.events.create_representation.preservation_event_type",
+          RodaConstants.PreservationEventType.CREATION),
+        eventDescription, null, targets, PluginState.SUCCESS, outcomeText, details, user.getName(), true, null);
 
       index.commit(IndexedRepresentation.class);
       return representation;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | AlreadyExistsException e) {
-      String outcomeText = "The representation '" + representationId + "' has not been manually created";
-      model.createUpdateAIPEvent(aipId, null, null, null, RodaConstants.PreservationEventType.CREATION,
+      String outcomeText = PluginHelper.getPreservationEventText("preservationEvent.representationService.representationNotCreated",
+        "The representation '{0}' has not been manually created", representationId);
+      model.createUpdateAIPEvent(aipId, null, null, null,
+        PluginHelper.getPreservationEventTypeFromProperty("core.events.create_representation.preservation_event_type",
+          RodaConstants.PreservationEventType.CREATION),
         eventDescription, PluginState.FAILURE, outcomeText, details, user.getName(), true, null);
 
       throw e;

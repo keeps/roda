@@ -340,17 +340,20 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
 
   @Override
   public String getPreservationEventDescription() {
-    return "Associates risk to an object";
+    return PluginHelper.getPreservationEventText("plugin.riskAssociationPlugin.event.description",
+      "Associates risk to an object");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Risk was successfully associated with objects";
+    return PluginHelper.getPreservationEventText("plugin.riskAssociationPlugin.event.success",
+      "Risk was successfully associated with objects");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Risk was not successfully associated with objects";
+    return PluginHelper.getPreservationEventText("plugin.riskAssociationPlugin.event.failure",
+      "Risk was not successfully associated with objects");
   }
 
   @Override

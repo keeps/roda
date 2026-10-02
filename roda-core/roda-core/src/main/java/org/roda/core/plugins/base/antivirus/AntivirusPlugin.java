@@ -243,17 +243,20 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Scanned package for malicious programs using ClamAV.";
+    return PluginHelper.getPreservationEventText("plugin.antivirusPlugin.event.description",
+      "Scanned package for malicious programs using ClamAV.");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The package does not contain any known malicious programs.";
+    return PluginHelper.getPreservationEventText("plugin.antivirusPlugin.event.success",
+      "The package does not contain any known malicious programs.");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "A malicious program was detected inside the package.";
+    return PluginHelper.getPreservationEventText("plugin.antivirusPlugin.event.failure",
+      "A malicious program was detected inside the package.");
   }
 
   @Override

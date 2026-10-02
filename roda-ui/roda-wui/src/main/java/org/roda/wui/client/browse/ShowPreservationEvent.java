@@ -198,7 +198,7 @@ public class ShowPreservationEvent extends Composite {
   private void initView() {
     navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getPreservationEventBreadCrumbs(preservationEvent));
     navigationToolbar.withObject(preservationEvent).build();
-    title.setText(StringUtils.isNotBlank(preservationEvent.getEventType()) ? preservationEvent.getEventType()
+    title.setText(StringUtils.isNotBlank(preservationEvent.getEventTypeLabel()) ? preservationEvent.getEventTypeLabel()
       : preservationEvent.getId());
 
     tabs.init(preservationEvent, agents, linkingObjects, eventOutcomeDetailText);

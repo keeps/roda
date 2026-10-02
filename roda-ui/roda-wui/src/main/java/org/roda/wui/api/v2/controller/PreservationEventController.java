@@ -32,8 +32,10 @@ import org.roda.wui.api.v2.services.IndexService;
 import org.roda.wui.api.v2.services.PreservationEventService;
 import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.client.services.PreservationEventRestService;
+import org.roda.wui.common.I18nUtility;
 import org.roda.wui.common.RequestControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
+import org.roda.wui.common.server.ServerTools;
 import org.roda.wui.common.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -70,12 +72,14 @@ public class PreservationEventController implements PreservationEventRestService
 
   @Override
   public IndexedPreservationEvent findByUuid(String uuid, String localeString) {
-    return indexService.retrieve(IndexedPreservationEvent.class, uuid, new ArrayList<>());
+    return I18nUtility.translatePreservationEvent(
+      indexService.retrieve(IndexedPreservationEvent.class, uuid, new ArrayList<>()), localeString);
   }
 
   @Override
   public IndexResult<IndexedPreservationEvent> find(@RequestBody FindRequest findRequest, String localeString) {
-    return indexService.find(IndexedPreservationEvent.class, findRequest, localeString);
+    return I18nUtility.translatePreservationEvents(
+      indexService.find(IndexedPreservationEvent.class, findRequest, localeString), localeString);
   }
 
   @Override
@@ -167,6 +171,7 @@ public class PreservationEventController implements PreservationEventRestService
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   public ResponseEntity<Map<String, String>> getPreservationEventsDetails(
     @Parameter(description = "The id of the preservation event", required = true) @PathVariable(name = "id") String id,
+    @Parameter(description = "language", content = @Content(schema = @Schema(defaultValue = "en", implementation = String.class))) @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString,
     @RequestHeader HttpHeaders headers) {
 
     return requestHandler.processRequest(new RequestHandler.RequestProcessor<ResponseEntity<Map<String, String>>>() {
@@ -187,6 +192,8 @@ public class PreservationEventController implements PreservationEventRestService
         Map<String, String> details = preservationEventService.retrievePreservationEventDetails(preservationEvent,
           requestContext);
 
+        details.put("outcomeDetailNote", I18nUtility.translatePreservationEventText(details.get("outcomeDetailNote"),
+          ServerTools.parseLocale(localeString)));
         return ResponseEntity.ok(details);
       }
     });

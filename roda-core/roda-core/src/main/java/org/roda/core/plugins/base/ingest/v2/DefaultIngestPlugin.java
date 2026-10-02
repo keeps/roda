@@ -321,7 +321,9 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
             Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH));
           final PluginState pluginState = jobPluginInfo.getAllReports().get(transferredResourceId).get(entry.getKey())
             .getPluginState();
-          setPreservationSuccessMessage(calculatePreservationSuccessMessageFromPluginState(pluginState));
+          if (getPreservationEventType() != START_TYPE) {
+            setPreservationSuccessMessage(calculatePreservationSuccessMessageFromPluginState(pluginState));
+          }
 
           PluginHelper.createPluginEvent(this, entry.getKey(), model, index, tr, pluginState, "", true, eventDate,
             cachedJob);
@@ -338,28 +340,33 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     // returns END_PARTIAL message if plugin state is partial_success
     switch (state) {
       case PARTIAL_SUCCESS:
-        return END_PARTIAL;
+        return PluginHelper.getPreservationEventText("plugin.defaultIngestPlugin.event.endPartial", END_PARTIAL);
       case SUCCESS:
       default:
-        return END_SUCCESS;
+        return PluginHelper.getPreservationEventText("plugin.defaultIngestPlugin.event.endSuccess", END_SUCCESS);
     }
   }
 
   private void createIngestStartedEvent(ModelService model, IndexService index, IngestJobPluginInfo jobPluginInfo,
     Date startDate, Job cachedJob) {
     setPreservationEventType(START_TYPE);
-    setPreservationSuccessMessage(START_MESSAGE);
-    setPreservationFailureMessage(START_MESSAGE);
-    setPreservationEventDescription(START_MESSAGE);
+    String startMessage = PluginHelper
+      .getPreservationEventText("plugin.defaultIngestPlugin.event.start", START_MESSAGE);
+    setPreservationSuccessMessage(startMessage);
+    setPreservationFailureMessage(startMessage);
+    setPreservationEventDescription(startMessage);
     createIngestEvent(model, index, jobPluginInfo, startDate, cachedJob);
   }
 
   private void createIngestEndedEvent(ModelService model, IndexService index, IngestJobPluginInfo jobPluginInfo,
     Job cachedJob) {
     setPreservationEventType(END_TYPE);
-    setPreservationSuccessMessage(END_SUCCESS);
-    setPreservationFailureMessage(END_FAILURE);
-    setPreservationEventDescription(END_DESCRIPTION);
+    setPreservationSuccessMessage(PluginHelper
+      .getPreservationEventText("plugin.defaultIngestPlugin.event.endSuccess", END_SUCCESS));
+    setPreservationFailureMessage(PluginHelper
+      .getPreservationEventText("plugin.defaultIngestPlugin.event.endFailure", END_FAILURE));
+    setPreservationEventDescription(PluginHelper
+      .getPreservationEventText("plugin.defaultIngestPlugin.event.endDescription", END_DESCRIPTION));
     createIngestEvent(model, index, jobPluginInfo, new Date(), cachedJob);
   }
 

@@ -105,7 +105,8 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
       LOGGER.debug("Done with auto accepting AIP {}", aip.getId());
     } catch (RODAException e) {
       LOGGER.error("Error updating AIP (metadata attribute state=ACTIVE)", e);
-      outcomeDetail = "Error updating AIP (metadata attribute state=ACTIVE): " + e.getMessage();
+      outcomeDetail = PluginHelper.getPreservationEventText("plugin.autoAcceptSipPlugin.event.errorUpdatingAip",
+        "Error updating AIP (metadata attribute state=ACTIVE): {0}", e.getMessage());
       reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(outcomeDetail)
         .setOutcomeObjectState(AIPState.UNDER_APPRAISAL);
     }
@@ -144,17 +145,17 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return DESCRIPTION;
+    return PluginHelper.getPreservationEventText("plugin.autoAcceptSipPlugin.event.description", DESCRIPTION);
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return SUCCESS_MESSAGE;
+    return PluginHelper.getPreservationEventText("plugin.autoAcceptSipPlugin.event.success", SUCCESS_MESSAGE);
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return FAILURE_MESSAGE;
+    return PluginHelper.getPreservationEventText("plugin.autoAcceptSipPlugin.event.failure", FAILURE_MESSAGE);
   }
 
   @Override

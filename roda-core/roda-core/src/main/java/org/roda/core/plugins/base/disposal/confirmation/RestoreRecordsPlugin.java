@@ -19,6 +19,7 @@ import java.util.UUID;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -91,7 +92,8 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Restore records under disposal confirmation report";
+    return PluginHelper.getPreservationEventText("plugin.restoreRecordsPlugin.event.description",
+      "Restore records under disposal confirmation report");
   }
 
   @Override
@@ -232,8 +234,9 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
       model.updateAIP(aip, cachedJob.getUsername());
       index.reindexAIP(aip);
 
-      outcomeText = "AIP '" + aip.getId() + "' has been restored from disposal bin under confirmation '"
-        + disposalConfirmation.getTitle() + "' (" + disposalConfirmation.getId() + ")";
+      outcomeText = PluginHelper.getPreservationEventText("plugin.restoreRecordsPlugin.event.aipRestored",
+        "AIP '{0}' has been restored from disposal bin under confirmation '{1}' ({2})", aip.getId(),
+        disposalConfirmation.getTitle(), disposalConfirmation.getId());
 
       reportItem.setPluginDetails(outcomeText);
 
@@ -241,15 +244,17 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
       | AlreadyExistsException e) {
       LOGGER.error("Failed to restore AIP '{}': {}", aipEntry.getAipId(), e.getMessage(), e);
       pluginState = PluginState.FAILURE;
-      outcomeText = "AIP '" + aipEntry.getAipId()
-        + "' has not been restored from disposal bin under disposal confirmation '" + disposalConfirmation.getTitle()
-        + "' (" + disposalConfirmation.getId() + ")";
+      outcomeText = PluginHelper.getPreservationEventText("plugin.restoreRecordsPlugin.event.aipNotRestored",
+        "AIP '{0}' has not been restored from disposal bin under disposal confirmation '{1}' ({2})",
+        aipEntry.getAipId(), disposalConfirmation.getTitle(), disposalConfirmation.getId());
       reportItem.setPluginDetails(outcomeText + ": " + e.getMessage());
       processedWithErrors = true;
     }
 
-    model.createEvent(aipEntry.getAipId(), null, null, null, RodaConstants.PreservationEventType.RECOVERY,
-      EVENT_DESCRIPTION, null, null, pluginState, outcomeText, "", cachedJob.getUsername(), true, null);
+    model.createEvent(aipEntry.getAipId(), null, null, null,
+      PluginHelper.getPreservationEventType(RestoreRecordsPlugin.class, PreservationEventType.RECOVERY),
+      PluginHelper.getPreservationEventText("plugin.restoreRecordsPlugin.event.eventDescription", EVENT_DESCRIPTION),
+      null, null, pluginState, outcomeText, "", cachedJob.getUsername(), true, null);
 
     jobPluginInfo.incrementObjectsProcessed(pluginState);
 

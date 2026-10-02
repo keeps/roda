@@ -73,7 +73,8 @@ public class DisassociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP>
 
   @Override
   public String getPreservationEventDescription() {
-    return "Disassociate disposal schedule from AIP";
+    return PluginHelper.getPreservationEventText("plugin.disassociateDisposalScheduleToAIPPlugin.event.description",
+      "Disassociate disposal schedule from AIP");
   }
 
   @Override
@@ -125,8 +126,10 @@ public class DisassociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP>
         jobPluginInfo.incrementObjectsProcessed(state);
         reportItem.setPluginState(state).setPluginDetails("Disposal schedule disassociation was skipped because AIP '"
           + aip.getId() + "' is not associated with any disposal schedule");
-        outcomeText = "Disposal schedule disassociation was skipped because AIP '" + aip.getId()
-          + "' is not associated with any disposal schedule";
+        outcomeText = PluginHelper.getPreservationEventText(
+          "plugin.disassociateDisposalScheduleToAIPPlugin.event.noScheduleAssociated",
+          "Disposal schedule disassociation was skipped because AIP '{0}' is not associated with any disposal schedule",
+          aip.getId());
       } else {
         if (StringUtils.isNotBlank(aip.getDisposalConfirmationId())) {
           state = PluginState.FAILURE;
@@ -136,10 +139,10 @@ public class DisassociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP>
           jobPluginInfo.incrementObjectsProcessedWithFailure();
           reportItem.setPluginState(state).setPluginDetails("Error disassociating disposal schedule from AIP '"
             + aip.getId() + "': This AIP is part of a disposal confirmation report and the schedule cannot be changed");
-          outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(
-            "failed to be disassociate from AIP '" + aip.getId()
-              + "'; This AIP is part of a disposal confirmation report and the schedule cannot be changed",
-            aip.getDisposalScheduleId(), null);
+          outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(PluginHelper.getPreservationEventText(
+            "plugin.disassociateDisposalScheduleToAIPPlugin.event.partOfDisposalConfirmation",
+            "failed to be disassociate from AIP '{0}'; This AIP is part of a disposal confirmation report and the schedule cannot be changed",
+            aip.getId()), aip.getDisposalScheduleId(), null);
         } else {
           try {
             disposalSchedule = model.retrieveDisposalSchedule(aip.getDisposalScheduleId());
@@ -149,13 +152,15 @@ public class DisassociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP>
               reportItem.setPluginState(state).setPluginDetails(
                 "Disposal schedule '" + aip.getDisposalScheduleId() + "' was successfully disassociated from AIP");
 
-              outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(
-                " was successfully disassociated from AIP", disposalSchedule.getId(), disposalSchedule.getTitle());
+              outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(PluginHelper.getPreservationEventText(
+                "plugin.disassociateDisposalScheduleToAIPPlugin.event.successfullyDisassociated",
+                " was successfully disassociated from AIP"), disposalSchedule.getId(), disposalSchedule.getTitle());
             } else {
               state = PluginState.SKIPPED;
               reportItem.setPluginState(state)
                 .setPluginDetails("Disposal schedule '" + aip.getDisposalScheduleId() + "' does not exist on this AIP");
-              outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(" does not exist on this AIP",
+              outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(PluginHelper.getPreservationEventText(
+                "plugin.disassociateDisposalScheduleToAIPPlugin.event.doesNotExist", " does not exist on this AIP"),
                 disposalSchedule.getId(), disposalSchedule.getTitle());
             }
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
@@ -166,8 +171,9 @@ public class DisassociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP>
             jobPluginInfo.incrementObjectsProcessedWithFailure();
             reportItem.setPluginState(state)
               .setPluginDetails("Error disassociating disposal schedule " + aip.getId() + ": " + e.getMessage());
-            outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(
-              "failed to be disassociate from AIP '" + aip.getId() + "'", aip.getDisposalScheduleId(), null);
+            outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(PluginHelper.getPreservationEventText(
+              "plugin.disassociateDisposalScheduleToAIPPlugin.event.failedToBeDisassociated",
+              "failed to be disassociate from AIP '{0}'", aip.getId()), aip.getDisposalScheduleId(), null);
           }
         }
       }

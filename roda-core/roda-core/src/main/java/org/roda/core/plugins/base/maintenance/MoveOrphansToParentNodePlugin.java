@@ -171,17 +171,20 @@ public class MoveOrphansToParentNodePlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Moved orphan AIPs to a new parent";
+    return PluginHelper.getPreservationEventText("plugin.moveOrphansToParentNodePlugin.event.description",
+      "Moved orphan AIPs to a new parent");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Moved orphan AIPs to a new parent successfully";
+    return PluginHelper.getPreservationEventText("plugin.moveOrphansToParentNodePlugin.event.success",
+      "Moved orphan AIPs to a new parent successfully");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Move of orphan AIPs to a new parent failed";
+    return PluginHelper.getPreservationEventText("plugin.moveOrphansToParentNodePlugin.event.failure",
+      "Move of orphan AIPs to a new parent failed");
   }
 
   @Override
