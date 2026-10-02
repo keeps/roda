@@ -120,17 +120,20 @@ public class InstanceIdentifierAIPEventPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Updated the AIP preservation events instance identifier";
+    return PluginHelper.getPreservationEventText("plugin.instanceIdentifierAIPEventPlugin.event.description",
+      "Updated the AIP preservation events instance identifier");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The AIP preservation event instance identifier was updated successfully";
+    return PluginHelper.getPreservationEventText("plugin.instanceIdentifierAIPEventPlugin.event.success",
+      "The AIP preservation event instance identifier was updated successfully");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Could not update the AIP preservation event instance identifier";
+    return PluginHelper.getPreservationEventText("plugin.instanceIdentifierAIPEventPlugin.event.failure",
+      "Could not update the AIP preservation event instance identifier");
   }
 
   @Override

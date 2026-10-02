@@ -74,14 +74,21 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
     eventTypeColumn = new TextColumn<IndexedPreservationEvent>() {
       @Override
       public String getValue(IndexedPreservationEvent event) {
-        return event != null ? event.getEventType() : null;
+        if (event == null) {
+          return null;
+        }
+        return StringUtils.isNotBlank(event.getEventTypeLabel()) ? event.getEventTypeLabel() : event.getEventType();
       }
     };
 
     eventDetailColumn = new TextColumn<IndexedPreservationEvent>() {
       @Override
       public String getValue(IndexedPreservationEvent event) {
-        return event != null ? event.getEventDetail() : null;
+        if (event == null) {
+          return null;
+        }
+        return StringUtils.isNotBlank(event.getEventDetailLabel()) ? event.getEventDetailLabel()
+          : event.getEventDetail();
       }
     };
 

@@ -44,7 +44,9 @@ public class DetailsPanelPreservationEvent extends GenericMetadataCardPanel<Inde
     }
 
     buildField(messages.preservationEventId()).withValue(event.getId()).build();
-    buildField(messages.preservationEventType()).withValue(event.getEventType()).build();
+    buildField(messages.preservationEventType())
+      .withValue(StringUtils.isNotBlank(event.getEventTypeLabel()) ? event.getEventTypeLabel() : event.getEventType())
+      .build();
 
     if (event.getEventDateTime() != null) {
       buildField(messages.preservationEventDatetime()).withValue(Humanize.formatDateTime(event.getEventDateTime()))

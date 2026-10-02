@@ -168,7 +168,10 @@ public class EARKSIP2ToAIPPlugin extends SIPToAIPPlugin {
         // put SIP inside the created AIP (if it is supposed to do so)
         PluginHelper.createSubmission(model, createSubmission, earkSIPPath, aip.getId());
 
-        createUnpackingEventSuccess(model, index, transferredResource, aip, UNPACK_DESCRIPTION, cachedJob);
+        createUnpackingEventSuccess(model, index, transferredResource, aip,
+          PluginHelper.getPreservationEventText("plugin.eARKSip2ToAipPlugin.event.unpackDescription",
+            UNPACK_DESCRIPTION),
+          cachedJob);
         reportItem.setSourceAndOutcomeObjectId(reportItem.getSourceObjectId(), aip.getId())
           .setPluginState(PluginState.SUCCESS);
 

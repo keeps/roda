@@ -94,8 +94,10 @@ public abstract class SIPToAIPPlugin extends AbstractPlugin<TransferredResource>
   protected void createUnpackingEventSuccess(ModelService model, IndexService index,
     TransferredResource transferredResource, AIP aip, String unpackDescription, Job cachedJob) {
     setPreservationEventType(UNPACK_EVENT_TYPE);
-    setPreservationSuccessMessage(UNPACK_SUCCESS_MESSAGE);
-    setPreservationFailureMessage(UNPACK_FAILURE_MESSAGE);
+    setPreservationSuccessMessage(
+      PluginHelper.getPreservationEventText("plugin.sipToAipPlugin.event.unpackSuccess", UNPACK_SUCCESS_MESSAGE));
+    setPreservationFailureMessage(
+      PluginHelper.getPreservationEventText("plugin.sipToAipPlugin.event.unpackFailure", UNPACK_FAILURE_MESSAGE));
     setPreservationEventDescription(unpackDescription);
     try {
       boolean notify = true;
@@ -110,9 +112,12 @@ public abstract class SIPToAIPPlugin extends AbstractPlugin<TransferredResource>
   protected void createWellformedEventSuccess(ModelService model, IndexService index,
     TransferredResource transferredResource, AIP aip, Job cachedJob) {
     setPreservationEventType(WELLFORMED_EVENT_TYPE);
-    setPreservationSuccessMessage(WELLFORMED_SUCCESS_MESSAGE);
-    setPreservationFailureMessage(WELLFORMED_FAILURE_MESSAGE);
-    setPreservationEventDescription(WELLFORMED_DESCRIPTION);
+    setPreservationSuccessMessage(PluginHelper
+      .getPreservationEventText("plugin.sipToAipPlugin.event.wellformedSuccess", WELLFORMED_SUCCESS_MESSAGE));
+    setPreservationFailureMessage(PluginHelper
+      .getPreservationEventText("plugin.sipToAipPlugin.event.wellformedFailure", WELLFORMED_FAILURE_MESSAGE));
+    setPreservationEventDescription(PluginHelper
+      .getPreservationEventText("plugin.sipToAipPlugin.event.wellformedDescription", WELLFORMED_DESCRIPTION));
     try {
       boolean notify = true;
       PluginHelper.createPluginEvent(this, aip.getId(), model, index, transferredResource, PluginState.SUCCESS, "",

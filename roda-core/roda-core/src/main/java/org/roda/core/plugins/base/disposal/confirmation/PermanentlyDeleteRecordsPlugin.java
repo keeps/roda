@@ -75,17 +75,20 @@ public class PermanentlyDeleteRecordsPlugin extends AbstractPlugin<DisposalConfi
 
   @Override
   public String getPreservationEventDescription() {
-    return "Permanently delete records from disposal confirmation report";
+    return PluginHelper.getPreservationEventText("plugin.permanentlyDeleteRecordsPlugin.event.description",
+      "Permanently delete records from disposal confirmation report");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The records under disposal confirmation report were deleted permanently";
+    return PluginHelper.getPreservationEventText("plugin.permanentlyDeleteRecordsPlugin.event.success",
+      "The records under disposal confirmation report were deleted permanently");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "The records under disposal confirmation report failed to be deleted permanently";
+    return PluginHelper.getPreservationEventText("plugin.permanentlyDeleteRecordsPlugin.event.failure",
+      "The records under disposal confirmation report failed to be deleted permanently");
   }
 
   @Override
@@ -142,7 +145,7 @@ public class PermanentlyDeleteRecordsPlugin extends AbstractPlugin<DisposalConfi
     report.addReport(reportItem);
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
 
-    model.createRepositoryEvent(getPreservationEventType(), getPreservationEventDescription(), state,
+    model.createRepositoryEvent(PluginHelper.getPreservationEventType(this), getPreservationEventDescription(), state,
       PluginState.FAILURE.equals(state) ? getPreservationEventFailureMessage() : getPreservationEventSuccessMessage(),
       confirmation.getId(), cachedJob.getUsername(), true, null);
   }

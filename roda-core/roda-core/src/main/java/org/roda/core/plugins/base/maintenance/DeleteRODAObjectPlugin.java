@@ -163,17 +163,20 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
 
   @Override
   public String getPreservationEventDescription() {
-    return "Deletes RODA entities";
+    return PluginHelper.getPreservationEventText("plugin.deleteRODAObjectPlugin.event.description",
+      "Deletes RODA entities");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "RODA entities were successfully removed";
+    return PluginHelper.getPreservationEventText("plugin.deleteRODAObjectPlugin.event.success",
+      "RODA entities were successfully removed");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "RODA entities were not successfully removed";
+    return PluginHelper.getPreservationEventText("plugin.deleteRODAObjectPlugin.event.failure",
+      "RODA entities were not successfully removed");
   }
 
   @Override

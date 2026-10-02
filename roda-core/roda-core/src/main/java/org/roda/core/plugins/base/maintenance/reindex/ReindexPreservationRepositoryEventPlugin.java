@@ -199,17 +199,20 @@ public class ReindexPreservationRepositoryEventPlugin extends AbstractPlugin<Voi
 
   @Override
   public String getPreservationEventDescription() {
-    return "Reindex Roda entity";
+    return PluginHelper.getPreservationEventText("plugin.reindexPreservationRepositoryEventPlugin.event.description",
+      "Reindex Roda entity");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "All entities were reindexed with success";
+    return PluginHelper.getPreservationEventText("plugin.reindexPreservationRepositoryEventPlugin.event.success",
+      "All entities were reindexed with success");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "An error occured while reindexing all entities";
+    return PluginHelper.getPreservationEventText("plugin.reindexPreservationRepositoryEventPlugin.event.failure",
+      "An error occured while reindexing all entities");
   }
 
   @Override

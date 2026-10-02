@@ -22,6 +22,7 @@ import org.apache.commons.io.input.ReaderInputStream;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -99,7 +100,8 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Destroy records under disposal confirmation report";
+    return PluginHelper.getPreservationEventText("plugin.destroyRecordsPlugin.event.description",
+      "Destroy records under disposal confirmation report");
   }
 
   @Override
@@ -242,7 +244,8 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
     try {
       if (AIPState.DESTROYED.equals(aip.getState())) {
         state = PluginState.SKIPPED;
-        outcomeText = "AIP '" + aip.getId() + " has been skipped because destruction process was successfully done";
+        outcomeText = PluginHelper.getPreservationEventText("plugin.destroyRecordsPlugin.event.alreadyDestroyed",
+          "AIP '{0} has been skipped because destruction process was successfully done", aip.getId());
       } else {
         aip.setState(AIPState.DESTROY_PROCESSING);
         model.updateAIPState(aip, cachedJob.getUsername());
@@ -258,8 +261,9 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
         // destroy the AIP
         model.destroyAIP(aip, cachedJob.getUsername());
 
-        outcomeText = "AIP '" + aip.getId() + "' has been destroyed with disposal confirmation '"
-          + disposalConfirmation.getTitle() + "' (" + disposalConfirmation.getId() + ")";
+        outcomeText = PluginHelper.getPreservationEventText("plugin.destroyRecordsPlugin.event.aipDestroyed",
+          "AIP '{0}' has been destroyed with disposal confirmation '{1}' ({2})", aip.getId(),
+          disposalConfirmation.getTitle(), disposalConfirmation.getId());
       }
 
       reportItem.setPluginDetails(outcomeText);
@@ -267,15 +271,17 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
       | NotFoundException | AlreadyExistsException e) {
       LOGGER.error("Failed to destroy AIP '{}': {}", aip.getId(), e.getMessage(), e);
       state = PluginState.FAILURE;
-      outcomeText = "AIP '" + aip.getId() + "' has not been destroyed with disposal confirmation '"
-        + disposalConfirmation.getTitle() + "' (" + disposalConfirmation.getId() + ")";
+      outcomeText = PluginHelper.getPreservationEventText("plugin.destroyRecordsPlugin.event.aipNotDestroyed",
+        "AIP '{0}' has not been destroyed with disposal confirmation '{1}' ({2})", aip.getId(),
+        disposalConfirmation.getTitle(), disposalConfirmation.getId());
       reportItem.setPluginDetails(outcomeText + ": " + e.getMessage());
       processedWithErrors = true;
     }
 
     PreservationMetadata event = model.createEvent(aip.getId(), null, null, null,
-      RodaConstants.PreservationEventType.DESTRUCTION, EVENT_DESCRIPTION, null, null, state, outcomeText, "",
-      cachedJob.getUsername(), true, null);
+      PluginHelper.getPreservationEventType(DestroyRecordsPlugin.class, PreservationEventType.DESTRUCTION),
+      PluginHelper.getPreservationEventText("plugin.destroyRecordsPlugin.event.eventDescription", EVENT_DESCRIPTION),
+      null, null, state, outcomeText, "", cachedJob.getUsername(), true, null);
 
     // copy the preservation event to the AIP in the disposal bin
     try {

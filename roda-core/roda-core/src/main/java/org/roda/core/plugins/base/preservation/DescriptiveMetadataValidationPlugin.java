@@ -229,24 +229,30 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Checked whether the descriptive metadata is included in the SIP and if this metadata is valid according to the established policy.";
+    return PluginHelper.getPreservationEventText("plugin.descriptiveMetadataValidationPlugin.event.description",
+      "Checked whether the descriptive metadata is included in the SIP and if this metadata is valid according to the established policy.");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return addSchemaToBuilder("Descriptive metadata is well formed and complete.");
+    return addSchemaToBuilder(PluginHelper.getPreservationEventText(
+      "plugin.descriptiveMetadataValidationPlugin.event.success", "Descriptive metadata is well formed and complete."));
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return addSchemaToBuilder(
-      "Descriptive metadata was not well formed or failed to meet the established ingest policy.");
+    return addSchemaToBuilder(PluginHelper.getPreservationEventText(
+      "plugin.descriptiveMetadataValidationPlugin.event.failure",
+      "Descriptive metadata was not well formed or failed to meet the established ingest policy."));
   }
 
   private String addSchemaToBuilder(String eventMessage) {
     if (!schemasInfo.isEmpty()) {
       StringBuilder builder = new StringBuilder(eventMessage);
-      builder.append("\nSchemas used on validation: ");
+      builder.append("\n")
+        .append(PluginHelper.getPreservationEventText(
+          "plugin.descriptiveMetadataValidationPlugin.event.schemasUsed", "Schemas used on validation:"))
+        .append(" ");
 
       Pair<String, String> firstSchema = schemasInfo.get(0);
       builder.append(firstSchema.getFirst());

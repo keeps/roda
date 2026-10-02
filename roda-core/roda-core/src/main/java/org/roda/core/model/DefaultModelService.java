@@ -162,6 +162,7 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.model.utils.ResourceListUtils;
 import org.roda.core.model.utils.ResourceParseUtils;
 import org.roda.core.model.utils.UserUtility;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.base.ingest.PermissionUtils;
 import org.roda.core.protocols.Protocol;
 import org.roda.core.repository.job.JobRepository;
@@ -1707,7 +1708,9 @@ public class DefaultModelService implements ModelService {
     try {
       StringBuilder builder = new StringBuilder(outcomeText);
       if (StringUtils.isNotBlank(outcomeDetail)) {
-        builder.append("\n").append("The following reason has been reported by the user: ").append(agentName)
+        builder.append("\n")
+          .append(PluginHelper.getPreservationEventText("preservationEvent.defaultModelService.userReason",
+            "The following reason has been reported by the user: {0}", agentName))
           .append("\n").append(outcomeDetail);
       }
       LinkingIdentifier linkingIdentifier = new LinkingIdentifier();
@@ -4651,8 +4654,12 @@ public class DefaultModelService implements ModelService {
       null);
     notifyDisposalHoldCreatedOrUpdated(currentDisposalHold).failOnError();
 
-    createRepositoryEvent(PreservationEventType.UPDATE, "Update disposal hold", PluginState.SUCCESS, "", details, "",
-      true, null);
+    createRepositoryEvent(
+      PluginHelper.getPreservationEventTypeFromProperty("core.events.update_disposal_hold.preservation_event_type",
+        PreservationEventType.UPDATE),
+      PluginHelper.getPreservationEventText("preservationEvent.defaultModelService.updateDisposalHold",
+        "Update disposal hold"),
+      PluginState.SUCCESS, "", details, "", true, null);
 
     return currentDisposalHold;
   }

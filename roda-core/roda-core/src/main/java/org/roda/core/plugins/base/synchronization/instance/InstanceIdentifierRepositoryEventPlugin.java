@@ -118,17 +118,20 @@ public class InstanceIdentifierRepositoryEventPlugin extends AbstractPlugin<Void
 
   @Override
   public String getPreservationEventDescription() {
-    return "Updated the repository preservation events instance identifier";
+    return PluginHelper.getPreservationEventText("plugin.instanceIdentifierRepositoryEventPlugin.event.description",
+      "Updated the repository preservation events instance identifier");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The repository preservation event instance identifier was updated successfully";
+    return PluginHelper.getPreservationEventText("plugin.instanceIdentifierRepositoryEventPlugin.event.success",
+      "The repository preservation event instance identifier was updated successfully");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Could not update the repository preservation event instance identifier";
+    return PluginHelper.getPreservationEventText("plugin.instanceIdentifierRepositoryEventPlugin.event.failure",
+      "Could not update the repository preservation event instance identifier");
   }
 
   @Override

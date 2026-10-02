@@ -163,17 +163,20 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Log entries were cleaned";
+    return PluginHelper.getPreservationEventText("plugin.actionLogCleanerPlugin.event.description",
+      "Log entries were cleaned");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Log entries were cleaned successfully";
+    return PluginHelper.getPreservationEventText("plugin.actionLogCleanerPlugin.event.success",
+      "Log entries were cleaned successfully");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Log entries cleaning failed";
+    return PluginHelper.getPreservationEventText("plugin.actionLogCleanerPlugin.event.failure",
+      "Log entries cleaning failed");
   }
 
   @Override

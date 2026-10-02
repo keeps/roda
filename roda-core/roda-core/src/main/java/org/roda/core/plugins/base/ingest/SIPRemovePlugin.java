@@ -93,19 +93,27 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
       LOGGER.debug("Done with removing SIP {}", transferredResource.getFullPath());
 
       if (createEvent) {
-        model.createRepositoryEvent(PreservationEventType.DELETION,
-          "The process of deleting an object of the repository", PluginState.SUCCESS,
-          "The transferred resource " + transferredResource.getId() + " has been deleted.", "", job.getUsername(),
-          true, null);
+        model.createRepositoryEvent(
+          PluginHelper.getPreservationEventType(SIPRemovePlugin.class, PreservationEventType.DELETION),
+          PluginHelper.getPreservationEventText("preservationEvent.common.deleteObject",
+            "The process of deleting an object of the repository"),
+          PluginState.SUCCESS,
+          PluginHelper.getPreservationEventText("preservationEvent.common.transferredResourceDeleted",
+            "The transferred resource {0} has been deleted.", transferredResource.getId()),
+          "", job.getUsername(), true, null);
       }
 
       pluginInfo.incrementObjectsProcessedWithSuccess();
     } catch (RuntimeException | GenericException | AuthorizationDeniedException e) {
       if (createEvent) {
-        model.createRepositoryEvent(PreservationEventType.DELETION,
-          "The process of deleting an object of the repository", PluginState.SUCCESS,
-          "The transferred resource " + transferredResource.getId() + " has not been deleted.", "", job.getUsername(),
-          true, null);
+        model.createRepositoryEvent(
+          PluginHelper.getPreservationEventType(SIPRemovePlugin.class, PreservationEventType.DELETION),
+          PluginHelper.getPreservationEventText("preservationEvent.common.deleteObject",
+            "The process of deleting an object of the repository"),
+          PluginState.SUCCESS,
+          PluginHelper.getPreservationEventText("preservationEvent.common.transferredResourceNotDeleted",
+            "The transferred resource {0} has not been deleted.", transferredResource.getId()),
+          "", job.getUsername(), true, null);
       }
 
       pluginInfo.incrementObjectsProcessedWithFailure();
@@ -139,17 +147,20 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Deleted SIP from the transfer area.";
+    return PluginHelper.getPreservationEventText("plugin.sipRemovePlugin.event.description",
+      "Deleted SIP from the transfer area.");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The original SIP has been deleted from the transfer area.";
+    return PluginHelper.getPreservationEventText("plugin.sipRemovePlugin.event.success",
+      "The original SIP has been deleted from the transfer area.");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Failed to delete the original SIP from the transfer area.";
+    return PluginHelper.getPreservationEventText("plugin.sipRemovePlugin.event.failure",
+      "Failed to delete the original SIP from the transfer area.");
   }
 
   @Override

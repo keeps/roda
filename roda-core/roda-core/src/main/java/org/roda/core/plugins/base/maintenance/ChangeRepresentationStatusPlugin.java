@@ -135,13 +135,15 @@ public class ChangeRepresentationStatusPlugin extends AbstractPlugin<Representat
         jobPluginInfo.incrementObjectsProcessed(state);
         reportItem.setPluginState(state);
 
-        StringBuilder outcomeText = new StringBuilder().append("The representation '").append(representation.getId())
-          .append(" of AIP ").append(representation.getAipId()).append("' changed its status from '")
-          .append(representation.getRepresentationStates()).append("' to '").append(newStatus).append("'.");
+        String outcomeText = PluginHelper.getPreservationEventText(
+          "plugin.changeRepresentationStatusPlugin.event.representationStatusChanged",
+          "The representation '{0} of AIP {1}' changed its status from '{2}' to '{3}'.", representation.getId(),
+          representation.getAipId(), representation.getRepresentationStates(), newStatus);
 
         model.createUpdateAIPEvent(representation.getAipId(), representation.getId(), null, null,
-          PreservationEventType.UPDATE, EVENT_DESCRIPTION, state, outcomeText.toString(), details, job.getUsername(),
-          true, null);
+          PluginHelper.getPreservationEventType(ChangeRepresentationStatusPlugin.class, PreservationEventType.UPDATE),
+          PluginHelper.getPreservationEventText("preservationEvent.common.updateObject", EVENT_DESCRIPTION), state,
+          outcomeText, details, job.getUsername(), true, null);
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
       }
@@ -181,17 +183,20 @@ public class ChangeRepresentationStatusPlugin extends AbstractPlugin<Representat
 
   @Override
   public String getPreservationEventDescription() {
-    return "Updates object type";
+    return PluginHelper.getPreservationEventText("plugin.changeRepresentationStatusPlugin.event.description",
+      "Updates object type");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The object type were successfully updated";
+    return PluginHelper.getPreservationEventText("plugin.changeRepresentationStatusPlugin.event.success",
+      "The object type were successfully updated");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "The object type were not successfully updated";
+    return PluginHelper.getPreservationEventText("plugin.changeRepresentationStatusPlugin.event.failure",
+      "The object type were not successfully updated");
   }
 
   @Override

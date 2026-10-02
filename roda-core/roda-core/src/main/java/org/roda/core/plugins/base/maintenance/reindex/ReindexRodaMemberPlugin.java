@@ -201,17 +201,20 @@ public class ReindexRodaMemberPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Reindexed action logs";
+    return PluginHelper.getPreservationEventText("plugin.reindexRodaMemberPlugin.event.description",
+      "Reindexed action logs");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Reindexed action logs successfully";
+    return PluginHelper.getPreservationEventText("plugin.reindexRodaMemberPlugin.event.success",
+      "Reindexed action logs successfully");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Reindex of action logs failed";
+    return PluginHelper.getPreservationEventText("plugin.reindexRodaMemberPlugin.event.failure",
+      "Reindex of action logs failed");
   }
 
   @Override

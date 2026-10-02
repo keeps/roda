@@ -20,10 +20,13 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FilenameUtils;
@@ -34,6 +37,7 @@ import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.pekko.Messages;
 import org.roda.core.common.pekko.messages.jobs.JobPartialUpdate;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.common.RodaConstants.RODA_TYPE;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -134,9 +138,104 @@ public final class PluginHelper {
 
   private static final String LOCK_REQUEST_TIMEOUT = "core.orchestrator.lock_request_timeout";
   private static final int DEFAULT_LOCK_REQUEST_TIMEOUT = 600;
+  private static final Pattern PRESERVATION_EVENT_TEXT_PLACEHOLDER = Pattern.compile("\\{(\\d{1,9})\\}");
 
   private PluginHelper() {
     // do nothing
+  }
+
+  /**
+   * Gets the preservation event type to use, allowing it to be redefined by
+   * configuration using the property
+   * {@code core.plugins.<class name>.preservation_event_type.<default type>}
+   * (e.g.
+   * {@code core.plugins.org.roda.core.plugins.base.preservation.AIPCorruptionRiskAssessmentPlugin.preservation_event_type.FIXITY_CHECK = VALIDATION}).
+   * If the property is not defined or its value is not a valid
+   * {@link PreservationEventType}, the default type is returned.
+   */
+  public static PreservationEventType getPreservationEventType(Class<?> owner, PreservationEventType defaultType) {
+    return getPreservationEventType(owner != null ? owner.getName() : null, defaultType);
+  }
+
+  /**
+   * Same as {@link #getPreservationEventType(Class, PreservationEventType)} but
+   * receiving the owner class name.
+   */
+  public static PreservationEventType getPreservationEventType(String ownerClassName,
+    PreservationEventType defaultType) {
+    if (StringUtils.isBlank(ownerClassName) || defaultType == null) {
+      return defaultType;
+    }
+
+    return getPreservationEventTypeFromProperty(
+      "core.plugins." + ownerClassName + ".preservation_event_type." + defaultType.name(), defaultType);
+  }
+
+  /**
+   * Gets the preservation event type defined in the given configuration
+   * property. If the property is not defined or its value is not a valid
+   * {@link PreservationEventType}, the default type is returned.
+   */
+  public static PreservationEventType getPreservationEventTypeFromProperty(String property,
+    PreservationEventType defaultType) {
+    String value = RodaCoreFactory.getProperty(property, null);
+    if (StringUtils.isBlank(value)) {
+      return defaultType;
+    }
+
+    try {
+      return PreservationEventType.valueOf(value.trim());
+    } catch (IllegalArgumentException e) {
+      LOGGER.warn("Invalid preservation event type '{}' in property '{}', using default '{}'", value, property,
+        defaultType);
+      return defaultType;
+    }
+  }
+
+  /**
+   * Gets the preservation event type of the plugin, possibly redefined by
+   * configuration (see
+   * {@link #getPreservationEventType(Class, PreservationEventType)}).
+   */
+  public static PreservationEventType getPreservationEventType(Plugin<?> plugin) {
+    return getPreservationEventType(plugin.getClass(), plugin.getPreservationEventType());
+  }
+
+  /**
+   * Gets a preservation event text (event detail or outcome detail) translated
+   * to the server language ({@code core.language.default}), so that the
+   * translated text (never the translation key) is stored in PREMIS. Each
+   * {@code {n}} in the text is replaced by the n-th argument. If there is no
+   * translation for the key, the default (English) text is used.
+   *
+   * @param key
+   *          the translation key in ServerMessages
+   * @param defaultText
+   *          the text to use when there is no translation for the key
+   * @param args
+   *          the values of the placeholders {0}, {1}, ...
+   */
+  public static String getPreservationEventText(String key, String defaultText, Object... args) {
+    String text = defaultText;
+    try {
+      String serverLanguage = RodaCoreFactory.getConfigurationManager().getConfigurationString("core.language.default",
+        "en");
+      org.roda.core.common.Messages messages = RodaCoreFactory
+        .getI18NMessages(Locale.forLanguageTag(serverLanguage.replace('_', '-')));
+      if (messages != null) {
+        text = messages.getTranslation(key, defaultText);
+      }
+    } catch (RuntimeException e) {
+      LOGGER.debug("Could not translate preservation event text {}", key, e);
+    }
+
+    if (text != null && args != null && args.length > 0) {
+      text = PRESERVATION_EVENT_TEXT_PLACEHOLDER.matcher(text).replaceAll(match -> {
+        int index = Integer.parseInt(match.group(1));
+        return Matcher.quoteReplacement(index < args.length ? String.valueOf(args[index]) : match.group());
+      });
+    }
+    return text;
   }
 
   public static <T extends IsRODAObject> Report processObjects(Plugin<T> plugin,
@@ -1261,7 +1360,7 @@ public final class PluginHelper {
      * plugin.getPreservationEventFailureMessage();
      */
     ContentPayload premisEvent = PremisV3Utils.createPremisEventBinary(id, startDate,
-      plugin.getPreservationEventType().toString(), plugin.getPreservationEventDescription(), sources, outcomes,
+      getPreservationEventType(plugin).toString(), plugin.getPreservationEventDescription(), sources, outcomes,
       outcome.name(), outcomeDetailNote, outcomeDetailExtension, agentIds);
     model.createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, representationId, filePath, fileId,
       premisEvent, jobUsername, notify);
@@ -1346,15 +1445,24 @@ public final class PluginHelper {
             try {
               model.deleteTransferredResource(transferredResource);
             } catch (GenericException | AuthorizationDeniedException e) {
-              model.createRepositoryEvent(RodaConstants.PreservationEventType.DELETION,
-                "The process of deleting an object of the repository", PluginState.FAILURE,
-                "The transferred resource " + transferredResource.getName() + " has not been deleted.", "",
+              model.createRepositoryEvent(
+                getPreservationEventType(cachedJob.getPlugin(), PreservationEventType.DELETION),
+                getPreservationEventText("preservationEvent.common.deleteObject",
+                  "The process of deleting an object of the repository"),
+                PluginState.FAILURE,
+                getPreservationEventText("preservationEvent.common.transferredResourceNotDeleted",
+                  "The transferred resource {0} has not been deleted.", transferredResource.getName()),
+                "",
                 cachedJob.getUsername(), true, null);
               LOGGER.debug("Failed to remove SIP {}", transferredResource.getFullPath(), e);
             }
-            model.createRepositoryEvent(RodaConstants.PreservationEventType.DELETION,
-              "The process of deleting an object of the repository", PluginState.SUCCESS,
-              "The transferred resource " + transferredResource.getName() + " has been deleted.", "",
+            model.createRepositoryEvent(getPreservationEventType(cachedJob.getPlugin(), PreservationEventType.DELETION),
+              getPreservationEventText("preservationEvent.common.deleteObject",
+                "The process of deleting an object of the repository"),
+              PluginState.SUCCESS,
+              getPreservationEventText("preservationEvent.common.transferredResourceDeleted",
+                "The transferred resource {0} has been deleted.", transferredResource.getName()),
+              "",
               cachedJob.getUsername(), true, null);
             LOGGER.debug("Done with removing SIP {}", transferredResource.getFullPath());
           }
@@ -1764,57 +1872,65 @@ public final class PluginHelper {
 
   public static String createOutcomeTextForDisposalConfirmationCreation(String actionMessage,
     String disposalConfirmationId, String aipId) {
-    return "The AIP '" + aipId + "' " + actionMessage + " '" + disposalConfirmationId + "'";
+    return getPreservationEventText("preservationEvent.common.disposalConfirmationCreation", "The AIP '{0}' {1} '{2}'",
+      aipId, actionMessage, disposalConfirmationId);
   }
 
   public static String createOutcomeTextForDisposalConfirmationEvent(String actionMessage,
     String disposalConfirmationTitle, String disposalConfirmationId) {
-    return "The disposal confirmation '" + disposalConfirmationTitle + " ' (" + disposalConfirmationId + ") "
-      + actionMessage;
+    return getPreservationEventText("preservationEvent.common.disposalConfirmationEvent",
+      "The disposal confirmation '{0} ' ({1}) {2}", disposalConfirmationTitle, disposalConfirmationId, actionMessage);
   }
 
   public static String createOutcomeTextForDisposalHold(String actionMessage, String disposalHoldId,
     String disposalHoldTitle) {
-    return createOutcomeTextForDisposal("Disposal hold", actionMessage, disposalHoldId, disposalHoldTitle);
+    return createOutcomeTextForDisposal(
+      getPreservationEventText("preservationEvent.common.disposalHold", "Disposal hold"), actionMessage,
+      disposalHoldId, disposalHoldTitle);
   }
 
   public static String createOutcomeTextForDisposalSchedule(String actionMessage, String disposalScheduleId,
     String disposalScheduleTitle) {
-    return createOutcomeTextForDisposal("Disposal schedule", actionMessage, disposalScheduleId, disposalScheduleTitle);
+    return createOutcomeTextForDisposal(
+      getPreservationEventText("preservationEvent.common.disposalSchedule", "Disposal schedule"), actionMessage,
+      disposalScheduleId, disposalScheduleTitle);
   }
 
   private static String createOutcomeTextForDisposal(String type, String actionMessage, String disposalId,
     String disposalTitle) {
-    StringBuilder outcomeText = new StringBuilder(type);
-
     if (StringUtils.isNotBlank(disposalTitle)) {
-      outcomeText.append(" '").append(disposalTitle).append("'");
+      return getPreservationEventText("preservationEvent.common.disposalWithTitle", "{0} '{1}' ({2}) {3}", type,
+        disposalTitle, disposalId, actionMessage);
     }
-
-    outcomeText.append(" (").append(disposalId).append(") ");
-    outcomeText.append(actionMessage);
-
-    return outcomeText.toString();
+    return getPreservationEventText("preservationEvent.common.disposalWithoutTitle", "{0} ({1}) {2}", type,
+      disposalId, actionMessage);
   }
 
   public static String createOutcomeTextForAIP(IndexedAIP item, String actionMessage) {
     SimpleDateFormat format = new SimpleDateFormat(RodaConstants.SIMPLE_DATE_FORMATTER);
-    StringBuilder outcomeText = new StringBuilder("Archival Information Package [id: ").append(item.getId());
+    StringBuilder outcomeText = new StringBuilder(
+      getPreservationEventText("preservationEvent.common.aip", "Archival Information Package")).append(" [id: ")
+      .append(item.getId());
 
     if (StringUtils.isNotBlank(item.getTitle())) {
-      outcomeText.append("; title: ").append(item.getTitle());
+      outcomeText.append("; ").append(getPreservationEventText("preservationEvent.common.aipTitle", "title"))
+        .append(": ").append(item.getTitle());
     }
 
     if (StringUtils.isNotBlank(item.getLevel())) {
-      outcomeText.append("; level: ").append(item.getLevel());
+      outcomeText.append("; ").append(getPreservationEventText("preservationEvent.common.aipLevel", "level"))
+        .append(": ").append(item.getLevel());
     }
 
     if (item.getDateInitial() != null) {
-      outcomeText.append("; initial date: ").append(format.format(item.getDateInitial()));
+      outcomeText.append("; ")
+        .append(getPreservationEventText("preservationEvent.common.aipInitialDate", "initial date")).append(": ")
+        .append(format.format(item.getDateInitial()));
     }
 
     if (item.getDateFinal() != null) {
-      outcomeText.append("; end date: ").append(format.format(item.getDateFinal()));
+      outcomeText.append("; ").append(getPreservationEventText("preservationEvent.common.aipEndDate", "end date"))
+        .append(": ").append(format.format(item.getDateFinal()));
     }
 
     outcomeText.append("] ").append(actionMessage);

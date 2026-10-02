@@ -98,17 +98,20 @@ public class InstanceIdentifierRepresentationInformationPlugin extends AbstractP
 
   @Override
   public String getPreservationEventDescription() {
-    return "Updated the instance identifier";
+    return PluginHelper.getPreservationEventText("plugin.instanceIdentifier.event.description",
+      "Updated the instance identifier");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The instance identifier was updated successfully";
+    return PluginHelper.getPreservationEventText("plugin.instanceIdentifier.event.success",
+      "The instance identifier was updated successfully");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Could not update the instance identifier";
+    return PluginHelper.getPreservationEventText("plugin.instanceIdentifier.event.failure",
+      "Could not update the instance identifier");
   }
 
   @Override
