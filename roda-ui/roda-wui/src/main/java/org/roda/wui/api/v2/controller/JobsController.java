@@ -140,7 +140,11 @@ public class JobsController implements JobsRestService, Exportable {
       // validate input and set missing information when possible
       jobService.validateAndSetJobInformation(requestContext.getUser(), job);
       // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
+      if (jobService.canOnlyCreateJobsOnAIPs(requestContext.getUser())) {
+        jobService.checkJobOnAIPsPermissions(requestContext.getUser(), job);
+      } else {
+        controllerAssistant.checkRoles(requestContext.getUser());
+      }
 
       return jobService.createJob(job, true);
     } catch (AuthorizationDeniedException e) {
