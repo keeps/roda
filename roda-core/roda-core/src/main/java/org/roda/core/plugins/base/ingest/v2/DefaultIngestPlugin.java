@@ -321,7 +321,9 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
             Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH));
           final PluginState pluginState = jobPluginInfo.getAllReports().get(transferredResourceId).get(entry.getKey())
             .getPluginState();
-          setPreservationSuccessMessage(calculatePreservationSuccessMessageFromPluginState(pluginState));
+          if (getPreservationEventType() != START_TYPE) {
+            setPreservationSuccessMessage(calculatePreservationSuccessMessageFromPluginState(pluginState));
+          }
 
           PluginHelper.createPluginEvent(this, entry.getKey(), model, index, tr, pluginState, "", true, eventDate,
             cachedJob);

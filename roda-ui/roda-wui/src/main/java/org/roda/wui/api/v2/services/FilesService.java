@@ -212,16 +212,20 @@ public class FilesService {
 
       String outcomeText = "The folder '" + folderName + "' has been manually created.";
       model.createUpdateAIPEvent(indexedRepresentation.getAipId(), indexedRepresentation.getId(), null, null,
-          RodaConstants.PreservationEventType.CREATION, eventDescription, PluginState.SUCCESS, outcomeText, details,
-          user.getName(), true, null);
+          RodaConstants.PreservationEventType.valueOf(RodaCoreFactory.getProperty(
+              "core.events.create_folder.preservation_event_type",
+              RodaConstants.PreservationEventType.CREATION.name())),
+          eventDescription, PluginState.SUCCESS, outcomeText, details, user.getName(), true, null);
 
       index.commit(IndexedFile.class);
       return index.retrieve(IndexedFile.class, IdUtils.getFileId(newFolder), new ArrayList<>());
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       String outcomeText = "The folder '" + folderName + "' has not been manually created.";
       model.createUpdateAIPEvent(indexedRepresentation.getAipId(), indexedRepresentation.getId(), null, null,
-          RodaConstants.PreservationEventType.CREATION, eventDescription, PluginState.FAILURE, outcomeText, details,
-          user.getName(), true, null);
+          RodaConstants.PreservationEventType.valueOf(RodaCoreFactory.getProperty(
+              "core.events.create_folder.preservation_event_type",
+              RodaConstants.PreservationEventType.CREATION.name())),
+          eventDescription, PluginState.FAILURE, outcomeText, details, user.getName(), true, null);
 
       throw e;
     }

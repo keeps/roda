@@ -1873,7 +1873,7 @@ public final class RodaConstants {
     INFORMATION_PACKAGE_SPLITTING("information package splitting"), METADATA_MODIFICATION("metadata modification"),
     MODIFICATION("modification"), POLICY_ASSIGNMENT("policy assignment"), QUARANTINE("quarantine"),
     RECOVERY("recovery"), REDACTION("redaction"), REFRESHMENT("refreshment"), TRANSFER("transfer"),
-    UNQUARANTINE("unquarantine"), NONE("none");
+    EXPORTING("exporting"), NONE("none");
 
     private String originalText;
     private String text;
