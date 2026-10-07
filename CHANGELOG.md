@@ -1,5 +1,27 @@
 # Changelog
 
+## v6.4.1 (07/10/2026)
+### :warning: Breaking Changes
+RODA 6.3.0 onwards will use Apache Solr 10 as indexing system. If you have an existing RODA implementation with Solr 9 you will need to [upgrade the Solr to version 10](https://solr.apache.org/guide/solr/latest/upgrade-notes/major-changes-in-solr-10.html) and then rebuild all indexes on RODA.
+
+> [!WARNING]
+> **Flyway migration scripts.** The scripts under `db/migration` changed (schema is now taken from the database connection instead of being hardcoded), so their checksums changed too. **Any installation that already ran a 6.2.x release needs a Flyway `repair` step before starting 6.4.0 onwards**, or it will refuse to start. Follow the [Database Schema Migration Guide](https://github.com/keeps/roda/blob/master/documentation/Database_Schema_Migration.md).
+
+#### Enhancements
+
+- Updated some event types to use properties #3766
+- Added aip batch export output folder default value as a configurable property #3762
+- Bumped commons-ip version to 2.12.1 #3759
+
+#### Security
+
+- Several dependency upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v6.4.0 (21/09/2026)
 ### :warning: Breaking Changes
 RODA 6.3.0 onwards will use Apache Solr 10 as indexing system. If you have an existing RODA implementation with Solr 9 you will need to [upgrade the Solr to version 10](https://solr.apache.org/guide/solr/latest/upgrade-notes/major-changes-in-solr-10.html) and then rebuild all indexes on RODA.
@@ -430,16 +452,6 @@ To try out this version, check the [install instructions](https://github.com/kee
 #### New features 
 
 - Replace Akka with Apache Pekko
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
-## v5.6.5 (07/06/2024)
-#### Bug fixes
-
-- Roda fails to resolve other metadata with folders #3219
 
 ---
 
