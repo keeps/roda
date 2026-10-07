@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.config.SpringContext;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -146,17 +147,20 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Create disposal confirmation report";
+    return PluginHelper.getPreservationEventText("plugin.createDisposalConfirmationPlugin.event.description",
+      "Create disposal confirmation report");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Disposal confirmation report was successfully created";
+    return PluginHelper.getPreservationEventText("plugin.createDisposalConfirmationPlugin.event.success",
+      "Disposal confirmation report was successfully created");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Disposal confirmation report failed to be created";
+    return PluginHelper.getPreservationEventText("plugin.createDisposalConfirmationPlugin.event.failure",
+      "Disposal confirmation report failed to be created");
   }
 
   @Override
@@ -224,7 +228,9 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
           .setPluginDetails("AIP '" + aip.getId() + "' is already assigned to a disposal confirmation '" + title + "' ("
             + aip.getDisposalConfirmationId() + ")");
         outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationCreation(
-          "failed to be assigned to disposal confirmation", title, aip.getId());
+          PluginHelper.getPreservationEventText("plugin.createDisposalConfirmationPlugin.event.failedToBeAssigned",
+            "failed to be assigned to disposal confirmation"),
+          title, aip.getId());
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
         processChildren = false;
@@ -237,7 +243,9 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
         reportItem.setPluginState(state)
           .setPluginDetails("AIP '" + aip.getId() + "' is currently with one or more holds applied");
         outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationCreation(
-          "failed to be assigned to disposal confirmation", title, aip.getId());
+          PluginHelper.getPreservationEventText("plugin.createDisposalConfirmationPlugin.event.failedToBeAssigned",
+            "failed to be assigned to disposal confirmation"),
+          title, aip.getId());
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
         processChildren = false;
@@ -249,7 +257,9 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
         reportItem.setPluginState(state)
           .setPluginDetails("AIP '" + aip.getId() + "' failed to be retrieve from the index");
         outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationCreation(
-          "failed to be assigned to disposal confirmation", title, aip.getId());
+          PluginHelper.getPreservationEventText("plugin.createDisposalConfirmationPlugin.event.failedToBeAssigned",
+            "failed to be assigned to disposal confirmation"),
+          title, aip.getId());
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
         processChildren = false;
@@ -276,7 +286,9 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
               + "' (" + disposalConfirmationAIPMetadata.getId() + ")");
 
           outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationCreation(
-            "was successfully assign to disposal confirmation", disposalConfirmationId, aip.getId());
+            PluginHelper.getPreservationEventText("plugin.createDisposalConfirmationPlugin.event.successfullyAssigned",
+              "was successfully assign to disposal confirmation"),
+            disposalConfirmationId, aip.getId());
         } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
           LOGGER.error("Failed to assign AIP '{}' to disposal confirmation '{}': {}", aip.getId(),
             disposalConfirmationId, e.getMessage(), e);
@@ -285,7 +297,9 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
           reportItem.setPluginState(state).setPluginDetails("Failed to assign AIP '" + aip.getId()
             + "' to disposal confirmation '" + title + "' (" + disposalConfirmationId + "): " + e.getMessage());
           outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationCreation(
-            "failed to be assigned to disposal confirmation", title, aip.getId());
+            PluginHelper.getPreservationEventText("plugin.createDisposalConfirmationPlugin.event.failedToBeAssigned",
+              "failed to be assigned to disposal confirmation"),
+            title, aip.getId());
           report.addReport(reportItem);
           PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
         }
@@ -294,8 +308,11 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
       report.addReport(reportItem);
       PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
 
-      model.createUpdateAIPEvent(aip.getId(), null, null, null, RodaConstants.PreservationEventType.UPDATE,
-        EVENT_DESCRIPTION, state, outcomeText, "", cachedJob.getUsername(), true, null);
+      model.createUpdateAIPEvent(aip.getId(), null, null, null,
+        PluginHelper.getPreservationEventType(CreateDisposalConfirmationPlugin.class, PreservationEventType.UPDATE),
+        PluginHelper.getPreservationEventText("plugin.createDisposalConfirmationPlugin.event.eventDescription",
+          EVENT_DESCRIPTION),
+        state, outcomeText, "", cachedJob.getUsername(), true, null);
 
       if (processChildren) {
         processAIPChildren(aip, disposalConfirmationId, index, model, cachedJob);
@@ -359,11 +376,15 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
         model.updateAIP(aip, cachedJob.getUsername());
 
         outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationCreation(
-          "was successfully assign to disposal confirmation", confirmationId, aip.getId());
+          PluginHelper.getPreservationEventText("plugin.createDisposalConfirmationPlugin.event.successfullyAssigned",
+            "was successfully assign to disposal confirmation"),
+          confirmationId, aip.getId());
       } else {
         state = PluginState.SKIPPED;
         outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationCreation(
-          "was skipped from being assign to disposal confirmation due to incompatible disposal schedule",
+          PluginHelper.getPreservationEventText(
+            "plugin.createDisposalConfirmationPlugin.event.skippedIncompatibleSchedule",
+            "was skipped from being assign to disposal confirmation due to incompatible disposal schedule"),
           confirmationId, aip.getId());
       }
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException e) {
@@ -371,11 +392,16 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
         e.getMessage(), e);
       state = PluginState.FAILURE;
       outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationCreation(
-        "failed to be assigned to disposal confirmation", title, child.getId());
+        PluginHelper.getPreservationEventText("plugin.createDisposalConfirmationPlugin.event.failedToBeAssigned",
+          "failed to be assigned to disposal confirmation"),
+        title, child.getId());
     }
 
-    model.createUpdateAIPEvent(child.getId(), null, null, null, RodaConstants.PreservationEventType.UPDATE,
-      EVENT_DESCRIPTION, state, outcomeText, "", cachedJob.getUsername(), true, null);
+    model.createUpdateAIPEvent(child.getId(), null, null, null,
+      PluginHelper.getPreservationEventType(CreateDisposalConfirmationPlugin.class, PreservationEventType.UPDATE),
+      PluginHelper.getPreservationEventText("plugin.createDisposalConfirmationPlugin.event.eventDescription",
+        EVENT_DESCRIPTION),
+      state, outcomeText, "", cachedJob.getUsername(), true, null);
   }
 
   private DisposalConfirmationAIPEntryRepository getAIPEntryRepository() {

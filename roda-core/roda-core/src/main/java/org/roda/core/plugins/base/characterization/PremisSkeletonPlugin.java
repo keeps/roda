@@ -320,17 +320,20 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
 
   @Override
   public String getPreservationEventDescription() {
-    return "Created base PREMIS objects with file original name and file fixity information (SHA-256).";
+    return PluginHelper.getPreservationEventText("plugin.premisSkeletonPlugin.event.description",
+      "Created base PREMIS objects with file original name and file fixity information (SHA-256).");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "PREMIS objects were successfully created.";
+    return PluginHelper.getPreservationEventText("plugin.premisSkeletonPlugin.event.success",
+      "PREMIS objects were successfully created.");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Failed to create PREMIS objects from files.";
+    return PluginHelper.getPreservationEventText("plugin.premisSkeletonPlugin.event.failure",
+      "Failed to create PREMIS objects from files.");
   }
 
   @Override

@@ -22,6 +22,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.base.multiple.NoObjectsMultipleStepPlugin;
 import org.roda.core.plugins.base.multiple.Step;
 import org.roda.core.storage.utils.RODAInstanceUtils;
@@ -185,17 +186,20 @@ public class LocalInstanceRegisterPlugin extends NoObjectsMultipleStepPlugin {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Updated the instance identifier";
+    return PluginHelper.getPreservationEventText("plugin.instanceIdentifier.event.description",
+      "Updated the instance identifier");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The instance identifier was updated successfully";
+    return PluginHelper.getPreservationEventText("plugin.instanceIdentifier.event.success",
+      "The instance identifier was updated successfully");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Could not update the instance identifier";
+    return PluginHelper.getPreservationEventText("plugin.instanceIdentifier.event.failure",
+      "Could not update the instance identifier");
   }
 
   @Override

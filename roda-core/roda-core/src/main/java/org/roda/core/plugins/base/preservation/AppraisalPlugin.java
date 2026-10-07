@@ -163,13 +163,16 @@ public class AppraisalPlugin extends AbstractPlugin<AIP> {
             // create preservation event
             String id = IdUtils.createPreservationMetadataId(PreservationMetadata.PreservationMetadataType.EVENT,
               RODAInstanceUtils.getLocalInstanceIdentifier());
-            PreservationEventType type = PreservationEventType.ACCESSION;
-            String preservationEventDescription = AutoAcceptSIPPlugin.DESCRIPTION;
+            PreservationEventType type = PluginHelper.getPreservationEventType(AppraisalPlugin.class,
+              PreservationEventType.ACCESSION);
+            String preservationEventDescription = PluginHelper.getPreservationEventText(
+              "plugin.autoAcceptSipPlugin.event.description", AutoAcceptSIPPlugin.DESCRIPTION);
             List<LinkingIdentifier> sources = new ArrayList<>();
             List<LinkingIdentifier> outcomes = Arrays
               .asList(PluginHelper.getLinkingIdentifier(aipId, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
             PluginState outcome = PluginState.SUCCESS;
-            String outcomeDetailNote = AutoAcceptSIPPlugin.SUCCESS_MESSAGE;
+            String outcomeDetailNote = PluginHelper.getPreservationEventText("plugin.autoAcceptSipPlugin.event.success",
+              AutoAcceptSIPPlugin.SUCCESS_MESSAGE);
 
             try {
               ContentPayload premisEvent = PremisV3Utils.createPremisEventBinary(id, now, type.toString(),
@@ -217,17 +220,21 @@ public class AppraisalPlugin extends AbstractPlugin<AIP> {
         } finally {
           jobPluginInfo.incrementObjectsProcessed(state);
 
-          StringBuilder outcomeText = new StringBuilder().append("The AIP '").append(aip.getId()).append("' was ");
+          StringBuilder outcomeText = new StringBuilder();
           if (accept) {
-            outcomeText.append("accepted into the repository.");
+            outcomeText.append(PluginHelper.getPreservationEventText("plugin.appraisalPlugin.event.aipAccepted",
+              "The AIP '{0}' was accepted into the repository.", aip.getId()));
 
           } else {
-            outcomeText.append("rejected from the repository.");
+            outcomeText.append(PluginHelper.getPreservationEventText("plugin.appraisalPlugin.event.aipRejected",
+              "The AIP '{0}' was rejected from the repository.", aip.getId()));
           }
 
-          model.createRepositoryEvent(PreservationEventType.APPRAISAL,
-            "The process of updating an non active object of the repository", state, outcomeText.toString(), null,
-            job.getUsername(), true, null);
+          model.createRepositoryEvent(
+            PluginHelper.getPreservationEventType(AppraisalPlugin.class, PreservationEventType.APPRAISAL),
+            PluginHelper.getPreservationEventText("preservationEvent.common.updateNonActiveObject",
+              "The process of updating an non active object of the repository"),
+            state, outcomeText.toString(), null, job.getUsername(), true, null);
           reportItem.setPluginState(state).setPluginDetails(outcomeText.toString());
           report.addReport(reportItem);
           PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
@@ -296,17 +303,20 @@ public class AppraisalPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Appraisal accept or remove AIPs";
+    return PluginHelper.getPreservationEventText("plugin.appraisalPlugin.event.description",
+      "Appraisal accept or remove AIPs");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Appraisal accept or remove AIPs was successful";
+    return PluginHelper.getPreservationEventText("plugin.appraisalPlugin.event.success",
+      "Appraisal accept or remove AIPs was successful");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Appraisal accept or remove AIPs failed";
+    return PluginHelper.getPreservationEventText("plugin.appraisalPlugin.event.failure",
+      "Appraisal accept or remove AIPs failed");
   }
 
   @Override

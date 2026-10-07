@@ -40,6 +40,8 @@ public class IndexedPreservationEvent
   private Map<String, Object> fields;
   private String instanceId;
   private String instanceName;
+  private String eventTypeLabel;
+  private String eventDetailLabel;
 
   @Override
   public String getId() {
@@ -128,6 +130,30 @@ public class IndexedPreservationEvent
 
   public void setInstanceName(String instanceName) {
     this.instanceName = instanceName;
+  }
+
+  /**
+   * Translated event type, for presentation purposes only (not indexed nor stored
+   * in PREMIS).
+   */
+  public String getEventTypeLabel() {
+    return eventTypeLabel;
+  }
+
+  public void setEventTypeLabel(String eventTypeLabel) {
+    this.eventTypeLabel = eventTypeLabel;
+  }
+
+  /**
+   * Translated event detail, for presentation purposes only (not indexed nor
+   * stored in PREMIS).
+   */
+  public String getEventDetailLabel() {
+    return eventDetailLabel;
+  }
+
+  public void setEventDetailLabel(String eventDetailLabel) {
+    this.eventDetailLabel = eventDetailLabel;
   }
 
   @Override

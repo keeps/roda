@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IllegalOperationException;
@@ -110,7 +111,8 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
 
   @Override
   public String getPreservationEventDescription() {
-    return "Remove disposal confirmation";
+    return PluginHelper.getPreservationEventText("plugin.deleteDisposalConfirmationPlugin.event.description",
+      "Remove disposal confirmation");
   }
 
   @Override
@@ -176,7 +178,9 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
       // Delete folder and notify
       model.deleteDisposalConfirmation(disposalConfirmationId);
 
-      outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationEvent("was successfully deleted",
+      outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationEvent(
+        PluginHelper.getPreservationEventText("plugin.deleteDisposalConfirmationPlugin.event.successfullyDeleted",
+          "was successfully deleted"),
         confirmation.getTitle(), disposalConfirmationId);
     } catch (RequestNotValidException | AuthorizationDeniedException | GenericException | NotFoundException
       | IOException | IllegalOperationException e) {
@@ -184,12 +188,16 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
       jobPluginInfo.incrementObjectsProcessedWithFailure();
       report.setPluginState(PluginState.FAILURE)
         .setPluginDetails("Error deleting disposal confirmation " + disposalConfirmationId + ": " + e.getMessage());
-      outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationEvent("failed to delete",
+      outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationEvent(
+        PluginHelper.getPreservationEventText("plugin.deleteDisposalConfirmationPlugin.event.failedToDelete",
+          "failed to delete"),
         confirmation.getTitle(), disposalConfirmationId);
     }
 
-    model.createRepositoryEvent(RodaConstants.PreservationEventType.DELETION, getPreservationEventDescription(),
-      report.getPluginState(), outcomeText, details, cachedJob.getUsername(), true, null);
+    model.createRepositoryEvent(
+      PluginHelper.getPreservationEventType(DeleteDisposalConfirmationPlugin.class, PreservationEventType.DELETION),
+      getPreservationEventDescription(), report.getPluginState(), outcomeText, details, cachedJob.getUsername(), true,
+      null);
   }
 
   private void processAIP(AIP aip, ModelService model, Report report, JobPluginInfo jobPluginInfo, Job cachedJob,
@@ -216,18 +224,24 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
     String outcomeText;
 
     if (state.equals(PluginState.SUCCESS)) {
-      outcomeText = "AIP '" + aip.getId() + "' was been withdrawn from disposal confirmation '"
-        + disposalConfirmationReport.getTitle() + "' (" + disposalConfirmationReport.getId() + ")";
+      outcomeText = PluginHelper.getPreservationEventText("plugin.deleteDisposalConfirmationPlugin.event.aipWithdrawn",
+        "AIP '{0}' was been withdrawn from disposal confirmation '{1}' ({2})", aip.getId(),
+        disposalConfirmationReport.getTitle(), disposalConfirmationReport.getId());
     } else {
-      outcomeText = "AIP '" + aip.getId() + "' was not been withdrawn from disposal confirmation '"
-        + disposalConfirmationReport.getTitle() + "' (" + disposalConfirmationReport.getId() + ")";
+      outcomeText = PluginHelper.getPreservationEventText(
+        "plugin.deleteDisposalConfirmationPlugin.event.aipNotWithdrawn",
+        "AIP '{0}' was not been withdrawn from disposal confirmation '{1}' ({2})", aip.getId(),
+        disposalConfirmationReport.getTitle(), disposalConfirmationReport.getId());
     }
 
     report.addReport(reportItem);
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
 
-    model.createUpdateAIPEvent(aip.getId(), null, null, null, RodaConstants.PreservationEventType.UPDATE,
-      EVENT_DESCRIPTION, state, outcomeText, details, cachedJob.getUsername(), true, null);
+    model.createUpdateAIPEvent(aip.getId(), null, null, null,
+      PluginHelper.getPreservationEventType(DeleteDisposalConfirmationPlugin.class, PreservationEventType.UPDATE),
+      PluginHelper.getPreservationEventText("plugin.deleteDisposalConfirmationPlugin.event.eventDescription",
+        EVENT_DESCRIPTION),
+      state, outcomeText, details, cachedJob.getUsername(), true, null);
   }
 
   @Override

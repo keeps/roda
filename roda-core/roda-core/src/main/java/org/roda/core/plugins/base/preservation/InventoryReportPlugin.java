@@ -374,17 +374,20 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Created a report in CSV format";
+    return PluginHelper.getPreservationEventText("plugin.inventoryReportPlugin.event.description",
+      "Created a report in CSV format");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Created a report in CSV format successfully";
+    return PluginHelper.getPreservationEventText("plugin.inventoryReportPlugin.event.success",
+      "Created a report in CSV format successfully");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Create of a report in CSV format failed";
+    return PluginHelper.getPreservationEventText("plugin.inventoryReportPlugin.event.failure",
+      "Create of a report in CSV format failed");
   }
 
   @Override

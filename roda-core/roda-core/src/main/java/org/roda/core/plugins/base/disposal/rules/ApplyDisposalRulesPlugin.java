@@ -107,22 +107,26 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Apply the disposal rules to AIPs in the repository";
+    return PluginHelper.getPreservationEventText("plugin.applyDisposalRulesPlugin.event.description",
+      "Apply the disposal rules to AIPs in the repository");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Disposal schedule successfully associated to AIP via disposal rule";
+    return PluginHelper.getPreservationEventText("plugin.applyDisposalRulesPlugin.event.success",
+      "Disposal schedule successfully associated to AIP via disposal rule");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Failed to associate disposal schedule to AIP via disposal rule";
+    return PluginHelper.getPreservationEventText("plugin.applyDisposalRulesPlugin.event.failure",
+      "Failed to associate disposal schedule to AIP via disposal rule");
   }
 
   @Override
   public String getPreservationEventSkippedMessage() {
-    return "Skipped disposal schedule association to AIP via disposal rule";
+    return PluginHelper.getPreservationEventText("plugin.applyDisposalRulesPlugin.event.skipped",
+      "Skipped disposal schedule association to AIP via disposal rule");
   }
 
   @Override
@@ -202,8 +206,10 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
         if (AIPDisposalScheduleAssociationType.MANUAL.equals(aip.getDisposalScheduleAssociationType())
           && !overrideManualAssociations) {
           state = PluginState.SKIPPED;
-          outcomeDetailsText = "Skipping associating disposal schedule to AIP '" + aip.getId()
-            + "' because the disposal schedule was manually associated";
+          outcomeDetailsText = PluginHelper.getPreservationEventText(
+            "plugin.applyDisposalRulesPlugin.event.manualAssociationSkipped",
+            "Skipping associating disposal schedule to AIP '{0}' because the disposal schedule was manually associated",
+            aip.getId());
           reportItem.setPluginState(state).setPluginDetails(outcomeDetailsText);
           jobPluginInfo.incrementObjectsProcessedWithSkipped();
         } else {
@@ -213,9 +219,10 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
             // Schedule was applied
             try {
               model.updateAIP(aip, cachedJob.getUsername());
-              outcomeDetailsText = "Disposal schedule '" + disposalRuleUsed.get().getDisposalScheduleName()
-                + "' was successfully associated to AIP '" + aip.getId() + "' via disposal rule '"
-                + disposalRuleUsed.get().getTitle() + "'";
+              outcomeDetailsText = PluginHelper.getPreservationEventText(
+                "plugin.applyDisposalRulesPlugin.event.associatedViaRule",
+                "Disposal schedule '{0}' was successfully associated to AIP '{1}' via disposal rule '{2}'",
+                disposalRuleUsed.get().getDisposalScheduleName(), aip.getId(), disposalRuleUsed.get().getTitle());
               reportItem.setPluginState(state).setPluginDetails(outcomeDetailsText);
               jobPluginInfo.incrementObjectsProcessedWithSuccess();
             } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
@@ -227,8 +234,10 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
             }
           } else {
             state = PluginState.SKIPPED;
-            outcomeDetailsText = "The AIP '" + aip.getId()
-              + "' did not match any disposal rule therefore the disposal schedule association was skipped";
+            outcomeDetailsText = PluginHelper.getPreservationEventText(
+              "plugin.applyDisposalRulesPlugin.event.noRuleMatched",
+              "The AIP '{0}' did not match any disposal rule therefore the disposal schedule association was skipped",
+              aip.getId());
             reportItem.setPluginState(state).setPluginDetails(outcomeDetailsText);
             jobPluginInfo.incrementObjectsProcessedWithSkipped();
           }

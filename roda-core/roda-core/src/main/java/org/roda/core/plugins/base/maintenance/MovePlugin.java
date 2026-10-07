@@ -163,17 +163,21 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
     String outcomeText;
 
     if (entityName.equals(AIP.class.getSimpleName())) {
-      outcomeText = entityName + " [id: " + entityId
-        + "] has not been manually deleted due to be associated to a disposal " + disposalType;
+      outcomeText = PluginHelper.getPreservationEventText("plugin.movePlugin.event.notDeletedDueToDisposal",
+        "{0} [id: {1}] has not been manually deleted due to be associated to a disposal {2}", entityName, entityId,
+        disposalType);
     } else {
-      outcomeText = entityName + " [id: " + entityId + "] has not been manually deleted due to parent AIP [id: "
-        + parentId + "] be associated to a disposal " + disposalType;
+      outcomeText = PluginHelper.getPreservationEventText("plugin.movePlugin.event.notDeletedDueToParentDisposal",
+        "{0} [id: {1}] has not been manually deleted due to parent AIP [id: {2}] be associated to a disposal {3}",
+        entityName, entityId, parentId, disposalType);
     }
 
     List<LinkingIdentifier> sources = new ArrayList<>();
     sources.add(PluginHelper.getLinkingIdentifier(entityId, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
-    model.createUpdateAIPEvent(entityId, null, null, null, PreservationEventType.UPDATE, EVENT_DESCRIPTION,
+    model.createUpdateAIPEvent(entityId, null, null, null,
+      PluginHelper.getPreservationEventType(MovePlugin.class, PreservationEventType.UPDATE),
+      PluginHelper.getPreservationEventText("preservationEvent.common.updateObject", EVENT_DESCRIPTION),
       PluginState.FAILURE, outcomeText, details, job.getUsername(), true, null);
   }
 
@@ -228,20 +232,26 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
           Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_TITLE));
 
         if (state.equals(PluginState.SUCCESS)) {
-          outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has been manually moved");
+          outcomeText = PluginHelper.createOutcomeTextForAIP(item,
+            PluginHelper.getPreservationEventText("plugin.movePlugin.event.moved", "has been manually moved"));
         } else {
-          outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has not been manually moved");
+          outcomeText = PluginHelper.createOutcomeTextForAIP(item,
+            PluginHelper.getPreservationEventText("plugin.movePlugin.event.notMoved", "has not been manually moved"));
         }
       } catch (NotFoundException | GenericException e1) {
         if (state.equals(PluginState.SUCCESS)) {
-          outcomeText = "Archival Information Package [id: " + aip.getId() + "] has been manually moved";
+          outcomeText = PluginHelper.getPreservationEventText("plugin.movePlugin.event.aipMoved",
+            "Archival Information Package [id: {0}] has been manually moved", aip.getId());
         } else {
-          outcomeText = "Archival Information Package [id: " + aip.getId() + "] has not been manually moved";
+          outcomeText = PluginHelper.getPreservationEventText("plugin.movePlugin.event.aipNotMoved",
+            "Archival Information Package [id: {0}] has not been manually moved", aip.getId());
         }
       }
 
       jobPluginInfo.incrementObjectsProcessed(state);
-      model.createUpdateAIPEvent(aip.getId(), null, null, null, PreservationEventType.UPDATE, EVENT_DESCRIPTION, state,
+      model.createUpdateAIPEvent(aip.getId(), null, null, null,
+        PluginHelper.getPreservationEventType(MovePlugin.class, PreservationEventType.UPDATE),
+        PluginHelper.getPreservationEventText("preservationEvent.common.updateObject", EVENT_DESCRIPTION), state,
         outcomeText, details, job.getUsername(), true, null);
     }
   }
@@ -275,9 +285,9 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       }
 
       File movedFile = model.moveFile(file, toAIP, toRepresentation, toPath, file.getId(), true);
-      outcomeText.append("The file '").append(ModelUtils.getFileStoragePath(file).toString())
-        .append("' has been manually moved to '").append(ModelUtils.getFileStoragePath(movedFile).toString())
-        .append("'");
+      outcomeText.append(PluginHelper.getPreservationEventText("plugin.movePlugin.event.fileMoved",
+        "The file '{0}' has been manually moved to '{1}'", ModelUtils.getFileStoragePath(file).toString(),
+        ModelUtils.getFileStoragePath(movedFile).toString()));
 
     } catch (GenericException | AlreadyExistsException | NotFoundException | RequestNotValidException
       | AuthorizationDeniedException e) {
@@ -287,13 +297,16 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       report.addReport(reportItem);
       PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
 
-      outcomeText.append("The file '").append(file.getId()).append("' has not been manually moved: [")
-        .append(e.getClass().getSimpleName()).append("] ").append(e.getMessage());
+      outcomeText.append(PluginHelper.getPreservationEventText("plugin.movePlugin.event.fileNotMoved",
+        "The file '{0}' has not been manually moved: [{1}] {2}", file.getId(), e.getClass().getSimpleName(),
+        e.getMessage()));
     }
 
     jobPluginInfo.incrementObjectsProcessed(state);
-    model.createUpdateAIPEvent(file.getAipId(), file.getRepresentationId(), null, null, PreservationEventType.UPDATE,
-      EVENT_DESCRIPTION, state, outcomeText.toString(), details, job.getUsername(), true, null);
+    model.createUpdateAIPEvent(file.getAipId(), file.getRepresentationId(), null, null,
+      PluginHelper.getPreservationEventType(MovePlugin.class, PreservationEventType.UPDATE),
+      PluginHelper.getPreservationEventText("preservationEvent.common.updateObject", EVENT_DESCRIPTION), state,
+      outcomeText.toString(), details, job.getUsername(), true, null);
   }
 
   @SuppressWarnings("unchecked")
@@ -388,17 +401,20 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Moves objects to a destination";
+    return PluginHelper.getPreservationEventText("plugin.movePlugin.event.description",
+      "Moves objects to a destination");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The objects were successfully moved";
+    return PluginHelper.getPreservationEventText("plugin.movePlugin.event.success",
+      "The objects were successfully moved");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "The objects were not successfully moved";
+    return PluginHelper.getPreservationEventText("plugin.movePlugin.event.failure",
+      "The objects were not successfully moved");
   }
 
   @Override

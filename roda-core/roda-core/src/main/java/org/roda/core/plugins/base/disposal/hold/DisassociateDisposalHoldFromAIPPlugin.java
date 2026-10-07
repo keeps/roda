@@ -138,7 +138,8 @@ public class DisassociateDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Disassociate disposal hold from AIP";
+    return PluginHelper.getPreservationEventText("plugin.disassociateDisposalHoldFromAIPPlugin.event.description",
+      "Disassociate disposal hold from AIP");
   }
 
   @Override
@@ -218,7 +219,9 @@ public class DisassociateDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
         try {
           // disassociate active direct disposal holds
           if (aip.getHolds() != null && !aip.getHolds().isEmpty()) {
-            outcomeText = "Cannot found any active direct disposal hold for disassociate from AIP : " + aip.getId();
+            outcomeText = PluginHelper.getPreservationEventText(
+              "plugin.disassociateDisposalHoldFromAIPPlugin.event.noActiveDirectHold",
+              "Cannot found any active direct disposal hold for disassociate from AIP : {0}", aip.getId());
             boolean hasAtLeastOneDirectHold = false;
             for (DisposalHold hold : model.retrieveDirectActiveDisposalHolds(aip.getId())) {
               hasAtLeastOneDirectHold = true;
@@ -240,14 +243,18 @@ public class DisassociateDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
 
           } else {
             state = PluginState.SKIPPED;
-            outcomeText = "There are no direct Disposal hold on this AIP";
+            outcomeText = PluginHelper.getPreservationEventText(
+              "plugin.disassociateDisposalHoldFromAIPPlugin.event.noDirectHold",
+              "There are no direct Disposal hold on this AIP");
             LOGGER.info("{} aip : {}", outcomeText, aip.getId());
             jobPluginInfo.incrementObjectsProcessed(state);
             reportItem.setPluginState(state).setPluginDetails(outcomeText + " aip : " + aip.getId());
           }
 
         } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-          outcomeText = "Error disassociating all active direct disposal holds from AIP " + aip.getId();
+          outcomeText = PluginHelper.getPreservationEventText(
+            "plugin.disassociateDisposalHoldFromAIPPlugin.event.disassociateAllError",
+            "Error disassociating all active direct disposal holds from AIP {0}", aip.getId());
           LOGGER.error("Error disassociating all active direct disposal holds from '{}': {}", aip.getId(),
             e.getMessage(), e);
           state = PluginState.FAILURE;
@@ -274,7 +281,9 @@ public class DisassociateDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
             reportItem.setPluginState(state).setPluginDetails(outcomeText);
           }
         } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-          outcomeText = "Error disassociating disposal hold " + disposalHoldId + " from AIP " + aip.getId();
+          outcomeText = PluginHelper.getPreservationEventText(
+            "plugin.disassociateDisposalHoldFromAIPPlugin.event.disassociateError",
+            "Error disassociating disposal hold {0} from AIP {1}", disposalHoldId, aip.getId());
           LOGGER.error("Error disassociating disposal hold '{}' from '{}': {}", disposalHoldId, aip.getId(),
             e.getMessage(), e);
           state = PluginState.FAILURE;
@@ -306,8 +315,9 @@ public class DisassociateDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
   private void skipLiftedDisposalHold(IndexService index, ModelService model, Report report, Job cachedJob,
     JobPluginInfo jobPluginInfo, List<AIP> aips) {
     for (AIP aip : aips) {
-      String outcomeText = "Disposal hold '" + disposalHoldId + "' is lifted and cannot be disassociated from aip '"
-        + aip.getId() + "'";
+      String outcomeText = PluginHelper.getPreservationEventText(
+        "plugin.disassociateDisposalHoldFromAIPPlugin.event.holdLifted",
+        "Disposal hold '{0}' is lifted and cannot be disassociated from aip '{1}'", disposalHoldId, aip.getId());
       Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
       PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
       LOGGER.info("{} aip : {}", outcomeText, aip.getId());
@@ -347,7 +357,9 @@ public class DisassociateDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
 
       } catch (AuthorizationDeniedException e) {
         state = PluginState.FAILURE;
-        outcomeText = "Can't retrieve AIP " + aip.getId() + " for disassociate transitive hold " + holdId + ".";
+        outcomeText = PluginHelper.getPreservationEventText(
+          "plugin.disassociateDisposalHoldFromAIPPlugin.event.retrieveAIPForTransitiveFailed",
+          "Can't retrieve AIP {0} for disassociate transitive hold {1}.", aip.getId(), holdId);
         LOGGER.debug(outcomeText, e);
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         reportItem.setPluginState(state).setPluginDetails("Error disassociate transitive disposal hold " + holdId

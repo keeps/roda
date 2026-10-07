@@ -184,17 +184,20 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Fixed the ancestor hierarchy";
+    return PluginHelper.getPreservationEventText("plugin.fixAncestorsPlugin.event.description",
+      "Fixed the ancestor hierarchy");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Fixed the ancestor hierarchy successfully";
+    return PluginHelper.getPreservationEventText("plugin.fixAncestorsPlugin.event.success",
+      "Fixed the ancestor hierarchy successfully");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Fix of the ancestor hierarchy failed";
+    return PluginHelper.getPreservationEventText("plugin.fixAncestorsPlugin.event.failure",
+      "Fix of the ancestor hierarchy failed");
   }
 
   @Override

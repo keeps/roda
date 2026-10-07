@@ -104,12 +104,15 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
 
     reportItem.setPluginState(PluginState.SUCCESS)
-      .setPluginDetails(String.format("Done with checking user authorization for AIP %s", aip.getId()));
+      .setPluginDetails(PluginHelper.getPreservationEventText("plugin.verifyUserAuthorizationPlugin.event.done",
+        "Done with checking user authorization for AIP {0}", aip.getId()));
 
     if (cachedJob != null) {
       processAIPPermissions(index, cachedJob, aip, reportItem);
     } else {
-      reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Unable to determine Job.");
+      reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(PluginHelper
+        .getPreservationEventText("plugin.verifyUserAuthorizationPlugin.event.unableToDetermineJob",
+          "Unable to determine Job."));
     }
 
     try {
@@ -145,11 +148,14 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
             userFieldsToReturn);
           UserUtility.checkAIPPermissions(user, parentAIP, PermissionType.CREATE);
         } catch (NotFoundException nfe) {
-          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(PARENT_AIP_NOT_FOUND);
+          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(
+            PluginHelper.getPreservationEventText("plugin.verifyUserAuthorizationPlugin.event.parentNotFound",
+              PARENT_AIP_NOT_FOUND));
         } catch (AuthorizationDeniedException e) {
           LOGGER.debug("User '{}' doesn't have CREATE permission on parent... Error...", jobCreatorUsername);
-          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(
-            "The user " + jobCreatorUsername + " doesn't have permission to create under AIP " + aip.getId());
+          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(PluginHelper.getPreservationEventText(
+            "plugin.verifyUserAuthorizationPlugin.event.noCreatePermission",
+            "The user {0} doesn't have permission to create under AIP {1}", jobCreatorUsername, aip.getId()));
         }
       } else {
         RODAMember member = index.retrieve(RODAMember.class, IdUtils.getUserId(jobCreatorUsername),
@@ -157,8 +163,9 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
         if (member.getAllRoles().contains(RodaConstants.REPOSITORY_PERMISSIONS_AIP_CREATE_TOP)) {
           LOGGER.debug("User have CREATE_TOP_LEVEL_AIP_PERMISSION permission.");
         } else {
-          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(
-            "The user " + jobCreatorUsername + " doesn't have CREATE_TOP_LEVEL_AIP_PERMISSION permission");
+          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(PluginHelper.getPreservationEventText(
+            "plugin.verifyUserAuthorizationPlugin.event.noCreateTopLevelPermission",
+            "The user {0} doesn't have CREATE_TOP_LEVEL_AIP_PERMISSION permission", jobCreatorUsername));
           LOGGER.debug("User doesn't have CREATE_TOP_LEVEL_AIP_PERMISSION permission...");
         }
       }
@@ -190,11 +197,13 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    String description = "User permissions have been checked to ensure that he has sufficient authorization to store the AIP under the desired "
-      + "node of the classification scheme.";
+    String description = PluginHelper.getPreservationEventText("plugin.verifyUserAuthorizationPlugin.event.description",
+      "User permissions have been checked to ensure that he has sufficient authorization to store the AIP under the desired node of the classification scheme.");
 
     if (hasFreeAccess) {
-      description += " It was given READ permission to the users group as indicated on the descriptive metadata";
+      description += PluginHelper.getPreservationEventText(
+        "plugin.verifyUserAuthorizationPlugin.event.descriptionFreeAccess",
+        " It was given READ permission to the users group as indicated on the descriptive metadata");
     }
 
     return description;
@@ -202,12 +211,14 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The user has enough permissions to deposit the AIP under the designated node of the classification scheme";
+    return PluginHelper.getPreservationEventText("plugin.verifyUserAuthorizationPlugin.event.success",
+      "The user has enough permissions to deposit the AIP under the designated node of the classification scheme");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "The user does not have enough permissions to deposit the AIP under the designated node of the classification scheme";
+    return PluginHelper.getPreservationEventText("plugin.verifyUserAuthorizationPlugin.event.failure",
+      "The user does not have enough permissions to deposit the AIP under the designated node of the classification scheme");
   }
 
   @Override

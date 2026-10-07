@@ -145,7 +145,10 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
         processTransferredResourceDirectory(model, transferredResourcePath, aip, representationId, job.getUsername());
       }
 
-      createUnpackingEventSuccess(model, index, transferredResource, aip, UNPACK_DESCRIPTION, job);
+      createUnpackingEventSuccess(model, index, transferredResource, aip,
+        PluginHelper.getPreservationEventText("plugin.transferredResourceToAipPlugin.event.unpackDescription",
+          UNPACK_DESCRIPTION),
+        job);
       ContentPayload metadataPayload = MetadataFileUtils.getMetadataPayload(transferredResource);
       model.createDescriptiveMetadata(aip.getId(), METADATA_FILE, metadataPayload, METADATA_TYPE, METADATA_VERSION,
         job.getUsername(), false);

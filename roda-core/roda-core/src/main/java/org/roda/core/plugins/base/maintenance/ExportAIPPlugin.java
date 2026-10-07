@@ -306,17 +306,19 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Exports AIPS to a local folder";
+    return PluginHelper.getPreservationEventText("plugin.exportAIPPlugin.event.description",
+      "Exports AIPS to a local folder");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The AIPs were successfully exported";
+    return PluginHelper.getPreservationEventText("plugin.exportAIPPlugin.event.success",
+      "The AIPs were successfully exported");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "The AIPs were not exported";
+    return PluginHelper.getPreservationEventText("plugin.exportAIPPlugin.event.failure", "The AIPs were not exported");
   }
 
   @Override

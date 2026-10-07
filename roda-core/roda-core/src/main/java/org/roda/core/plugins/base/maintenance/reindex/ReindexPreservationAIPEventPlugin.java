@@ -182,17 +182,20 @@ public class ReindexPreservationAIPEventPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Reindex Roda entity";
+    return PluginHelper.getPreservationEventText("plugin.reindexPreservationAIPEventPlugin.event.description",
+      "Reindex Roda entity");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "All entities were reindexed with success";
+    return PluginHelper.getPreservationEventText("plugin.reindexPreservationAIPEventPlugin.event.success",
+      "All entities were reindexed with success");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "An error occured while reindexing all entities";
+    return PluginHelper.getPreservationEventText("plugin.reindexPreservationAIPEventPlugin.event.failure",
+      "An error occured while reindexing all entities");
   }
 
   @Override

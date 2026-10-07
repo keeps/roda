@@ -215,17 +215,20 @@ public class UpdateIncidencesPlugin extends AbstractPlugin<RiskIncidence> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Update multiple incidences";
+    return PluginHelper.getPreservationEventText("plugin.updateIncidencesPlugin.event.description",
+      "Update multiple incidences");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Multiple incidences update was successful";
+    return PluginHelper.getPreservationEventText("plugin.updateIncidencesPlugin.event.success",
+      "Multiple incidences update was successful");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Multiple incidences update failed";
+    return PluginHelper.getPreservationEventText("plugin.updateIncidencesPlugin.event.failure",
+      "Multiple incidences update failed");
   }
 
   @Override

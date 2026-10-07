@@ -259,17 +259,20 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Changed files' format metadata";
+    return PluginHelper.getPreservationEventText("plugin.editFileFormatPlugin.event.description",
+      "Changed files' format metadata");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "File formats were updated and recorded in PREMIS objects.";
+    return PluginHelper.getPreservationEventText("plugin.editFileFormatPlugin.event.success",
+      "File formats were updated and recorded in PREMIS objects.");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Failed to update file formats in the package.";
+    return PluginHelper.getPreservationEventText("plugin.editFileFormatPlugin.event.failure",
+      "Failed to update file formats in the package.");
   }
 
   @Override

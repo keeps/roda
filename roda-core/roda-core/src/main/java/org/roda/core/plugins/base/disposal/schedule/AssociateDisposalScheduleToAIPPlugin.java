@@ -108,7 +108,8 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Associate disposal schedule to AIP";
+    return PluginHelper.getPreservationEventText("plugin.associateDisposalScheduleToAIPPlugin.event.description",
+      "Associate disposal schedule to AIP");
   }
 
   @Override
@@ -175,10 +176,10 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
           jobPluginInfo.incrementObjectsProcessedWithFailure();
           reportItem.setPluginState(state).setPluginDetails("Error associating disposal schedule to AIP '" + aip.getId()
             + "': This AIP is part of a disposal confirmation report and the schedule cannot be changed");
-          outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(
-            "failed to be associated to AIP '" + aip.getId()
-              + "'; This AIP is part of a disposal confirmation report and the schedule cannot be changed",
-            disposalScheduleId, null);
+          outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(PluginHelper.getPreservationEventText(
+            "plugin.associateDisposalScheduleToAIPPlugin.event.partOfDisposalConfirmation",
+            "failed to be associated to AIP '{0}'; This AIP is part of a disposal confirmation report and the schedule cannot be changed",
+            aip.getId()), disposalScheduleId, null);
           report.addReport(reportItem);
           PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
         } else {
@@ -187,8 +188,9 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
             reportItem.setPluginState(state).setPluginDetails("Disposal schedule '" + disposalSchedule.getTitle()
               + "' (" + disposalScheduleId + ") was successfully associated to AIP");
-            outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule("was successfully associated to AIP",
-              disposalSchedule.getId(), disposalSchedule.getTitle());
+            outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(PluginHelper.getPreservationEventText(
+              "plugin.associateDisposalScheduleToAIPPlugin.event.successfullyAssociated",
+              "was successfully associated to AIP"), disposalSchedule.getId(), disposalSchedule.getTitle());
           } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException
             | IllegalOperationException e) {
             LOGGER.error("Error associating disposal schedule {} to {}: {}", disposalScheduleId, aip.getId(),
@@ -198,8 +200,9 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
             reportItem.setPluginState(state)
               .setPluginDetails("Error associating disposal schedule '" + disposalSchedule.getTitle() + "' ("
                 + disposalScheduleId + ") to AIP '" + aip.getId() + "': " + e.getMessage());
-            outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(" failed to be associated to AIP",
-              disposalSchedule.getId(), disposalSchedule.getTitle());
+            outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(PluginHelper.getPreservationEventText(
+              "plugin.associateDisposalScheduleToAIPPlugin.event.failedToBeAssociated",
+              " failed to be associated to AIP"), disposalSchedule.getId(), disposalSchedule.getTitle());
           } finally {
             report.addReport(reportItem);
             PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);

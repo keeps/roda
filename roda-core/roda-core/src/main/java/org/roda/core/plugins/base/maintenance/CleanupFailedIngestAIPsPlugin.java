@@ -188,17 +188,20 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Removes AIP from the system";
+    return PluginHelper.getPreservationEventText("plugin.cleanupFailedIngestAIPsPlugin.event.description",
+      "Removes AIP from the system");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The AIPs were successfully removed";
+    return PluginHelper.getPreservationEventText("plugin.cleanupFailedIngestAIPsPlugin.event.success",
+      "The AIPs were successfully removed");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "The AIPs were not removed";
+    return PluginHelper.getPreservationEventText("plugin.cleanupFailedIngestAIPsPlugin.event.failure",
+      "The AIPs were not removed");
   }
 
   @Override

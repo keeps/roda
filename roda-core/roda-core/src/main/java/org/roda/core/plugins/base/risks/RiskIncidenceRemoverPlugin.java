@@ -163,17 +163,20 @@ public class RiskIncidenceRemoverPlugin<T extends IsRODAObject> extends Abstract
 
   @Override
   public String getPreservationEventDescription() {
-    return "Removed all risk incidences";
+    return PluginHelper.getPreservationEventText("plugin.riskIncidenceRemoverPlugin.event.description",
+      "Removed all risk incidences");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Removed all risk incidences successfully";
+    return PluginHelper.getPreservationEventText("plugin.riskIncidenceRemoverPlugin.event.success",
+      "Removed all risk incidences successfully");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Remove of risk incidences failed";
+    return PluginHelper.getPreservationEventText("plugin.riskIncidenceRemoverPlugin.event.failure",
+      "Remove of risk incidences failed");
   }
 
   @Override

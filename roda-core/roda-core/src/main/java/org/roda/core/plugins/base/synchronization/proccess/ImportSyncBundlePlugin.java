@@ -91,17 +91,20 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Send the sync bundle to the central instance";
+    return PluginHelper.getPreservationEventText("plugin.sendSyncBundlePlugin.event.description",
+      "Send the sync bundle to the central instance");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Sync bundle sent successfully";
+    return PluginHelper.getPreservationEventText("plugin.sendSyncBundlePlugin.event.success",
+      "Sync bundle sent successfully");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Sync bundle not sent successfully";
+    return PluginHelper.getPreservationEventText("plugin.sendSyncBundlePlugin.event.failure",
+      "Sync bundle not sent successfully");
   }
 
   @Override

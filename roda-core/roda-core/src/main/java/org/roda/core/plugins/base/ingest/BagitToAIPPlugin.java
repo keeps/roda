@@ -120,7 +120,10 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
 
       PluginHelper.createSubmission(model, createSubmission, bagitPath, aipCreated.getId());
 
-      createUnpackingEventSuccess(model, index, transferredResource, aipCreated, UNPACK_DESCRIPTION, job);
+      createUnpackingEventSuccess(model, index, transferredResource, aipCreated,
+        PluginHelper.getPreservationEventText("plugin.bagitToAipPlugin.event.unpackDescription",
+          UNPACK_DESCRIPTION),
+        job);
       reportItem.setSourceAndOutcomeObjectId(reportItem.getSourceObjectId(), aipCreated.getId())
         .setPluginState(PluginState.SUCCESS);
 

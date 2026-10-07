@@ -392,17 +392,20 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
 
   @Override
   public String getPreservationEventDescription() {
-    return "Identified the object's file formats and versions using Siegfried.";
+    return PluginHelper.getPreservationEventText("plugin.siegfriedPlugin.event.description",
+      "Identified the object's file formats and versions using Siegfried.");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "File formats were identified and recorded in PREMIS objects.";
+    return PluginHelper.getPreservationEventText("plugin.siegfriedPlugin.event.success",
+      "File formats were identified and recorded in PREMIS objects.");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Failed to identify file formats in the package.";
+    return PluginHelper.getPreservationEventText("plugin.siegfriedPlugin.event.failure",
+      "Failed to identify file formats in the package.");
   }
 
   @Override

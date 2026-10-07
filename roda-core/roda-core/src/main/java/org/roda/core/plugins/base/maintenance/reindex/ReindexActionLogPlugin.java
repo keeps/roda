@@ -255,17 +255,20 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Reindexed action logs";
+    return PluginHelper.getPreservationEventText("plugin.reindexActionLogPlugin.event.description",
+      "Reindexed action logs");
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Reindexed action logs successfully";
+    return PluginHelper.getPreservationEventText("plugin.reindexActionLogPlugin.event.success",
+      "Reindexed action logs successfully");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Reindex of action logs failed";
+    return PluginHelper.getPreservationEventText("plugin.reindexActionLogPlugin.event.failure",
+      "Reindex of action logs failed");
   }
 
   @Override

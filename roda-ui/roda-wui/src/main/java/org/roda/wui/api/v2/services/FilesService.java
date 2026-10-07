@@ -85,7 +85,8 @@ public class FilesService {
   public IndexedFile renameFolder(RequestContext requestContext, IndexedFile indexedFolder, String newName,
       String details) throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
       AuthorizationDeniedException {
-    String eventDescription = "The process of updating an object of the repository.";
+    String eventDescription = PluginHelper.getPreservationEventText("preservationEvent.common.updateObjectWithPeriod",
+        "The process of updating an object of the repository.");
 
     User user = requestContext.getUser();
     ModelService model = requestContext.getModelService();
@@ -96,18 +97,24 @@ public class FilesService {
       File folder = model.retrieveFile(indexedFolder.getAipId(), indexedFolder.getRepresentationId(),
           indexedFolder.getPath(), indexedFolder.getId());
       File newFolder = model.renameFolder(folder, newName, true);
-      String outcomeText = "The folder '" + oldName + "' has been manually renamed to '" + newName + "'.";
+      String outcomeText = PluginHelper.getPreservationEventText("preservationEvent.filesService.folderRenamed",
+          "The folder '{0}' has been manually renamed to '{1}'.", oldName, newName);
       model.createUpdateAIPEvent(indexedFolder.getAipId(), indexedFolder.getRepresentationId(), null, null,
-          RodaConstants.PreservationEventType.UPDATE, eventDescription, PluginState.SUCCESS, outcomeText, details,
+          PluginHelper.getPreservationEventTypeFromProperty("core.events.rename_folder.preservation_event_type",
+              RodaConstants.PreservationEventType.UPDATE),
+          eventDescription, PluginState.SUCCESS, outcomeText, details,
           user.getName(), true, null);
 
       index.commitAIPs();
       return index.retrieve(IndexedFile.class, IdUtils.getFileId(newFolder), RodaConstants.FILE_FIELDS_TO_RETURN);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      String outcomeText = "The folder '" + oldName + "' has not been manually renamed to '" + newName + "'.";
+      String outcomeText = PluginHelper.getPreservationEventText("preservationEvent.filesService.folderNotRenamed",
+          "The folder '{0}' has not been manually renamed to '{1}'.", oldName, newName);
 
       model.createUpdateAIPEvent(indexedFolder.getAipId(), indexedFolder.getRepresentationId(), null, null,
-          RodaConstants.PreservationEventType.UPDATE, eventDescription, PluginState.FAILURE, outcomeText, details,
+          PluginHelper.getPreservationEventTypeFromProperty("core.events.rename_folder.preservation_event_type",
+              RodaConstants.PreservationEventType.UPDATE),
+          eventDescription, PluginState.FAILURE, outcomeText, details,
           user.getName(), true, null);
 
       throw e;
@@ -158,7 +165,8 @@ public class FilesService {
   public File createFile(RequestContext requestContext, String aipId, String representationId,
       List<String> directoryPath, String fileId, ContentPayload content, String details) throws GenericException,
       AuthorizationDeniedException, RequestNotValidException, NotFoundException, AlreadyExistsException {
-    String eventDescription = "The process of creating an object of the repository.";
+    String eventDescription = PluginHelper.getPreservationEventText("preservationEvent.common.createObject",
+        "The process of creating an object of the repository.");
 
     User user = requestContext.getUser();
     ModelService model = requestContext.getModelService();
@@ -170,16 +178,22 @@ public class FilesService {
       targets.add(PluginHelper.getLinkingIdentifier(aipId, file.getRepresentationId(), file.getPath(), file.getId(),
           RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
 
-      String outcomeText = "The file '" + file.getId() + "' has been manually created.";
-      model.createEvent(aipId, representationId, null, null, RodaConstants.PreservationEventType.CREATION,
+      String outcomeText = PluginHelper.getPreservationEventText("preservationEvent.filesService.fileCreated",
+          "The file '{0}' has been manually created.", file.getId());
+      model.createEvent(aipId, representationId, null, null,
+          PluginHelper.getPreservationEventTypeFromProperty("core.events.create_file.preservation_event_type",
+              RodaConstants.PreservationEventType.CREATION),
           eventDescription, null, targets, PluginState.SUCCESS, outcomeText, details, user.getName(), true, null);
 
       requestContext.getIndexService().commit(IndexedFile.class);
       return file;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
         | AlreadyExistsException e) {
-      String outcomeText = "The file '" + fileId + "' has not been manually created.";
-      model.createUpdateAIPEvent(aipId, representationId, null, null, RodaConstants.PreservationEventType.CREATION,
+      String outcomeText = PluginHelper.getPreservationEventText("preservationEvent.filesService.fileNotCreated",
+          "The file '{0}' has not been manually created.", fileId);
+      model.createUpdateAIPEvent(aipId, representationId, null, null,
+          PluginHelper.getPreservationEventTypeFromProperty("core.events.create_file.preservation_event_type",
+              RodaConstants.PreservationEventType.CREATION),
           eventDescription, PluginState.FAILURE, outcomeText, details, user.getName(), true, null);
 
       throw e;
@@ -189,7 +203,8 @@ public class FilesService {
   public IndexedFile createFolder(RequestContext requestContext, IndexedRepresentation indexedRepresentation,
       CreateFolderRequest request) throws GenericException, RequestNotValidException, AlreadyExistsException,
       NotFoundException, AuthorizationDeniedException {
-    String eventDescription = "The process of creating an object of the repository.";
+    String eventDescription = PluginHelper.getPreservationEventText("preservationEvent.common.createObject",
+        "The process of creating an object of the repository.");
 
     User user = requestContext.getUser();
     ModelService model = requestContext.getModelService();
@@ -210,18 +225,22 @@ public class FilesService {
             folderName, user.getId(), true);
       }
 
-      String outcomeText = "The folder '" + folderName + "' has been manually created.";
+      String outcomeText = PluginHelper.getPreservationEventText("preservationEvent.filesService.folderCreated",
+          "The folder '{0}' has been manually created.", folderName);
       model.createUpdateAIPEvent(indexedRepresentation.getAipId(), indexedRepresentation.getId(), null, null,
-          RodaConstants.PreservationEventType.CREATION, eventDescription, PluginState.SUCCESS, outcomeText, details,
-          user.getName(), true, null);
+          PluginHelper.getPreservationEventTypeFromProperty("core.events.create_folder.preservation_event_type",
+              RodaConstants.PreservationEventType.CREATION),
+          eventDescription, PluginState.SUCCESS, outcomeText, details, user.getName(), true, null);
 
       index.commit(IndexedFile.class);
       return index.retrieve(IndexedFile.class, IdUtils.getFileId(newFolder), new ArrayList<>());
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      String outcomeText = "The folder '" + folderName + "' has not been manually created.";
+      String outcomeText = PluginHelper.getPreservationEventText("preservationEvent.filesService.folderNotCreated",
+          "The folder '{0}' has not been manually created.", folderName);
       model.createUpdateAIPEvent(indexedRepresentation.getAipId(), indexedRepresentation.getId(), null, null,
-          RodaConstants.PreservationEventType.CREATION, eventDescription, PluginState.FAILURE, outcomeText, details,
-          user.getName(), true, null);
+          PluginHelper.getPreservationEventTypeFromProperty("core.events.create_folder.preservation_event_type",
+              RodaConstants.PreservationEventType.CREATION),
+          eventDescription, PluginState.FAILURE, outcomeText, details, user.getName(), true, null);
 
       throw e;
     }
