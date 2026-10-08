@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.roda.core.data.utils.XMLUtils;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
 import org.roda.core.data.v2.validation.ValidationReport;
@@ -58,7 +59,7 @@ public final class MetadataUtils {
     try {
       StringWriter writer = new StringWriter();
 
-      final JAXBContext jaxbContext = JAXBContext.newInstance(tClass);
+      final JAXBContext jaxbContext = XMLUtils.getJAXBContext(tClass);
       Marshaller marshaller = jaxbContext.createMarshaller();
       marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
       marshaller.marshal(object, writer);
