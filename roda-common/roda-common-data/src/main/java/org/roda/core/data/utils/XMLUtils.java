@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
@@ -27,9 +30,18 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 public class XMLUtils {
+  // JAXB contexts are thread-safe and expensive to build, so build one per set
+  // of bound classes
+  private static final Map<List<Class<?>>, JAXBContext> JAXB_CONTEXTS = new ConcurrentHashMap<>();
+
+  // SAX parser factories are not guaranteed to be thread-safe. The default
+  // namespace-aware factory is the parser that XMLReaderFactory falls back to,
+  // without its per-call service lookup
+  private static final ThreadLocal<SAXParserFactory> SAX_PARSER_FACTORY = ThreadLocal
+    .withInitial(SAXParserFactory::newDefaultNSInstance);
+
   private XMLUtils() {
     // do nothing
   }
@@ -38,7 +50,7 @@ public class XMLUtils {
     String ret = null;
     JAXBContext jaxbContext;
     try {
-      jaxbContext = JAXBContext.newInstance(object.getClass());
+      jaxbContext = getJAXBContext(object.getClass());
       Marshaller marshaller = jaxbContext.createMarshaller();
       StringWriter writer = new StringWriter();
       marshaller.marshal(object, writer);
@@ -66,11 +78,41 @@ public class XMLUtils {
   public static <T> T getObjectFromXML(String xml, Class<T> objectClass) throws GenericException {
     try {
       SAXSource xmlSource = getSafeSAXSource(new InputSource(new StringReader(xml)));
-      JAXBContext jaxbContext = JAXBContext.newInstance(objectClass);
+      JAXBContext jaxbContext = getJAXBContext(objectClass);
       Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
       return unmarshaller.unmarshal(xmlSource, objectClass).getValue();
     } catch (JAXBException | ParserConfigurationException | SAXException e) {
       throw new GenericException(e);
+    }
+  }
+
+  /**
+   * Returns a shared {@link JAXBContext} for the given classes, creating it on
+   * first use. Marshallers and unmarshallers created from it are not
+   * thread-safe and must still be created per use.
+   */
+  public static JAXBContext getJAXBContext(Class<?>... classes) throws JAXBException {
+    List<Class<?>> key = List.of(classes);
+    JAXBContext jaxbContext = JAXB_CONTEXTS.get(key);
+    if (jaxbContext == null) {
+      jaxbContext = JAXBContext.newInstance(classes);
+      JAXBContext existing = JAXB_CONTEXTS.putIfAbsent(key, jaxbContext);
+      if (existing != null) {
+        jaxbContext = existing;
+      }
+    }
+    return jaxbContext;
+  }
+
+  /**
+   * Creates a new namespace-aware {@link XMLReader}. Readers are not
+   * thread-safe, so each parse needs its own.
+   */
+  public static XMLReader createXMLReader() throws SAXException {
+    try {
+      return SAX_PARSER_FACTORY.get().newSAXParser().getXMLReader();
+    } catch (ParserConfigurationException e) {
+      throw new SAXException(e);
     }
   }
 
@@ -80,7 +122,7 @@ public class XMLUtils {
 
   public static XMLReader getSafeXMLReader() throws SAXException, ParserConfigurationException {
     // Disable XXE
-    XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+    XMLReader xmlReader = createXMLReader();
     xmlReader.setFeature("http://xml.org/sax/features/external-general-entities", false);
     xmlReader.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
     xmlReader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
