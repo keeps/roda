@@ -8,6 +8,7 @@
 package org.roda.core.index.utils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.Serializable;
 import java.text.ParseException;
@@ -159,6 +160,8 @@ public class SolrUtils {
   public static final String SCHEMA = "managed-schema.xml";
   private static final Logger LOGGER = LoggerFactory.getLogger(SolrUtils.class);
   private static final String DEFAULT_QUERY_PARSER_OPERATOR = "AND";
+  // StAX factories are thread-safe once configured; looking one up is not cheap
+  private static final XMLInputFactory XML_INPUT_FACTORY = XMLInputFactory.newInstance();
   private static final Set<String> NON_REPEATABLE_FIELDS = new HashSet<>(Arrays.asList(RodaConstants.AIP_TITLE,
     RodaConstants.AIP_LEVEL, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL));
   private static Map<String, List<String>> liteFieldsForEachClass = new HashMap<>();
@@ -860,7 +863,7 @@ public class SolrUtils {
       metadataType, metadataVersion, parameters)) {
 
       SolrXMLLoader loader = new SolrXMLLoader();
-      XMLStreamReader parser = XMLInputFactory.newInstance().createXMLStreamReader(transformationResult);
+      XMLStreamReader parser = XML_INPUT_FACTORY.createXMLStreamReader(transformationResult);
 
       boolean parsing = true;
       doc = null;
@@ -894,8 +897,12 @@ public class SolrUtils {
 
     String technicalMetadataStylesheetName = getTechnicalMetadataStylesheetName(metadataType, metadataVersion);
 
-    if ((RodaCoreFactory.getConfigurationFileAsStream(technicalMetadataStylesheetName)) == null) {
-      return new SolrInputDocument();
+    try (InputStream stylesheet = RodaCoreFactory.getConfigurationFileAsStream(technicalMetadataStylesheetName)) {
+      if (stylesheet == null) {
+        return new SolrInputDocument();
+      }
+    } catch (IOException e) {
+      throw new GenericException("Could not read technical metadata stylesheet " + technicalMetadataStylesheetName, e);
     }
 
     try (Reader transformationResult = RodaUtils.applyMetadataStylesheet(binary,
@@ -906,7 +913,7 @@ public class SolrUtils {
       }
 
       SolrXMLLoader loader = new SolrXMLLoader();
-      XMLStreamReader parser = XMLInputFactory.newInstance().createXMLStreamReader(transformationResult);
+      XMLStreamReader parser = XML_INPUT_FACTORY.createXMLStreamReader(transformationResult);
 
       boolean parsing = true;
       doc = null;

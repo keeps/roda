@@ -124,6 +124,8 @@ public final class PremisV3Utils {
   private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 
   private static final ObjectFactory FACTORY = new ObjectFactory();
+  // compiled once on first validation; Schema objects are thread-safe
+  private static volatile Schema premisSchema;
 
   /** Private empty constructor */
   private PremisV3Utils() {
@@ -144,6 +146,25 @@ public final class PremisV3Utils {
     }
 
     return ret;
+  }
+
+  private static Schema getPremisSchema() throws SAXException {
+    Schema schema = premisSchema;
+    if (schema == null) {
+      synchronized (PremisV3Utils.class) {
+        schema = premisSchema;
+        if (schema == null) {
+          try (InputStream xsd = PremisV3Utils.class.getClassLoader().getResourceAsStream("premis/v3/premis.xsd")) {
+            SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            schema = sf.newSchema(new StreamSource(xsd));
+          } catch (IOException e) {
+            throw new SAXException("Could not read PREMIS schema", e);
+          }
+          premisSchema = schema;
+        }
+      }
+    }
+    return schema;
   }
 
   public static boolean isPremisV2(Binary binary) throws IOException, SAXException {
@@ -744,7 +765,7 @@ public final class PremisV3Utils {
   public static Representation binaryToRepresentation(InputStream binaryInputStream) throws GenericException {
     JAXBContext jaxbContext;
     try {
-      jaxbContext = JAXBContext.newInstance(gov.loc.premis.v3.Representation.class);
+      jaxbContext = XMLUtils.getJAXBContext(gov.loc.premis.v3.Representation.class);
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
       Object unmarshal = jaxbUnmarshaller.unmarshal(binaryInputStream);
       return ((gov.loc.premis.v3.Representation) ((JAXBElement<?>) unmarshal).getValue());
@@ -756,7 +777,7 @@ public final class PremisV3Utils {
   public static AgentComplexType binaryToAgent(InputStream binaryInputStream) throws IOException, GenericException {
     JAXBContext jaxbContext;
     try {
-      jaxbContext = JAXBContext.newInstance(gov.loc.premis.v3.AgentComplexType.class);
+      jaxbContext = XMLUtils.getJAXBContext(gov.loc.premis.v3.AgentComplexType.class);
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
       Object unmarshal = jaxbUnmarshaller.unmarshal(binaryInputStream);
       return ((gov.loc.premis.v3.AgentComplexType) ((JAXBElement<?>) unmarshal).getValue());
@@ -1229,16 +1250,12 @@ public final class PremisV3Utils {
     ValidationEventCollector validationCollector = new ValidationEventCollector();
 
     try {
-      jaxbContext = JAXBContext.newInstance(gov.loc.premis.v3.PremisComplexType.class,
+      jaxbContext = XMLUtils.getJAXBContext(gov.loc.premis.v3.PremisComplexType.class,
         gov.loc.premis.v3.AgentComplexType.class, gov.loc.premis.v3.EventComplexType.class);
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
       if (validate) {
-        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        StreamSource source = new StreamSource(
-          PremisV3Utils.class.getClassLoader().getResourceAsStream("premis/v3/premis.xsd"));
-        Schema schema = sf.newSchema(source);
-        jaxbUnmarshaller.setSchema(schema);
+        jaxbUnmarshaller.setSchema(getPremisSchema());
         jaxbUnmarshaller.setEventHandler(validationCollector);
       }
 
@@ -1366,15 +1383,11 @@ public final class PremisV3Utils {
     ValidationEventCollector validationCollector = new ValidationEventCollector();
 
     try {
-      jaxbContext = JAXBContext.newInstance(gov.loc.premis.v3.Representation.class);
+      jaxbContext = XMLUtils.getJAXBContext(gov.loc.premis.v3.Representation.class);
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
       if (validate) {
-        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        StreamSource source = new StreamSource(
-          PremisV3Utils.class.getClassLoader().getResourceAsStream("premis/v3/premis.xsd"));
-        Schema schema = sf.newSchema(source);
-        jaxbUnmarshaller.setSchema(schema);
+        jaxbUnmarshaller.setSchema(getPremisSchema());
         jaxbUnmarshaller.setEventHandler(validationCollector);
       }
 
@@ -1396,15 +1409,11 @@ public final class PremisV3Utils {
     ValidationEventCollector validationCollector = new ValidationEventCollector();
 
     try {
-      jaxbContext = JAXBContext.newInstance(gov.loc.premis.v3.AgentComplexType.class);
+      jaxbContext = XMLUtils.getJAXBContext(gov.loc.premis.v3.AgentComplexType.class);
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
       if (validate) {
-        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        StreamSource source = new StreamSource(
-          PremisV3Utils.class.getClassLoader().getResourceAsStream("premis/v3/premis.xsd"));
-        Schema schema = sf.newSchema(source);
-        jaxbUnmarshaller.setSchema(schema);
+        jaxbUnmarshaller.setSchema(getPremisSchema());
         jaxbUnmarshaller.setEventHandler(validationCollector);
       }
 
@@ -1426,15 +1435,11 @@ public final class PremisV3Utils {
     ValidationEventCollector validationCollector = new ValidationEventCollector();
 
     try {
-      jaxbContext = JAXBContext.newInstance(gov.loc.premis.v3.File.class);
+      jaxbContext = XMLUtils.getJAXBContext(gov.loc.premis.v3.File.class);
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
       if (validate) {
-        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        StreamSource source = new StreamSource(
-          PremisV3Utils.class.getClassLoader().getResourceAsStream("premis/v3/premis.xsd"));
-        Schema schema = sf.newSchema(source);
-        jaxbUnmarshaller.setSchema(schema);
+        jaxbUnmarshaller.setSchema(getPremisSchema());
         jaxbUnmarshaller.setEventHandler(validationCollector);
       }
 
@@ -1456,15 +1461,11 @@ public final class PremisV3Utils {
     ValidationEventCollector validationCollector = new ValidationEventCollector();
 
     try {
-      jaxbContext = JAXBContext.newInstance(gov.loc.premis.v3.EventComplexType.class);
+      jaxbContext = XMLUtils.getJAXBContext(gov.loc.premis.v3.EventComplexType.class);
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
       if (validate) {
-        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        StreamSource source = new StreamSource(
-          PremisV3Utils.class.getClassLoader().getResourceAsStream("premis/v3/premis.xsd"));
-        Schema schema = sf.newSchema(source);
-        jaxbUnmarshaller.setSchema(schema);
+        jaxbUnmarshaller.setSchema(getPremisSchema());
         jaxbUnmarshaller.setEventHandler(validationCollector);
       }
 

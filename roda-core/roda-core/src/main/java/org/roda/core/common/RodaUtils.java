@@ -48,13 +48,13 @@ import org.reflections.util.ConfigurationBuilder;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.utils.XMLUtils;
 import org.roda.core.storage.Binary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -196,7 +196,7 @@ public class RodaUtils {
       transformer.setParameter(parameter.getKey(), parameter.getValue());
     }
     try {
-      XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+      XMLReader xmlReader = XMLUtils.createXMLReader();
       xmlReader.setEntityResolver(new RodaEntityResolver());
       InputSource source = new InputSource(fileReader);
       Source text = new SAXSource(xmlReader, source);
@@ -211,7 +211,7 @@ public class RodaUtils {
     try (
       Reader descMetadataReader = new InputStreamReader(new BOMInputStream(binary.getContent().createInputStream()))) {
 
-      XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+      XMLReader xmlReader = XMLUtils.createXMLReader();
       xmlReader.setEntityResolver(new RodaEntityResolver());
       InputSource source = new InputSource(descMetadataReader);
       Source text = new SAXSource(xmlReader, source);
@@ -249,7 +249,7 @@ public class RodaUtils {
     try (
       Reader descMetadataReader = new InputStreamReader(new BOMInputStream(binary.getContent().createInputStream()))) {
 
-      XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+      XMLReader xmlReader = XMLUtils.createXMLReader();
       xmlReader.setEntityResolver(new RodaEntityResolver());
       InputSource source = new InputSource(descMetadataReader);
       Source text = new SAXSource(xmlReader, source);
