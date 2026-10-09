@@ -13,11 +13,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -54,6 +54,9 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   private StorageService mainStorageService;
   private TransactionLog transaction;
   private boolean isInitialized = false;
+  // storage paths deleted with success in this transaction, kept here to avoid
+  // querying the operation log on every create
+  private final Set<String> deletedStoragePaths = ConcurrentHashMap.newKeySet();
 
   public DefaultTransactionalStorageService(StorageService mainStorageService, StorageService stagingStorageService,
     TransactionLog transaction, TransactionLogService transactionLogService) {
@@ -289,15 +292,8 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     NotFoundException {
     TransactionalStoragePathOperationLog operationLog;
 
-    try {
-      TransactionalStoragePathOperationLog anyDeletedStoragePathOperation = transactionLogService.getAnyDeletedStoragePathOperation(transaction.getId(),
-        storagePath.toString());
-      if (anyDeletedStoragePathOperation == null && mainStorageService.exists(storagePath)) {
-        throw new AlreadyExistsException("Binary already exists: " + storagePath);
-      }
-    } catch (RODATransactionException e) {
-      throw new GenericException("[transactionId:" + transaction.getId()
-        + "] Failed to create binary for storage path: " + storagePath, e);
+    if (!deletedStoragePaths.contains(storagePath.toString()) && mainStorageService.exists(storagePath)) {
+      throw new AlreadyExistsException("Binary already exists: " + storagePath);
     }
 
     if (storagePath.getDirectoryPath() != null && !storagePath.getDirectoryPath().isEmpty()
@@ -325,19 +321,10 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
 
     Binary ret;
 
-    try {
-      TransactionalStoragePathOperationLog anyDeletedStoragePathOperation = transactionLogService
-        .getAnyDeletedStoragePathOperation(transaction.getId(), storagePath.toString());
-      if (anyDeletedStoragePathOperation == null && mainStorageService.exists(storagePath)) {
-        ret = getBinary(storagePath);
-        updateOperationState(operationLog, OperationState.SKIPPED);
-        return ret;
-      }
-    } catch (RODATransactionException e) {
-      updateOperationState(operationLog, OperationState.FAILURE);
-      throw new GenericException(
-        "[transactionId:" + transaction.getId() + "] Failed to create or get binary for storage path: " + storagePath,
-        e);
+    if (!deletedStoragePaths.contains(storagePath.toString()) && mainStorageService.exists(storagePath)) {
+      ret = getBinary(storagePath);
+      updateOperationState(operationLog, OperationState.SKIPPED);
+      return ret;
     }
 
     try {
@@ -678,35 +665,38 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     stagingStorageService.importBinaryVersion(fromService, storagePath, version);
   }
 
-  private Map<StoragePathVersion, List<TransactionStoragePathConsolidatedOperation>> consolidateAndRegisterLogs()
+  /**
+   * Consolidates the operation log and registers the result in one database
+   * transaction.
+   *
+   * @return the consolidated operations, in the order they must be applied
+   */
+  private List<TransactionStoragePathConsolidatedOperation> consolidateAndRegisterLogs()
     throws RequestNotValidException, RODATransactionException {
     Map<StoragePathVersion, List<ConsolidatedOperation>> consolidatedOperations = TransactionLogConsolidator
       .consolidateLogs(transactionLogService.getStoragePathsOperations(transaction.getId()));
-    Map<StoragePathVersion, List<TransactionStoragePathConsolidatedOperation>> databaseOperationsMap = new HashMap<>();
+    List<TransactionStoragePathConsolidatedOperation> databaseOperations = new ArrayList<>();
     for (Map.Entry<StoragePathVersion, List<ConsolidatedOperation>> consolidatedOperation : consolidatedOperations
       .entrySet()) {
-      StoragePath storagePath = consolidatedOperation.getKey().storagePath();
+      String storagePathAsString = getStoragePathAsString(consolidatedOperation.getKey().storagePath(), false);
       String version = consolidatedOperation.getKey().version();
-      List<ConsolidatedOperation> operations = consolidatedOperation.getValue();
-      List<TransactionStoragePathConsolidatedOperation> databaseOperations = transactionLogService
-        .registerConsolidatedStoragePathOperations(transaction, getStoragePathAsString(storagePath, false), version,
-          operations);
-      databaseOperationsMap.put(consolidatedOperation.getKey(), databaseOperations);
+      for (ConsolidatedOperation operation : consolidatedOperation.getValue()) {
+        databaseOperations.add(new TransactionStoragePathConsolidatedOperation(transaction, storagePathAsString,
+          operation.previousVersionId(), version, operation.operationType()));
+      }
     }
-    return databaseOperationsMap;
+    return transactionLogService.registerConsolidatedStoragePathOperations(databaseOperations);
   }
 
   @Override
   public void commit() throws RODATransactionException {
+    List<TransactionStoragePathConsolidatedOperation> databaseOperations;
     try {
-      consolidateAndRegisterLogs();
+      databaseOperations = consolidateAndRegisterLogs();
     } catch (RequestNotValidException e) {
       throw new RODATransactionException(
         "[transactionId:" + transaction.getId() + "] Failed to consolidate transaction logs", e);
     }
-
-    List<TransactionStoragePathConsolidatedOperation> databaseOperations = transactionLogService
-      .getConsolidatedStoragePathOperations(transaction);
 
     for (TransactionStoragePathConsolidatedOperation operation : databaseOperations) {
       StoragePath storagePath;
@@ -722,7 +712,6 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
       String version = operation.getVersion();
       String previousVersion = operation.getPreviousVersion();
       try {
-        transactionLogService.updateConsolidatedStoragePathOperationState(operation.getId(), OperationState.RUNNING);
         OperationType operationType = operation.getOperationType();
         String previousVersionId = null;
         if (operationType == OperationType.DELETE) {
@@ -1072,7 +1061,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     try {
       LOGGER.debug("[transactionId:{}] Registering operation for storage path: {} with operation: {}",
         transaction.getId(), storagePathAsString, operation);
-      return transactionLogService.registerStoragePathOperation(transaction.getId(), storagePathAsString, operation,
+      return transactionLogService.newStoragePathOperation(transaction.getId(), storagePathAsString, operation,
         previousVersion, version);
     } catch (RODATransactionException e) {
       throw new IllegalArgumentException(
@@ -1081,26 +1070,28 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     }
   }
 
+  /**
+   * Saves the operation, registered by {@link #registerOperation}, with its final
+   * state.
+   */
   public void updateOperationState(TransactionalStoragePathOperationLog operationLog, OperationState state) {
-    try {
-      if (operationLog != null) {
-        transactionLogService.updateStoragePathOperationState(operationLog.getId(), state);
-      }
-    } catch (RODATransactionException e) {
-      throw new IllegalArgumentException(
-        "[transactionId:" + transaction.getId() + "] Cannot update operation state: " + operationLog.getId(), e);
+    if (operationLog != null) {
+      transactionLogService.saveStoragePathOperation(operationLog, state);
+      trackDeletedStoragePath(operationLog, state);
     }
   }
 
   public void updateOperationState(TransactionalStoragePathOperationLog operationLog, OperationState state,
     String previousVersion, String version) {
-    try {
-      if (operationLog != null) {
-        transactionLogService.updateStoragePathOperationState(operationLog.getId(), state, previousVersion, version);
-      }
-    } catch (RODATransactionException e) {
-      throw new IllegalArgumentException(
-        "[transactionId:" + transaction.getId() + "] Cannot update operation state: " + operationLog.getId(), e);
+    if (operationLog != null) {
+      transactionLogService.saveStoragePathOperation(operationLog, state, previousVersion, version);
+      trackDeletedStoragePath(operationLog, state);
+    }
+  }
+
+  private void trackDeletedStoragePath(TransactionalStoragePathOperationLog operationLog, OperationState state) {
+    if (operationLog.getOperationType() == OperationType.DELETE && state == OperationState.SUCCESS) {
+      deletedStoragePaths.add(operationLog.getStoragePath());
     }
   }
 
@@ -1123,19 +1114,11 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
         storagePathAsString);
       return stagingStorageService;
     }
-    try {
-      TransactionalStoragePathOperationLog storagePathOperation = transactionLogService
-        .getAnyDeletedStoragePathOperation(transaction.getId(), storagePathAsString);
-      if (storagePathOperation == null) {
-        LOGGER.debug("[transactionId:{}] Using main storage service for storage path: {}", transaction.getId(),
-          storagePathAsString);
-        return mainStorageService;
-      }
-      throw new NotFoundException(
-        "[transactionId:" + transaction.getId() + "] Resource was deleted in this transaction.");
-    } catch (RODATransactionException e) {
-      throw new GenericException("[transactionId:" + transaction.getId()
-        + "] Failed to get effective storage service for storage path: " + storagePath, e);
+    if (!deletedStoragePaths.contains(storagePathAsString)) {
+      LOGGER.debug("[transactionId:{}] Using main storage service for storage path: {}", transaction.getId(),
+        storagePathAsString);
+      return mainStorageService;
     }
+    throw new NotFoundException("[transactionId:" + transaction.getId() + "] Resource was deleted in this transaction.");
   }
 }

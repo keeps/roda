@@ -43,11 +43,15 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.entity.transaction.OperationState;
+import org.roda.core.entity.transaction.TransactionStoragePathConsolidatedOperation;
+import org.roda.core.entity.transaction.TransactionalStoragePathOperationLog;
 import org.roda.core.security.LdapUtilityTestHelper;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.transaction.RODATransactionException;
 import org.roda.core.transaction.RODATransactionManager;
+import org.roda.core.transaction.TransactionLogService;
 import org.roda.core.transaction.TransactionalContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +75,9 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
 
   @Autowired
   private RODATransactionManager transactionManager;
+
+  @Autowired
+  private TransactionLogService transactionLogService;
 
   @BeforeClass
   public void init() throws IOException, GenericException {
@@ -2047,5 +2054,85 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     // 1.5) cleaning the committed transaction also cleans its trash
     transactionManager.cleanCommittedTransactions(context1.transactionLog().getId());
     assertFalse(FSUtils.exists(transactionTrashPath));
+  }
+
+  @Test
+  public void testOperationsAreLoggedOnceWithTheirFinalState() throws RODAException {
+    // 1) set up a container in main storage
+    TransactionalContext context1 = transactionManager.beginTestTransaction(mainStorage);
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    context1.transactionalStorageService().createContainer(containerStoragePath);
+    transactionManager.endTransaction(context1.transactionLog().getId());
+
+    // 2) create a binary, then fail to create it again
+    TransactionalContext context2 = transactionManager.beginTestTransaction(mainStorage);
+    TransactionalStorageService storage2 = context2.transactionalStorageService();
+    final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    storage2.createBinary(binaryStoragePath, new RandomMockContentPayload(), false);
+    try {
+      storage2.createBinary(binaryStoragePath, new RandomMockContentPayload(), false);
+      Assert.fail("Creating the same binary twice should fail");
+    } catch (AlreadyExistsException e) {
+      LOGGER.info("Caught expected exception: {}", e.getMessage());
+    }
+
+    // 3) one row per operation, with its final state
+    String binaryPath = storage2.getStagingStorageService().getStoragePathAsString(binaryStoragePath, false);
+    List<OperationState> states = transactionLogService
+      .listModificationsUnderStoragePath(context2.transactionLog().getId(), binaryPath).stream()
+      .filter(log -> log.getStoragePath().equals(binaryPath)).map(TransactionalStoragePathOperationLog::getOperationState)
+      .toList();
+    assertThat(states, Matchers.containsInAnyOrder(OperationState.SUCCESS, OperationState.FAILURE));
+
+    // 4) only the successful one is committed
+    transactionManager.endTransaction(context2.transactionLog().getId());
+    assertTrue(mainStorage.exists(binaryStoragePath));
+  }
+
+  @Test
+  public void testCommitRegistersAndCompletesEveryConsolidatedOperation() throws RODAException, IOException {
+    TransactionalContext context1 = transactionManager.beginTestTransaction(mainStorage);
+    TransactionalStorageService storage1 = context1.transactionalStorageService();
+    // container, a directory, a binary in the directory and one in the container
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage1.createContainer(containerStoragePath);
+    final StoragePath directoryStoragePath = StorageTestUtils
+      .generateRandomResourceStoragePathUnder(containerStoragePath);
+    storage1.createDirectory(directoryStoragePath);
+    final StoragePath binaryInDirectory = StorageTestUtils.generateRandomResourceStoragePathUnder(directoryStoragePath);
+    final ContentPayload payload1 = new RandomMockContentPayload();
+    storage1.createBinary(binaryInDirectory, payload1, false);
+    final StoragePath binaryInContainer = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    final ContentPayload payload2 = new RandomMockContentPayload();
+    storage1.createBinary(binaryInContainer, payload2, false);
+
+    transactionManager.commitTestTransactionWithoutRemoving(context1.transactionLog().getId());
+
+    List<TransactionStoragePathConsolidatedOperation> operations = transactionLogService
+      .getSuccessfulConsolidatedStoragePathOperations(context1.transactionLog());
+    assertEquals(4, operations.size());
+    testBinaryContent(mainStorage.getBinary(binaryInDirectory), payload1);
+    testBinaryContent(mainStorage.getBinary(binaryInContainer), payload2);
+  }
+
+  @Test
+  public void testDeleteAndCreateBinaryInTheSameTransaction() throws RODAException, IOException {
+    // 1) binary in main storage
+    TransactionalContext context1 = transactionManager.beginTestTransaction(mainStorage);
+    TransactionalStorageService storage1 = context1.transactionalStorageService();
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage1.createContainer(containerStoragePath);
+    final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    storage1.createBinary(binaryStoragePath, new RandomMockContentPayload(), false);
+    transactionManager.endTransaction(context1.transactionLog().getId());
+
+    // 2) delete it and create it again in one transaction
+    TransactionalContext context2 = transactionManager.beginTestTransaction(mainStorage);
+    TransactionalStorageService storage2 = context2.transactionalStorageService();
+    storage2.deleteResource(binaryStoragePath);
+    assertFalse(storage2.exists(binaryStoragePath));
+    final ContentPayload payload = new RandomMockContentPayload();
+    storage2.createBinary(binaryStoragePath, payload, false);
+    testBinaryContent(storage2.getBinary(binaryStoragePath), payload);
   }
 }
