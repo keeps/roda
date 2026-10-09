@@ -93,24 +93,32 @@ public class TransactionalModelOperationRegistry {
   }
 
   private TransactionalModelOperationLog registerOperationForRelatedAIP(String aipID, OperationType operation) {
+    return saveOperation(newOperationForRelatedAIP(aipID, operation));
+  }
+
+  private TransactionalModelOperationLog newOperationForRelatedAIP(String aipID, OperationType operation) {
     acquireLock(AIP.class, aipID, operation);
     if (operation != OperationType.READ) {
-      return registerOperation(AIP.class, Arrays.asList(aipID), OperationType.UPDATE);
+      return newOperation(AIP.class, Arrays.asList(aipID), OperationType.UPDATE);
     } else {
-      return registerOperation(AIP.class, Arrays.asList(aipID), OperationType.READ);
+      return newOperation(AIP.class, Arrays.asList(aipID), OperationType.READ);
     }
   }
 
   public List<TransactionalModelOperationLog> registerOperationForDescriptiveMetadata(String aipID,
     String representationId, String descriptiveMetadataId, OperationType operation) {
     List<TransactionalModelOperationLog> operationLogs = new ArrayList<>();
-    operationLogs.add(registerOperationForRelatedAIP(aipID, operation));
-    if (representationId == null) {
-      operationLogs
-        .add(registerOperation(DescriptiveMetadata.class, Arrays.asList(aipID, descriptiveMetadataId), operation));
-    } else {
-      operationLogs.add(registerOperation(DescriptiveMetadata.class,
-        Arrays.asList(aipID, representationId, descriptiveMetadataId), operation));
+    try {
+      operationLogs.add(newOperationForRelatedAIP(aipID, operation));
+      if (representationId == null) {
+        operationLogs
+          .add(newOperation(DescriptiveMetadata.class, Arrays.asList(aipID, descriptiveMetadataId), operation));
+      } else {
+        operationLogs.add(newOperation(DescriptiveMetadata.class,
+          Arrays.asList(aipID, representationId, descriptiveMetadataId), operation));
+      }
+    } finally {
+      saveOperations(operationLogs);
     }
     return operationLogs;
   }
@@ -118,23 +126,31 @@ public class TransactionalModelOperationRegistry {
   public List<TransactionalModelOperationLog> registerOperationForTechnicalMetadata(String aipID,
     String representationId, List<String> fileDirectoryPath, String fileId, OperationType operation) {
     List<TransactionalModelOperationLog> operationLogs = new ArrayList<>();
-    operationLogs.add(registerOperationForRelatedAIP(aipID, operation));
-    List<String> list = new ArrayList<>();
-    list.add(aipID);
-    list.addAll(fileDirectoryPath);
-    if (representationId != null) {
-      list.add(representationId);
+    try {
+      operationLogs.add(newOperationForRelatedAIP(aipID, operation));
+      List<String> list = new ArrayList<>();
+      list.add(aipID);
+      list.addAll(fileDirectoryPath);
+      if (representationId != null) {
+        list.add(representationId);
+      }
+      list.add(fileId);
+      operationLogs.add(newOperation(TechnicalMetadata.class, list, operation));
+    } finally {
+      saveOperations(operationLogs);
     }
-    list.add(fileId);
-    operationLogs.add(registerOperation(TechnicalMetadata.class, list, operation));
     return operationLogs;
   }
 
   public List<TransactionalModelOperationLog> registerOperationForRepresentation(String aipID, String representationId,
     OperationType operation) {
     List<TransactionalModelOperationLog> operationLogs = new ArrayList<>();
-    operationLogs.add(registerOperationForRelatedAIP(aipID, operation));
-    operationLogs.add(registerOperation(Representation.class, Arrays.asList(aipID, representationId), operation));
+    try {
+      operationLogs.add(newOperationForRelatedAIP(aipID, operation));
+      operationLogs.add(newOperation(Representation.class, Arrays.asList(aipID, representationId), operation));
+    } finally {
+      saveOperations(operationLogs);
+    }
     return operationLogs;
   }
 
@@ -166,20 +182,24 @@ public class TransactionalModelOperationRegistry {
   public List<TransactionalModelOperationLog> registerOperationForFile(String aipID, String representationId,
     List<String> path, String fileID, String folderName, OperationType operation) {
     List<TransactionalModelOperationLog> operationLogs = new ArrayList<>();
-    operationLogs.add(registerOperationForRelatedAIP(aipID, operation));
-    List<String> list = new ArrayList<>();
-    list.add(aipID);
-    list.add(representationId);
-    if (path != null) {
-      list.addAll(path);
+    try {
+      operationLogs.add(newOperationForRelatedAIP(aipID, operation));
+      List<String> list = new ArrayList<>();
+      list.add(aipID);
+      list.add(representationId);
+      if (path != null) {
+        list.addAll(path);
+      }
+      if (fileID != null) {
+        list.add(fileID);
+      }
+      if (folderName != null) {
+        list.add(folderName);
+      }
+      operationLogs.add(newOperation(File.class, list, operation));
+    } finally {
+      saveOperations(operationLogs);
     }
-    if (fileID != null) {
-      list.add(fileID);
-    }
-    if (folderName != null) {
-      list.add(folderName);
-    }
-    operationLogs.add(registerOperation(File.class, list, operation));
     return operationLogs;
   }
 
@@ -211,15 +231,19 @@ public class TransactionalModelOperationRegistry {
 
     List<TransactionalModelOperationLog> operationLogs = new ArrayList<>();
 
-    if (aipID == null) {
-      operationLogs.add(registerOperation(PreservationMetadata.class, Collections.singletonList(eventID), operation));
-    } else if (representationId == null) {
-      operationLogs.add(registerOperationForRelatedAIP(aipID, operation));
-      operationLogs.add(registerOperation(PreservationMetadata.class, Arrays.asList(aipID, eventID), operation));
-    } else {
-      operationLogs.add(registerOperationForRelatedAIP(aipID, operation));
-      operationLogs
-        .add(registerOperation(PreservationMetadata.class, Arrays.asList(aipID, representationId, eventID), operation));
+    try {
+      if (aipID == null) {
+        operationLogs.add(newOperation(PreservationMetadata.class, Collections.singletonList(eventID), operation));
+      } else if (representationId == null) {
+        operationLogs.add(newOperationForRelatedAIP(aipID, operation));
+        operationLogs.add(newOperation(PreservationMetadata.class, Arrays.asList(aipID, eventID), operation));
+      } else {
+        operationLogs.add(newOperationForRelatedAIP(aipID, operation));
+        operationLogs
+          .add(newOperation(PreservationMetadata.class, Arrays.asList(aipID, representationId, eventID), operation));
+      }
+    } finally {
+      saveOperations(operationLogs);
     }
 
     return operationLogs;
@@ -321,25 +345,29 @@ public class TransactionalModelOperationRegistry {
   private List<TransactionalModelOperationLog> registerOperationForPreservationMetadata(String aipID,
     String representationId, List<String> path, String fileID, String preservationID, OperationType operation) {
     List<TransactionalModelOperationLog> operationLogs = new ArrayList<>();
-    if (aipID == null) {
-      // Lock is already acquired in the caller method
-      operationLogs.add(registerOperation(PreservationMetadata.class, Arrays.asList(preservationID), operation));
-    } else if (representationId == null) {
-      operationLogs.add(registerOperationForRelatedAIP(aipID, operation));
-      operationLogs.add(registerOperation(PreservationMetadata.class, Arrays.asList(aipID, preservationID), operation));
-    } else if (fileID == null) {
-      operationLogs.add(registerOperationForRelatedAIP(aipID, operation));
-      operationLogs.add(registerOperation(PreservationMetadata.class,
-        Arrays.asList(aipID, representationId, preservationID), operation));
-    } else {
-      operationLogs.add(registerOperationForRelatedAIP(aipID, operation));
-      List<String> list = new ArrayList<>();
-      list.add(aipID);
-      list.add(representationId);
-      list.addAll(path);
-      list.add(fileID);
-      list.add(preservationID);
-      operationLogs.add(registerOperation(PreservationMetadata.class, list, operation));
+    try {
+      if (aipID == null) {
+        // Lock is already acquired in the caller method
+        operationLogs.add(newOperation(PreservationMetadata.class, Arrays.asList(preservationID), operation));
+      } else if (representationId == null) {
+        operationLogs.add(newOperationForRelatedAIP(aipID, operation));
+        operationLogs.add(newOperation(PreservationMetadata.class, Arrays.asList(aipID, preservationID), operation));
+      } else if (fileID == null) {
+        operationLogs.add(newOperationForRelatedAIP(aipID, operation));
+        operationLogs.add(newOperation(PreservationMetadata.class,
+          Arrays.asList(aipID, representationId, preservationID), operation));
+      } else {
+        operationLogs.add(newOperationForRelatedAIP(aipID, operation));
+        List<String> list = new ArrayList<>();
+        list.add(aipID);
+        list.add(representationId);
+        list.addAll(path);
+        list.add(fileID);
+        list.add(preservationID);
+        operationLogs.add(newOperation(PreservationMetadata.class, list, operation));
+      }
+    } finally {
+      saveOperations(operationLogs);
     }
     return operationLogs;
   }
@@ -435,13 +463,18 @@ public class TransactionalModelOperationRegistry {
 
   public <T extends IsRODAObject> TransactionalModelOperationLog registerOperation(Class<T> objectClass,
     List<String> ids, OperationType operation) {
+    return saveOperation(newOperation(objectClass, ids, operation));
+  }
+
+  private <T extends IsRODAObject> TransactionalModelOperationLog newOperation(Class<T> objectClass, List<String> ids,
+    OperationType operation) {
     if (ids == null || ids.isEmpty()) {
       throw new IllegalArgumentException(
         "[transactionId:" + transaction.getId() + "] Object IDs cannot be null or a empty list");
     }
     Optional<LiteRODAObject> liteRODAObject = LiteRODAObjectFactory.get(objectClass, ids);
     if (liteRODAObject.isPresent()) {
-      return registerOperation(liteRODAObject.get().getInfo(), operation);
+      return newOperation(liteRODAObject.get().getInfo(), operation);
     } else {
       throw new IllegalArgumentException(
         "[transactionId:" + transaction.getId() + "] Cannot register operation for object: " + liteRODAObject);
@@ -449,6 +482,15 @@ public class TransactionalModelOperationRegistry {
   }
 
   public TransactionalModelOperationLog registerOperation(String liteInfo, OperationType operation) {
+    return saveOperation(newOperation(liteInfo, operation));
+  }
+
+  /**
+   * Creates an operation log without saving it, so that the operations on an
+   * object and on its AIP are saved in one database transaction. Read operations
+   * are not logged and return null.
+   */
+  private TransactionalModelOperationLog newOperation(String liteInfo, OperationType operation) {
     if (operation == OperationType.READ) {
       // TODO: add a configuration to allow logging the read operation for debugging
       // purposes
@@ -457,17 +499,30 @@ public class TransactionalModelOperationRegistry {
     try {
       LOGGER.debug("[transactionId:{}] Registering operation {} for liteInfo {}", transaction.getId(), operation,
         liteInfo);
-      return transactionLogService.registerModelOperation(transaction.getId(), liteInfo, operation);
+      return transactionLogService.newModelOperation(transaction.getId(), liteInfo, operation);
     } catch (RODATransactionException e) {
       throw new IllegalArgumentException(
         "[transactionId:" + transaction.getId() + "] Cannot register operation for liteInfo: " + liteInfo, e);
     }
   }
 
-  public void updateOperationState(List<TransactionalModelOperationLog> operationLogs, OperationState state) {
-    for (TransactionalModelOperationLog operationLog : operationLogs) {
-      updateOperationState(operationLog, state);
+  private TransactionalModelOperationLog saveOperation(TransactionalModelOperationLog operationLog) {
+    if (operationLog != null) {
+      transactionLogService.saveModelOperations(List.of(operationLog));
     }
+    return operationLog;
+  }
+
+  private void saveOperations(List<TransactionalModelOperationLog> operationLogs) {
+    List<TransactionalModelOperationLog> toSave = operationLogs.stream().filter(Objects::nonNull).toList();
+    if (!toSave.isEmpty()) {
+      transactionLogService.saveModelOperations(toSave);
+    }
+  }
+
+  public void updateOperationState(List<TransactionalModelOperationLog> operationLogs, OperationState state) {
+    transactionLogService.updateModelOperationsState(
+      operationLogs.stream().filter(Objects::nonNull).map(TransactionalModelOperationLog::getId).toList(), state);
   }
 
   public void updateOperationState(TransactionalModelOperationLog operationLog, OperationState state) {

@@ -7,6 +7,8 @@
  */
 package org.roda.core.repository.transaction;
 
+import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,6 +18,7 @@ import org.roda.core.entity.transaction.TransactionLog;
 import org.roda.core.entity.transaction.TransactionalModelOperationLog;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -40,4 +43,9 @@ public interface TransactionalModelOperationLogRepository extends JpaRepository<
   List<TransactionalModelOperationLog> findAnyByTransactionLogAndLiteObjectAndOperationType(
     @Param("transactionLog") TransactionLog transactionLog, @Param("operationState") OperationState operationState,
     @Param("liteObject") String liteObject, @Param("operationType") OperationType operationType, PageRequest of);
+
+  @Modifying
+  @Query("UPDATE TransactionalModelOperationLog o SET o.operationState = :operationState, o.updatedAt = :updatedAt WHERE o.id IN :ids")
+  int updateOperationState(@Param("ids") Collection<UUID> ids, @Param("operationState") OperationState operationState,
+    @Param("updatedAt") LocalDateTime updatedAt);
 }
