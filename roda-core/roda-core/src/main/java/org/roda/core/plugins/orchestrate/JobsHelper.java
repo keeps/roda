@@ -211,7 +211,7 @@ public final class JobsHelper {
       job.getJobStats().setSourceObjectsCount(objectsCount.intValue())
         .setSourceObjectsWaitingToBeProcessed(objectsCount.intValue());
 
-      model.createOrUpdateJob(job);
+      model.updateJobStats(job);
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       LOGGER.error("Unable to get or update Job from model", e);
     }
@@ -226,7 +226,7 @@ public final class JobsHelper {
       Job job = PluginHelper.getJob(plugin, model);
       job = setJobCounters(job, jobPluginInfo);
 
-      model.createOrUpdateJob(job);
+      model.updateJobStats(job);
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       LOGGER.error("Unable to get or update Job from model", e);
     }

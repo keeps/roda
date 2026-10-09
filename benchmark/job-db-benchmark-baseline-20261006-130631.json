@@ -1,0 +1,872 @@
+{
+  "label" : "baseline",
+  "timestamp" : "2026-10-06T13:06:31.205+01:00",
+  "git" : {
+    "branch" : "perf-optimize-jobs-reports",
+    "commit" : "d28afff7e",
+    "dirty" : true
+  },
+  "config" : {
+    "jobs" : 10,
+    "sipsPerJob" : 100,
+    "steps" : 12,
+    "threads" : 8,
+    "idChangeStep" : 3,
+    "jobUpdateEvery" : 10,
+    "detailsBytes" : 256,
+    "readsPerJob" : 50,
+    "warmupJobs" : 2,
+    "warmupSipsPerJob" : 20,
+    "seed" : 42
+  },
+  "environment" : {
+    "java" : "21",
+    "availableProcessors" : 24,
+    "connectionPoolMaxSize" : 10,
+    "pgStatStatements" : true,
+    "postgres" : {
+      "version" : "PostgreSQL 17.10 (Debian 17.10-1.pgdg13+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+      "settings" : {
+        "autovacuum" : "on",
+        "autovacuum_vacuum_scale_factor" : "0.2",
+        "checkpoint_timeout" : "300 s",
+        "fsync" : "on",
+        "max_connections" : "100",
+        "max_wal_size" : "1024 MB",
+        "shared_buffers" : "16384 8kB",
+        "synchronous_commit" : "on",
+        "wal_level" : "replica",
+        "work_mem" : "4096 kB"
+      },
+      "indexes" : [ {
+        "tablename" : "job_reports",
+        "indexname" : "idx_report_job_id",
+        "indexdef" : "CREATE INDEX idx_report_job_id ON public.job_reports USING btree (job_id)"
+      }, {
+        "tablename" : "job_reports",
+        "indexname" : "job_reports_pkey",
+        "indexdef" : "CREATE UNIQUE INDEX job_reports_pkey ON public.job_reports USING btree (id)"
+      }, {
+        "tablename" : "jobs",
+        "indexname" : "jobs_pkey",
+        "indexdef" : "CREATE UNIQUE INDEX jobs_pkey ON public.jobs USING btree (id)"
+      } ]
+    }
+  },
+  "phases" : [ {
+    "name" : "create-jobs",
+    "wallMs" : 19.199,
+    "operations" : 10,
+    "opsPerSec" : 520.86,
+    "latency" : {
+      "job.create" : {
+        "count" : 10,
+        "totalMs" : 113.07,
+        "meanMs" : 11.307,
+        "p50Ms" : 12.773,
+        "p95Ms" : 13.727,
+        "p99Ms" : 13.727,
+        "maxMs" : 13.727
+      }
+    },
+    "hibernate" : {
+      "preparedStatements" : 20,
+      "queries" : 0,
+      "entityLoads" : 0,
+      "entityInserts" : 10,
+      "entityUpdates" : 0,
+      "entityDeletes" : 0,
+      "transactions" : 10,
+      "flushes" : 10,
+      "sessions" : 10
+    },
+    "walBytes" : 50896,
+    "tables" : {
+      "jobs" : {
+        "tuplesInserted" : 10,
+        "tuplesUpdated" : 0,
+        "tuplesHotUpdated" : 0,
+        "tuplesDeleted" : 0,
+        "seqScans" : 11,
+        "seqTuplesRead" : 9,
+        "indexScans" : 0,
+        "autovacuumRuns" : 0,
+        "liveTuplesAfter" : 10,
+        "deadTuplesAfter" : 0,
+        "rowsAfter" : 10,
+        "avgRowBytesAfter" : 4599,
+        "totalBytesAfter" : 139264,
+        "heapBytesAfter" : 8192,
+        "toastBytesAfter" : 114688,
+        "indexBytesAfter" : 16384
+      },
+      "job_reports" : {
+        "tuplesInserted" : 0,
+        "tuplesUpdated" : 0,
+        "tuplesHotUpdated" : 0,
+        "tuplesDeleted" : 0,
+        "seqScans" : 1,
+        "seqTuplesRead" : 0,
+        "indexScans" : 0,
+        "autovacuumRuns" : 0,
+        "liveTuplesAfter" : 0,
+        "deadTuplesAfter" : 0,
+        "rowsAfter" : 0,
+        "avgRowBytesAfter" : 0,
+        "totalBytesAfter" : 24576,
+        "heapBytesAfter" : 0,
+        "toastBytesAfter" : 8192,
+        "indexBytesAfter" : 16384
+      }
+    },
+    "statementTotals" : {
+      "benchmarkTables" : {
+        "calls" : 20,
+        "total_exec_ms" : 2.843,
+        "rows" : 10,
+        "shared_blks_hit" : 378,
+        "shared_blks_read" : 4,
+        "shared_blks_dirtied" : 16,
+        "wal_bytes" : 50240
+      },
+      "all" : {
+        "calls" : 38,
+        "total_exec_ms" : 2.852,
+        "rows" : 10,
+        "shared_blks_hit" : 378,
+        "shared_blks_read" : 4,
+        "shared_blks_dirtied" : 16,
+        "wal_bytes" : 50240
+      }
+    },
+    "topStatements" : [ {
+      "query" : "insert into jobs (attachments_list,end_date,fields,flushed_at,instance_id,instance_name,job_stats,job_users_details,name,outcome_objects_class,parallelism,plugin,plugin_parameters,plugin_type,priority,source_objects,start_date,state,state_details,username,id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21)",
+      "calls" : 10,
+      "total_exec_ms" : 2.807,
+      "mean_exec_ms" : 0.2807,
+      "max_exec_ms" : 0.387,
+      "rows" : 10,
+      "shared_blks_hit" : 376,
+      "shared_blks_read" : 4,
+      "shared_blks_dirtied" : 16,
+      "shared_blks_written" : 15,
+      "wal_records" : 62,
+      "wal_fpi" : 0,
+      "wal_bytes" : 50240
+    }, {
+      "query" : "select j1_0.id,j1_0.attachments_list,j1_0.end_date,j1_0.fields,j1_0.flushed_at,j1_0.instance_id,j1_0.instance_name,j1_0.job_stats,j1_0.job_users_details,j1_0.name,j1_0.outcome_objects_class,j1_0.parallelism,j1_0.plugin,j1_0.plugin_parameters,j1_0.plugin_type,j1_0.priority,j1_0.source_objects,j1_0.start_date,j1_0.state,j1_0.state_details,j1_0.username from jobs j1_0 where j1_0.id=$1",
+      "calls" : 10,
+      "total_exec_ms" : 0.035,
+      "mean_exec_ms" : 0.0035,
+      "max_exec_ms" : 0.008,
+      "rows" : 0,
+      "shared_blks_hit" : 2,
+      "shared_blks_read" : 0,
+      "shared_blks_dirtied" : 0,
+      "shared_blks_written" : 0,
+      "wal_records" : 0,
+      "wal_fpi" : 0,
+      "wal_bytes" : 0
+    } ]
+  }, {
+    "name" : "ingest",
+    "wallMs" : 17276.952,
+    "operations" : 27400,
+    "opsPerSec" : 1585.93,
+    "latency" : {
+      "job.retrieve" : {
+        "count" : 1200,
+        "totalMs" : 551.663,
+        "meanMs" : 0.46,
+        "p50Ms" : 0.414,
+        "p95Ms" : 0.838,
+        "p99Ms" : 1.131,
+        "maxMs" : 2.687
+      },
+      "job.update" : {
+        "count" : 1200,
+        "totalMs" : 9283.165,
+        "meanMs" : 7.736,
+        "p50Ms" : 4.091,
+        "p95Ms" : 40.989,
+        "p99Ms" : 55.992,
+        "maxMs" : 386.489
+      },
+      "report.create" : {
+        "count" : 1000,
+        "totalMs" : 8886.986,
+        "meanMs" : 8.887,
+        "p50Ms" : 4.466,
+        "p95Ms" : 44.376,
+        "p99Ms" : 56.607,
+        "maxMs" : 386.571
+      },
+      "report.retrieve" : {
+        "count" : 12000,
+        "totalMs" : 4566.203,
+        "meanMs" : 0.381,
+        "p50Ms" : 0.335,
+        "p95Ms" : 0.677,
+        "p99Ms" : 1.011,
+        "maxMs" : 11.454
+      },
+      "report.update" : {
+        "count" : 11000,
+        "totalMs" : 96473.718,
+        "meanMs" : 8.77,
+        "p50Ms" : 4.286,
+        "p95Ms" : 44.128,
+        "p99Ms" : 55.592,
+        "maxMs" : 386.748
+      },
+      "report.update.id-change" : {
+        "count" : 1000,
+        "totalMs" : 17279.996,
+        "meanMs" : 17.28,
+        "p50Ms" : 9.029,
+        "p95Ms" : 85.578,
+        "p99Ms" : 103.244,
+        "maxMs" : 124.07
+      }
+    },
+    "hibernate" : {
+      "preparedStatements" : 59400,
+      "queries" : 14000,
+      "entityLoads" : 26400,
+      "entityInserts" : 2000,
+      "entityUpdates" : 14000,
+      "entityDeletes" : 1000,
+      "transactions" : 42400,
+      "flushes" : 15200,
+      "sessions" : 42400
+    },
+    "walBytes" : 40815936,
+    "tables" : {
+      "jobs" : {
+        "tuplesInserted" : 0,
+        "tuplesUpdated" : 1000,
+        "tuplesHotUpdated" : 994,
+        "tuplesDeleted" : 0,
+        "seqScans" : 16401,
+        "seqTuplesRead" : 164010,
+        "indexScans" : 0,
+        "autovacuumRuns" : 0,
+        "liveTuplesAfter" : 10,
+        "deadTuplesAfter" : 40,
+        "rowsAfter" : 10,
+        "avgRowBytesAfter" : 4607,
+        "totalBytesAfter" : 4005888,
+        "heapBytesAfter" : 24576,
+        "toastBytesAfter" : 3940352,
+        "indexBytesAfter" : 16384
+      },
+      "job_reports" : {
+        "tuplesInserted" : 2000,
+        "tuplesUpdated" : 13000,
+        "tuplesHotUpdated" : 10918,
+        "tuplesDeleted" : 1000,
+        "seqScans" : 108,
+        "seqTuplesRead" : 708,
+        "indexScans" : 40893,
+        "autovacuumRuns" : 0,
+        "liveTuplesAfter" : 1000,
+        "deadTuplesAfter" : 5067,
+        "rowsAfter" : 1000,
+        "avgRowBytesAfter" : 3451,
+        "totalBytesAfter" : 23789568,
+        "heapBytesAfter" : 15081472,
+        "toastBytesAfter" : 8355840,
+        "indexBytesAfter" : 327680
+      }
+    },
+    "statementTotals" : {
+      "benchmarkTables" : {
+        "calls" : 59400,
+        "total_exec_ms" : 3215.299,
+        "rows" : 57400,
+        "shared_blks_hit" : 354334,
+        "shared_blks_read" : 1,
+        "shared_blks_dirtied" : 3371,
+        "wal_bytes" : 39942641
+      },
+      "all" : {
+        "calls" : 101808,
+        "total_exec_ms" : 3299.010,
+        "rows" : 57400,
+        "shared_blks_hit" : 354334,
+        "shared_blks_read" : 1,
+        "shared_blks_dirtied" : 3371,
+        "wal_bytes" : 39942641
+      }
+    },
+    "topStatements" : [ {
+      "query" : "update job_reports set completion_percentage=$1,date_created=$2,date_updated=$3,html_plugin_details=$4,ingest_type=$5,instance_id=$6,job_id=$7,line_separator=$8,outcome_object_class=$9,outcome_object_id=$10,outcome_object_state=$11,plugin=$12,plugin_details=$13,plugin_is_mandatory=$14,plugin_name=$15,plugin_state=$16,plugin_version=$17,reports=$18,source_object_class=$19,source_object_id=$20,source_object_original_ids=$21,source_object_original_name=$22,steps_completed=$23,title=$24,total_steps=$25,transaction_id=$26 where id=$27",
+      "calls" : 13000,
+      "total_exec_ms" : 1930.687,
+      "mean_exec_ms" : 0.1485,
+      "max_exec_ms" : 19.193,
+      "rows" : 13000,
+      "shared_blks_hit" : 149889,
+      "shared_blks_read" : 1,
+      "shared_blks_dirtied" : 2829,
+      "shared_blks_written" : 2829,
+      "wal_records" : 53373,
+      "wal_fpi" : 0,
+      "wal_bytes" : 31569685
+    }, {
+      "query" : "select r1_0.id,r1_0.completion_percentage,r1_0.date_created,r1_0.date_updated,r1_0.html_plugin_details,r1_0.ingest_type,r1_0.instance_id,r1_0.job_id,r1_0.line_separator,r1_0.outcome_object_class,r1_0.outcome_object_id,r1_0.outcome_object_state,r1_0.plugin,r1_0.plugin_details,r1_0.plugin_is_mandatory,r1_0.plugin_name,r1_0.plugin_state,r1_0.plugin_version,r1_0.reports,r1_0.source_object_class,r1_0.source_object_id,r1_0.source_object_original_ids,r1_0.source_object_original_name,r1_0.steps_completed,r1_0.title,r1_0.total_steps,r1_0.transaction_id from job_reports r1_0 where r1_0.id=$1",
+      "calls" : 26000,
+      "total_exec_ms" : 788.935,
+      "mean_exec_ms" : 0.0303,
+      "max_exec_ms" : 0.283,
+      "rows" : 24000,
+      "shared_blks_hit" : 120297,
+      "shared_blks_read" : 0,
+      "shared_blks_dirtied" : 0,
+      "shared_blks_written" : 0,
+      "wal_records" : 3486,
+      "wal_fpi" : 0,
+      "wal_bytes" : 224012
+    }, {
+      "query" : "update jobs set attachments_list=$1,end_date=$2,fields=$3,flushed_at=$4,instance_id=$5,instance_name=$6,job_stats=$7,job_users_details=$8,name=$9,outcome_objects_class=$10,parallelism=$11,plugin=$12,plugin_parameters=$13,plugin_type=$14,priority=$15,source_objects=$16,start_date=$17,state=$18,state_details=$19,username=$20 where id=$21",
+      "calls" : 1000,
+      "total_exec_ms" : 146.504,
+      "mean_exec_ms" : 0.1465,
+      "max_exec_ms" : 0.260,
+      "rows" : 1000,
+      "shared_blks_hit" : 18272,
+      "shared_blks_read" : 0,
+      "shared_blks_dirtied" : 471,
+      "shared_blks_written" : 472,
+      "wal_records" : 8104,
+      "wal_fpi" : 0,
+      "wal_bytes" : 4996017
+    }, {
+      "query" : "insert into job_reports (completion_percentage,date_created,date_updated,html_plugin_details,ingest_type,instance_id,job_id,line_separator,outcome_object_class,outcome_object_id,outcome_object_state,plugin,plugin_details,plugin_is_mandatory,plugin_name,plugin_state,plugin_version,reports,source_object_class,source_object_id,source_object_original_ids,source_object_original_name,steps_completed,title,total_steps,transaction_id,id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27)",
+      "calls" : 2000,
+      "total_exec_ms" : 139.440,
+      "mean_exec_ms" : 0.0697,
+      "max_exec_ms" : 0.201,
+      "rows" : 2000,
+      "shared_blks_hit" : 10405,
+      "shared_blks_read" : 0,
+      "shared_blks_dirtied" : 71,
+      "shared_blks_written" : 72,
+      "wal_records" : 6265,
+      "wal_fpi" : 0,
+      "wal_bytes" : 3018801
+    }, {
+      "query" : "select count(*) from jobs j1_0 where j1_0.id=$1",
+      "calls" : 13000,
+      "total_exec_ms" : 126.622,
+      "mean_exec_ms" : 0.0097,
+      "max_exec_ms" : 0.055,
+      "rows" : 13000,
+      "shared_blks_hit" : 34150,
+      "shared_blks_read" : 0,
+      "shared_blks_dirtied" : 0,
+      "shared_blks_written" : 0,
+      "wal_records" : 163,
+      "wal_fpi" : 0,
+      "wal_bytes" : 12434
+    }, {
+      "query" : "select j1_0.id,j1_0.attachments_list,j1_0.end_date,j1_0.fields,j1_0.flushed_at,j1_0.instance_id,j1_0.instance_name,j1_0.job_stats,j1_0.job_users_details,j1_0.name,j1_0.outcome_objects_class,j1_0.parallelism,j1_0.plugin,j1_0.plugin_parameters,j1_0.plugin_type,j1_0.priority,j1_0.source_objects,j1_0.start_date,j1_0.state,j1_0.state_details,j1_0.username from jobs j1_0 where j1_0.id=$1",
+      "calls" : 2400,
+      "total_exec_ms" : 55.810,
+      "mean_exec_ms" : 0.0233,
+      "max_exec_ms" : 0.147,
+      "rows" : 2400,
+      "shared_blks_hit" : 14213,
+      "shared_blks_read" : 0,
+      "shared_blks_dirtied" : 0,
+      "shared_blks_written" : 0,
+      "wal_records" : 488,
+      "wal_fpi" : 0,
+      "wal_bytes" : 28906
+    }, {
+      "query" : "delete from job_reports where id=$1",
+      "calls" : 1000,
+      "total_exec_ms" : 14.240,
+      "mean_exec_ms" : 0.0142,
+      "max_exec_ms" : 0.042,
+      "rows" : 1000,
+      "shared_blks_hit" : 4112,
+      "shared_blks_read" : 0,
+      "shared_blks_dirtied" : 0,
+      "shared_blks_written" : 0,
+      "wal_records" : 1619,
+      "wal_fpi" : 0,
+      "wal_bytes" : 92786
+    }, {
+      "query" : "select count(*) from job_reports r1_0 where r1_0.id=$1",
+      "calls" : 1000,
+      "total_exec_ms" : 13.061,
+      "mean_exec_ms" : 0.0131,
+      "max_exec_ms" : 0.030,
+      "rows" : 1000,
+      "shared_blks_hit" : 2996,
+      "shared_blks_read" : 0,
+      "shared_blks_dirtied" : 0,
+      "shared_blks_written" : 0,
+      "wal_records" : 0,
+      "wal_fpi" : 0,
+      "wal_bytes" : 0
+    } ]
+  }, {
+    "name" : "read",
+    "wallMs" : 99.198,
+    "operations" : 560,
+    "opsPerSec" : 5645.28,
+    "latency" : {
+      "job.retrieve" : {
+        "count" : 50,
+        "totalMs" : 74.444,
+        "meanMs" : 1.489,
+        "p50Ms" : 0.477,
+        "p95Ms" : 1.193,
+        "p99Ms" : 26.384,
+        "maxMs" : 26.384
+      },
+      "report.list" : {
+        "count" : 10,
+        "totalMs" : 242.537,
+        "meanMs" : 24.254,
+        "p50Ms" : 23.872,
+        "p95Ms" : 34.589,
+        "p99Ms" : 34.589,
+        "maxMs" : 34.589
+      },
+      "report.retrieve" : {
+        "count" : 500,
+        "totalMs" : 325.582,
+        "meanMs" : 0.651,
+        "p50Ms" : 0.351,
+        "p95Ms" : 0.595,
+        "p99Ms" : 25.992,
+        "maxMs" : 26.321
+      }
+    },
+    "hibernate" : {
+      "preparedStatements" : 570,
+      "queries" : 20,
+      "entityLoads" : 1550,
+      "entityInserts" : 0,
+      "entityUpdates" : 0,
+      "entityDeletes" : 0,
+      "transactions" : 560,
+      "flushes" : 0,
+      "sessions" : 570
+    },
+    "walBytes" : 0,
+    "tables" : {
+      "jobs" : {
+        "tuplesInserted" : 0,
+        "tuplesUpdated" : 0,
+        "tuplesHotUpdated" : 0,
+        "tuplesDeleted" : 0,
+        "seqScans" : 61,
+        "seqTuplesRead" : 610,
+        "indexScans" : 0,
+        "autovacuumRuns" : 0,
+        "liveTuplesAfter" : 10,
+        "deadTuplesAfter" : 40,
+        "rowsAfter" : 10,
+        "avgRowBytesAfter" : 4607,
+        "totalBytesAfter" : 4005888,
+        "heapBytesAfter" : 24576,
+        "toastBytesAfter" : 3940352,
+        "indexBytesAfter" : 16384
+      },
+      "job_reports" : {
+        "tuplesInserted" : 0,
+        "tuplesUpdated" : 0,
+        "tuplesHotUpdated" : 0,
+        "tuplesDeleted" : 0,
+        "seqScans" : 1,
+        "seqTuplesRead" : 1000,
+        "indexScans" : 510,
+        "autovacuumRuns" : 0,
+        "liveTuplesAfter" : 1000,
+        "deadTuplesAfter" : 3130,
+        "rowsAfter" : 1000,
+        "avgRowBytesAfter" : 3451,
+        "totalBytesAfter" : 23789568,
+        "heapBytesAfter" : 15081472,
+        "toastBytesAfter" : 8355840,
+        "indexBytesAfter" : 327680
+      }
+    },
+    "statementTotals" : {
+      "benchmarkTables" : {
+        "calls" : 570,
+        "total_exec_ms" : 65.421,
+        "rows" : 1560,
+        "shared_blks_hit" : 10076,
+        "shared_blks_read" : 0,
+        "shared_blks_dirtied" : 0,
+        "wal_bytes" : 0
+      },
+      "all" : {
+        "calls" : 1138,
+        "total_exec_ms" : 66.671,
+        "rows" : 1560,
+        "shared_blks_hit" : 10076,
+        "shared_blks_read" : 0,
+        "shared_blks_dirtied" : 0,
+        "wal_bytes" : 0
+      }
+    },
+    "topStatements" : [ {
+      "query" : "select r1_0.id,r1_0.completion_percentage,r1_0.date_created,r1_0.date_updated,r1_0.html_plugin_details,r1_0.ingest_type,r1_0.instance_id,r1_0.job_id,r1_0.line_separator,r1_0.outcome_object_class,r1_0.outcome_object_id,r1_0.outcome_object_state,r1_0.plugin,r1_0.plugin_details,r1_0.plugin_is_mandatory,r1_0.plugin_name,r1_0.plugin_state,r1_0.plugin_version,r1_0.reports,r1_0.source_object_class,r1_0.source_object_id,r1_0.source_object_original_ids,r1_0.source_object_original_name,r1_0.steps_completed,r1_0.title,r1_0.total_steps,r1_0.transaction_id from job_reports r1_0 where r1_0.job_id=$1",
+      "calls" : 10,
+      "total_exec_ms" : 40.470,
+      "mean_exec_ms" : 4.0470,
+      "max_exec_ms" : 5.226,
+      "rows" : 1000,
+      "shared_blks_hit" : 6137,
+      "shared_blks_read" : 0,
+      "shared_blks_dirtied" : 0,
+      "shared_blks_written" : 0,
+      "wal_records" : 0,
+      "wal_fpi" : 0,
+      "wal_bytes" : 0
+    }, {
+      "query" : "select r1_0.id,r1_0.completion_percentage,r1_0.date_created,r1_0.date_updated,r1_0.html_plugin_details,r1_0.ingest_type,r1_0.instance_id,r1_0.job_id,r1_0.line_separator,r1_0.outcome_object_class,r1_0.outcome_object_id,r1_0.outcome_object_state,r1_0.plugin,r1_0.plugin_details,r1_0.plugin_is_mandatory,r1_0.plugin_name,r1_0.plugin_state,r1_0.plugin_version,r1_0.reports,r1_0.source_object_class,r1_0.source_object_id,r1_0.source_object_original_ids,r1_0.source_object_original_name,r1_0.steps_completed,r1_0.title,r1_0.total_steps,r1_0.transaction_id from job_reports r1_0 where r1_0.id=$1",
+      "calls" : 500,
+      "total_exec_ms" : 23.398,
+      "mean_exec_ms" : 0.0468,
+      "max_exec_ms" : 0.096,
+      "rows" : 500,
+      "shared_blks_hit" : 3410,
+      "shared_blks_read" : 0,
+      "shared_blks_dirtied" : 0,
+      "shared_blks_written" : 0,
+      "wal_records" : 0,
+      "wal_fpi" : 0,
+      "wal_bytes" : 0
+    }, {
+      "query" : "select j1_0.id,j1_0.attachments_list,j1_0.end_date,j1_0.fields,j1_0.flushed_at,j1_0.instance_id,j1_0.instance_name,j1_0.job_stats,j1_0.job_users_details,j1_0.name,j1_0.outcome_objects_class,j1_0.parallelism,j1_0.plugin,j1_0.plugin_parameters,j1_0.plugin_type,j1_0.priority,j1_0.source_objects,j1_0.start_date,j1_0.state,j1_0.state_details,j1_0.username from jobs j1_0 where j1_0.id=$1",
+      "calls" : 50,
+      "total_exec_ms" : 1.372,
+      "mean_exec_ms" : 0.0274,
+      "max_exec_ms" : 0.076,
+      "rows" : 50,
+      "shared_blks_hit" : 499,
+      "shared_blks_read" : 0,
+      "shared_blks_dirtied" : 0,
+      "shared_blks_written" : 0,
+      "wal_records" : 0,
+      "wal_fpi" : 0,
+      "wal_bytes" : 0
+    }, {
+      "query" : "select count(*) from jobs j1_0 where j1_0.id=$1",
+      "calls" : 10,
+      "total_exec_ms" : 0.182,
+      "mean_exec_ms" : 0.0182,
+      "max_exec_ms" : 0.032,
+      "rows" : 10,
+      "shared_blks_hit" : 30,
+      "shared_blks_read" : 0,
+      "shared_blks_dirtied" : 0,
+      "shared_blks_written" : 0,
+      "wal_records" : 0,
+      "wal_fpi" : 0,
+      "wal_bytes" : 0
+    } ]
+  }, {
+    "name" : "finish",
+    "wallMs" : 105.711,
+    "operations" : 20,
+    "opsPerSec" : 189.19,
+    "latency" : {
+      "job.finish" : {
+        "count" : 10,
+        "totalMs" : 577.569,
+        "meanMs" : 57.757,
+        "p50Ms" : 59.864,
+        "p95Ms" : 71.412,
+        "p99Ms" : 71.412,
+        "maxMs" : 71.412
+      },
+      "job.retrieve" : {
+        "count" : 10,
+        "totalMs" : 16.644,
+        "meanMs" : 1.664,
+        "p50Ms" : 1.685,
+        "p95Ms" : 2.311,
+        "p99Ms" : 2.311,
+        "maxMs" : 2.311
+      }
+    },
+    "hibernate" : {
+      "preparedStatements" : 40,
+      "queries" : 10,
+      "entityLoads" : 1020,
+      "entityInserts" : 0,
+      "entityUpdates" : 10,
+      "entityDeletes" : 0,
+      "transactions" : 20,
+      "flushes" : 10,
+      "sessions" : 30
+    },
+    "walBytes" : 52048,
+    "tables" : {
+      "jobs" : {
+        "tuplesInserted" : 0,
+        "tuplesUpdated" : 10,
+        "tuplesHotUpdated" : 7,
+        "tuplesDeleted" : 0,
+        "seqScans" : 31,
+        "seqTuplesRead" : 310,
+        "indexScans" : 0,
+        "autovacuumRuns" : 0,
+        "liveTuplesAfter" : 10,
+        "deadTuplesAfter" : 28,
+        "rowsAfter" : 10,
+        "avgRowBytesAfter" : 4633,
+        "totalBytesAfter" : 4063232,
+        "heapBytesAfter" : 32768,
+        "toastBytesAfter" : 3989504,
+        "indexBytesAfter" : 16384
+      },
+      "job_reports" : {
+        "tuplesInserted" : 0,
+        "tuplesUpdated" : 0,
+        "tuplesHotUpdated" : 0,
+        "tuplesDeleted" : 0,
+        "seqScans" : 1,
+        "seqTuplesRead" : 1000,
+        "indexScans" : 10,
+        "autovacuumRuns" : 0,
+        "liveTuplesAfter" : 1000,
+        "deadTuplesAfter" : 3130,
+        "rowsAfter" : 1000,
+        "avgRowBytesAfter" : 3451,
+        "totalBytesAfter" : 23789568,
+        "heapBytesAfter" : 15081472,
+        "toastBytesAfter" : 8355840,
+        "indexBytesAfter" : 327680
+      }
+    },
+    "statementTotals" : {
+      "benchmarkTables" : {
+        "calls" : 40,
+        "total_exec_ms" : 43.864,
+        "rows" : 1030,
+        "shared_blks_hit" : 6726,
+        "shared_blks_read" : 0,
+        "shared_blks_dirtied" : 7,
+        "wal_bytes" : 51324
+      },
+      "all" : {
+        "calls" : 68,
+        "total_exec_ms" : 43.920,
+        "rows" : 1030,
+        "shared_blks_hit" : 6726,
+        "shared_blks_read" : 0,
+        "shared_blks_dirtied" : 7,
+        "wal_bytes" : 51324
+      }
+    },
+    "topStatements" : [ {
+      "query" : "select r1_0.id,r1_0.completion_percentage,r1_0.date_created,r1_0.date_updated,r1_0.html_plugin_details,r1_0.ingest_type,r1_0.instance_id,r1_0.job_id,r1_0.line_separator,r1_0.outcome_object_class,r1_0.outcome_object_id,r1_0.outcome_object_state,r1_0.plugin,r1_0.plugin_details,r1_0.plugin_is_mandatory,r1_0.plugin_name,r1_0.plugin_state,r1_0.plugin_version,r1_0.reports,r1_0.source_object_class,r1_0.source_object_id,r1_0.source_object_original_ids,r1_0.source_object_original_name,r1_0.steps_completed,r1_0.title,r1_0.total_steps,r1_0.transaction_id from job_reports r1_0 where r1_0.job_id=$1",
+      "calls" : 10,
+      "total_exec_ms" : 40.535,
+      "mean_exec_ms" : 4.0535,
+      "max_exec_ms" : 5.182,
+      "rows" : 1000,
+      "shared_blks_hit" : 6097,
+      "shared_blks_read" : 0,
+      "shared_blks_dirtied" : 0,
+      "shared_blks_written" : 0,
+      "wal_records" : 0,
+      "wal_fpi" : 0,
+      "wal_bytes" : 0
+    }, {
+      "query" : "update jobs set attachments_list=$1,end_date=$2,fields=$3,flushed_at=$4,instance_id=$5,instance_name=$6,job_stats=$7,job_users_details=$8,name=$9,outcome_objects_class=$10,parallelism=$11,plugin=$12,plugin_parameters=$13,plugin_type=$14,priority=$15,source_objects=$16,start_date=$17,state=$18,state_details=$19,username=$20 where id=$21",
+      "calls" : 10,
+      "total_exec_ms" : 2.316,
+      "mean_exec_ms" : 0.2316,
+      "max_exec_ms" : 0.344,
+      "rows" : 10,
+      "shared_blks_hit" : 271,
+      "shared_blks_read" : 0,
+      "shared_blks_dirtied" : 7,
+      "shared_blks_written" : 7,
+      "wal_records" : 83,
+      "wal_fpi" : 0,
+      "wal_bytes" : 51080
+    }, {
+      "query" : "select j1_0.id,j1_0.attachments_list,j1_0.end_date,j1_0.fields,j1_0.flushed_at,j1_0.instance_id,j1_0.instance_name,j1_0.job_stats,j1_0.job_users_details,j1_0.name,j1_0.outcome_objects_class,j1_0.parallelism,j1_0.plugin,j1_0.plugin_parameters,j1_0.plugin_type,j1_0.priority,j1_0.source_objects,j1_0.start_date,j1_0.state,j1_0.state_details,j1_0.username from jobs j1_0 where j1_0.id=$1",
+      "calls" : 20,
+      "total_exec_ms" : 1.013,
+      "mean_exec_ms" : 0.0507,
+      "max_exec_ms" : 0.090,
+      "rows" : 20,
+      "shared_blks_hit" : 358,
+      "shared_blks_read" : 0,
+      "shared_blks_dirtied" : 0,
+      "shared_blks_written" : 0,
+      "wal_records" : 3,
+      "wal_fpi" : 0,
+      "wal_bytes" : 244
+    } ]
+  }, {
+    "name" : "cleanup",
+    "wallMs" : 504.467,
+    "operations" : 1,
+    "opsPerSec" : 1.98,
+    "latency" : {
+      "cleanup.run" : {
+        "count" : 1,
+        "totalMs" : 504.46,
+        "meanMs" : 504.46,
+        "p50Ms" : 504.46,
+        "p95Ms" : 504.46,
+        "p99Ms" : 504.46,
+        "maxMs" : 504.46
+      }
+    },
+    "hibernate" : {
+      "preparedStatements" : 2003,
+      "queries" : 2,
+      "entityLoads" : 1010,
+      "entityInserts" : 0,
+      "entityUpdates" : 1000,
+      "entityDeletes" : 1000,
+      "transactions" : 2,
+      "flushes" : 1,
+      "sessions" : 3
+    },
+    "walBytes" : 2304128,
+    "tables" : {
+      "jobs" : {
+        "tuplesInserted" : 0,
+        "tuplesUpdated" : 0,
+        "tuplesHotUpdated" : 0,
+        "tuplesDeleted" : 10,
+        "seqScans" : 3,
+        "seqTuplesRead" : 30,
+        "indexScans" : 0,
+        "autovacuumRuns" : 0,
+        "liveTuplesAfter" : 0,
+        "deadTuplesAfter" : 26,
+        "rowsAfter" : 0,
+        "avgRowBytesAfter" : 0,
+        "totalBytesAfter" : 4071424,
+        "heapBytesAfter" : 32768,
+        "toastBytesAfter" : 3997696,
+        "indexBytesAfter" : 16384
+      },
+      "job_reports" : {
+        "tuplesInserted" : 0,
+        "tuplesUpdated" : 1000,
+        "tuplesHotUpdated" : 975,
+        "tuplesDeleted" : 1000,
+        "seqScans" : 1,
+        "seqTuplesRead" : 1000,
+        "indexScans" : 2001,
+        "autovacuumRuns" : 0,
+        "liveTuplesAfter" : 0,
+        "deadTuplesAfter" : 2000,
+        "rowsAfter" : 0,
+        "avgRowBytesAfter" : 0,
+        "totalBytesAfter" : 23822336,
+        "heapBytesAfter" : 15081472,
+        "toastBytesAfter" : 8380416,
+        "indexBytesAfter" : 327680
+      }
+    },
+    "statementTotals" : {
+      "benchmarkTables" : {
+        "calls" : 2003,
+        "total_exec_ms" : 166.410,
+        "rows" : 3020,
+        "shared_blks_hit" : 28724,
+        "shared_blks_read" : 0,
+        "shared_blks_dirtied" : 2,
+        "wal_bytes" : 2285398
+      },
+      "all" : {
+        "calls" : 2006,
+        "total_exec_ms" : 166.413,
+        "rows" : 3020,
+        "shared_blks_hit" : 28724,
+        "shared_blks_read" : 0,
+        "shared_blks_dirtied" : 2,
+        "wal_bytes" : 2285398
+      }
+    },
+    "topStatements" : [ {
+      "query" : "update job_reports set completion_percentage=$1,date_created=$2,date_updated=$3,html_plugin_details=$4,ingest_type=$5,instance_id=$6,job_id=$7,line_separator=$8,outcome_object_class=$9,outcome_object_id=$10,outcome_object_state=$11,plugin=$12,plugin_details=$13,plugin_is_mandatory=$14,plugin_name=$15,plugin_state=$16,plugin_version=$17,reports=$18,source_object_class=$19,source_object_id=$20,source_object_original_ids=$21,source_object_original_name=$22,steps_completed=$23,title=$24,total_steps=$25,transaction_id=$26 where id=$27",
+      "calls" : 1000,
+      "total_exec_ms" : 143.043,
+      "mean_exec_ms" : 0.1430,
+      "max_exec_ms" : 0.312,
+      "rows" : 1000,
+      "shared_blks_hit" : 16694,
+      "shared_blks_read" : 0,
+      "shared_blks_dirtied" : 2,
+      "shared_blks_written" : 2,
+      "wal_records" : 5052,
+      "wal_fpi" : 0,
+      "wal_bytes" : 2175778
+    }, {
+      "query" : "select r1_0.id,r1_0.completion_percentage,r1_0.date_created,r1_0.date_updated,r1_0.html_plugin_details,r1_0.ingest_type,r1_0.instance_id,r1_0.job_id,r1_0.line_separator,r1_0.outcome_object_class,r1_0.outcome_object_id,r1_0.outcome_object_state,r1_0.plugin,r1_0.plugin_details,r1_0.plugin_is_mandatory,r1_0.plugin_name,r1_0.plugin_state,r1_0.plugin_version,r1_0.reports,r1_0.source_object_class,r1_0.source_object_id,r1_0.source_object_original_ids,r1_0.source_object_original_name,r1_0.steps_completed,r1_0.title,r1_0.total_steps,r1_0.transaction_id from job_reports r1_0 where r1_0.job_id in ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)",
+      "calls" : 1,
+      "total_exec_ms" : 17.935,
+      "mean_exec_ms" : 17.9354,
+      "max_exec_ms" : 17.935,
+      "rows" : 1000,
+      "shared_blks_hit" : 3886,
+      "shared_blks_read" : 0,
+      "shared_blks_dirtied" : 0,
+      "shared_blks_written" : 0,
+      "wal_records" : 0,
+      "wal_fpi" : 0,
+      "wal_bytes" : 0
+    }, {
+      "query" : "delete from job_reports where id=$1",
+      "calls" : 1000,
+      "total_exec_ms" : 5.261,
+      "mean_exec_ms" : 0.0053,
+      "max_exec_ms" : 0.031,
+      "rows" : 1000,
+      "shared_blks_hit" : 8025,
+      "shared_blks_read" : 0,
+      "shared_blks_dirtied" : 0,
+      "shared_blks_written" : 0,
+      "wal_records" : 2000,
+      "wal_fpi" : 0,
+      "wal_bytes" : 108000
+    }, {
+      "query" : "select j1_0.id,j1_0.attachments_list,j1_0.end_date,j1_0.fields,j1_0.flushed_at,j1_0.instance_id,j1_0.instance_name,j1_0.job_stats,j1_0.job_users_details,j1_0.name,j1_0.outcome_objects_class,j1_0.parallelism,j1_0.plugin,j1_0.plugin_parameters,j1_0.plugin_type,j1_0.priority,j1_0.source_objects,j1_0.start_date,j1_0.state,j1_0.state_details,j1_0.username from jobs j1_0 where j1_0.flushed_at is not null fetch first $1 rows only",
+      "calls" : 1,
+      "total_exec_ms" : 0.111,
+      "mean_exec_ms" : 0.1112,
+      "max_exec_ms" : 0.111,
+      "rows" : 10,
+      "shared_blks_hit" : 55,
+      "shared_blks_read" : 0,
+      "shared_blks_dirtied" : 0,
+      "shared_blks_written" : 0,
+      "wal_records" : 0,
+      "wal_fpi" : 0,
+      "wal_bytes" : 0
+    }, {
+      "query" : "delete from jobs j1_0 where j1_0.id in ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)",
+      "calls" : 1,
+      "total_exec_ms" : 0.060,
+      "mean_exec_ms" : 0.0603,
+      "max_exec_ms" : 0.060,
+      "rows" : 10,
+      "shared_blks_hit" : 64,
+      "shared_blks_read" : 0,
+      "shared_blks_dirtied" : 0,
+      "shared_blks_written" : 0,
+      "wal_records" : 30,
+      "wal_fpi" : 0,
+      "wal_bytes" : 1620
+    } ]
+  } ]
+}

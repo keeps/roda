@@ -22,7 +22,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         "org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientAutoConfiguration"})
 @ComponentScan(basePackages = {"org.roda.*"})
 @EnableJpaRepositories(basePackages = "org.roda.core.repository")
-@EntityScan(basePackages = {"org.roda.core.entity", "org.roda.core.data.v2.jobs"})
+@EntityScan(basePackages = {"org.roda.core.entity", "org.roda.core.data.v2.db"})
 @ServletComponentScan
 @EnableScheduling
 public class RODA {
