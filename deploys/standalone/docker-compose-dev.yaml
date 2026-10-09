@@ -20,6 +20,7 @@ services:
     environment:
       ZK_HOST: zoo:2181
       SOLR_HOST: localhost
+      SOLR_HEAP: 2g
       SOLR_OPTS: "-Dsolr.environment=dev,label=DEV+ENV"
     depends_on:
       - zoo
