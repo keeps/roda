@@ -2103,6 +2103,12 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   @Override
+  public void updateJobStats(Job job)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    mainModelService.updateJobStats(job);
+  }
+
+  @Override
   public Job retrieveJob(String jobId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     return mainModelService.retrieveJob(jobId);
@@ -2112,6 +2118,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public CloseableIterable<OptionalWithCause<Report>> listJobReports(String jobId)
     throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
     return mainModelService.listJobReports(jobId);
+  }
+
+  @Override
+  public CloseableIterable<OptionalWithCause<Report>> listJobReportsByTransaction(String jobId,
+    String transactionId)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
+    return mainModelService.listJobReportsByTransaction(jobId, transactionId);
   }
 
   @Override

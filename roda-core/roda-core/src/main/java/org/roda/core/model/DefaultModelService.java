@@ -39,6 +39,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -165,8 +166,7 @@ import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.base.ingest.PermissionUtils;
 import org.roda.core.protocols.Protocol;
-import org.roda.core.repository.job.JobRepository;
-import org.roda.core.repository.job.ReportRepository;
+import org.roda.core.repository.job.JobDatabaseService;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.storage.BinaryVersion;
@@ -215,9 +215,8 @@ public class DefaultModelService implements ModelService {
   private Object logFileLock = new Object();
   private long entryLogLineNumber = -1;
 
-  // Lazy-loaded JPA repositories for hybrid Job/Report persistence
-  private JobRepository jobRepository;
-  private ReportRepository reportRepository;
+  // Lazily-resolved database layer for running jobs and their reports
+  private JobDatabaseService jobDatabaseService;
 
   public DefaultModelService(StorageService storage, EventsManager eventsManager, NodeType nodeType,
     String instanceId) {
@@ -246,23 +245,13 @@ public class DefaultModelService implements ModelService {
   }
 
   /**
-   * Lazily retrieves the JobRepository bean from Spring context.
+   * Lazily retrieves the job database layer from the Spring context.
    */
-  private JobRepository getJobRepository() {
-    if (jobRepository == null && SpringContext.isContextInitialized()) {
-      jobRepository = SpringContext.getBean(JobRepository.class);
+  private JobDatabaseService getJobDatabase() {
+    if (jobDatabaseService == null && SpringContext.isContextInitialized()) {
+      jobDatabaseService = SpringContext.getBean(JobDatabaseService.class);
     }
-    return jobRepository;
-  }
-
-  /**
-   * Lazily retrieves the ReportRepository bean from Spring context.
-   */
-  private ReportRepository getReportRepository() {
-    if (reportRepository == null && SpringContext.isContextInitialized()) {
-      reportRepository = SpringContext.getBean(ReportRepository.class);
-    }
-    return reportRepository;
+    return jobDatabaseService;
   }
 
   /**
@@ -2980,14 +2969,15 @@ public class DefaultModelService implements ModelService {
       job.setInstanceId(RODAInstanceUtils.getLocalInstanceIdentifier());
     }
 
-    // Check if JPA is available and determine persistence strategy
-    if (isJpaAvailable() && getJobRepository() != null) {
+    // Check if JPA is available and determine persistence strategy (jobs whose id is not a UUID, e.g. legacy
+    // ones, stay in storage)
+    if (isJpaAvailable() && getJobDatabase() != null && JobDatabaseService.isStorableJobId(job.getId())) {
       if (Job.isFinalState(job.getState())) {
         // Job is in final state - flush to storage and remove from DB
         flushJobToStorage(job);
       } else {
         // Job is running - save to database only
-        getJobRepository().save(job);
+        getJobDatabase().saveJob(job);
       }
     } else {
       // Fallback to storage-only persistence
@@ -2999,11 +2989,29 @@ public class DefaultModelService implements ModelService {
     notifyJobCreatedOrUpdated(job, false).failOnError();
   }
 
+  @Override
+  public void updateJobStats(Job job)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    // a running job in the database: one UPDATE of its counters row (no read or rewrite of the rest of the job)
+    JobDatabaseService jobDatabase = isJpaAvailable() ? getJobDatabase() : null;
+    if (jobDatabase != null && !Job.isFinalState(job.getState())
+      && jobDatabase.updateJobStats(job.getId(), job.getJobStats())) {
+      // index it (the job's progress is read from the index)
+      notifyJobCreatedOrUpdated(job, false).failOnError();
+    } else {
+      createOrUpdateJob(job);
+    }
+  }
+
   // Bound on how many reports of a single job are flushed to storage
   // concurrently. Reports across different jobs are already flushed
   // concurrently by the orchestrator (one flush call per finishing job); this
   // only parallelizes the (potentially many) reports of one job.
   private static final int JOB_REPORT_FLUSH_PARALLELISM = 8;
+  // reports read from the database at a time when flushing a job to storage
+  private static final int JOB_REPORT_FLUSH_PAGE_SIZE = 500;
 
   /**
    * Flushes a job and its reports from the database to the file storage. This
@@ -3024,11 +3032,22 @@ public class DefaultModelService implements ModelService {
     StoragePath jobPath = ModelUtils.getJobStoragePath(job.getId());
     storage.updateBinaryContent(jobPath, new StringContentPayload(jobAsJson), false, true, false, null);
 
-    // Flush all reports for this job from DB to storage
-    if (getReportRepository() != null) {
-      List<Report> dbReports = getReportRepository().findByJobId(job.getId());
-      if (!dbReports.isEmpty()) {
-        flushReportsToStorage(dbReports);
+    // Flush all reports for this job from DB to storage, a page at a time (a job can have many reports)
+    JobDatabaseService jobDatabase = getJobDatabase();
+    if (jobDatabase != null) {
+      ExecutorService executor = Executors.newFixedThreadPool(JOB_REPORT_FLUSH_PARALLELISM);
+      try {
+        long afterPk = 0;
+        JobDatabaseService.ReportPage page;
+        do {
+          page = jobDatabase.findReportsPage(job.getId(), afterPk, JOB_REPORT_FLUSH_PAGE_SIZE);
+          if (!page.reports().isEmpty()) {
+            flushReportsToStorage(page.reports(), executor);
+          }
+          afterPk = page.lastPk();
+        } while (page.reports().size() == JOB_REPORT_FLUSH_PAGE_SIZE);
+      } finally {
+        executor.shutdown();
       }
     }
 
@@ -3037,23 +3056,20 @@ public class DefaultModelService implements ModelService {
     // entity is saved here (not a partial "set flushedAt" update) so that a
     // read of the DB row in the window before cleanup runs (e.g. via
     // retrieveJob/listJobReports) still reflects the job's final state.
-    JobRepository jobRepo = getJobRepository();
-    if (jobRepo != null) {
+    if (jobDatabase != null) {
       job.setFlushedAt(new Date());
-      jobRepo.save(job);
+      jobDatabase.saveJob(job);
     }
   }
 
   /**
-   * Writes each report's JSON representation to file storage, in parallel
-   * (bounded by {@link #JOB_REPORT_FLUSH_PARALLELISM}), since storage I/O
+   * Writes each report's JSON representation to file storage, in parallel on the
+   * given executor (of {@link #JOB_REPORT_FLUSH_PARALLELISM} threads), since storage I/O
    * latency -- not database access -- dominates the cost of flushing a job with
    * many reports.
    */
-  private void flushReportsToStorage(List<Report> dbReports)
+  private void flushReportsToStorage(List<Report> dbReports, ExecutorService executor)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    int parallelism = Math.min(dbReports.size(), JOB_REPORT_FLUSH_PARALLELISM);
-    ExecutorService executor = Executors.newFixedThreadPool(parallelism);
     try {
       List<Future<Void>> futures = new ArrayList<>(dbReports.size());
       for (Report report : dbReports) {
@@ -3087,8 +3103,6 @@ public class DefaultModelService implements ModelService {
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       throw new GenericException("Interrupted while flushing job reports to storage", e);
-    } finally {
-      executor.shutdown();
     }
   }
 
@@ -3097,9 +3111,9 @@ public class DefaultModelService implements ModelService {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     // Try to fetch from database first (for running jobs)
     if (isJpaAvailable()) {
-      JobRepository jobRepo = getJobRepository();
-      if (jobRepo != null) {
-        Optional<Job> dbJob = jobRepo.findById(jobId);
+      JobDatabaseService jobDatabase = getJobDatabase();
+      if (jobDatabase != null) {
+        Optional<Job> dbJob = jobDatabase.findJob(jobId);
         if (dbJob.isPresent()) {
           return dbJob.get();
         }
@@ -3124,11 +3138,10 @@ public class DefaultModelService implements ModelService {
     throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
     // Check if job exists in database (running job)
     if (isJpaAvailable()) {
-      JobRepository jobRepo = getJobRepository();
-      ReportRepository reportRepo = getReportRepository();
-      if (jobRepo != null && reportRepo != null && jobRepo.existsById(jobId)) {
+      JobDatabaseService jobDatabase = getJobDatabase();
+      if (jobDatabase != null && jobDatabase.jobExists(jobId)) {
         // Return reports from database
-        List<Report> dbReports = reportRepo.findByJobId(jobId);
+        List<Report> dbReports = jobDatabase.findReports(jobId);
         List<OptionalWithCause<Report>> wrappedReports = dbReports.stream().map(OptionalWithCause::of)
           .collect(Collectors.toList());
         return CloseableIterables.fromList(wrappedReports);
@@ -3142,6 +3155,25 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
+  public CloseableIterable<OptionalWithCause<Report>> listJobReportsByTransaction(String jobId,
+    String transactionId)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
+    // running job in the database: only the transaction's reports are read
+    if (isJpaAvailable()) {
+      JobDatabaseService jobDatabase = getJobDatabase();
+      if (jobDatabase != null && jobDatabase.jobExists(jobId)) {
+        List<OptionalWithCause<Report>> reports = jobDatabase.findReportsByTransaction(jobId, transactionId).stream()
+          .map(OptionalWithCause::of).collect(Collectors.toList());
+        return CloseableIterables.fromList(reports);
+      }
+    }
+
+    // job in storage: filter all its reports
+    return CloseableIterables.filter(listJobReports(jobId),
+      report -> report.isPresent() && Objects.equals(transactionId, report.get().getTransactionId()));
+  }
+
+  @Override
   public void deleteJob(String jobId)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
@@ -3150,15 +3182,9 @@ public class DefaultModelService implements ModelService {
 
     // Try to delete from database first (for running jobs)
     if (isJpaAvailable()) {
-      JobRepository jobRepo = getJobRepository();
-      ReportRepository reportRepo = getReportRepository();
-      if (jobRepo != null && jobRepo.existsById(jobId)) {
-        // Delete reports from DB
-        if (reportRepo != null) {
-          reportRepo.deleteByJobId(jobId);
-        }
-        // Delete job from DB
-        jobRepo.deleteById(jobId);
+      JobDatabaseService jobDatabase = getJobDatabase();
+      // Delete job and its reports from DB
+      if (jobDatabase != null && jobDatabase.deleteJobs(List.of(jobId)) > 0) {
         deletedFromDb = true;
       }
     }
@@ -3190,9 +3216,9 @@ public class DefaultModelService implements ModelService {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     // Try to fetch from database first (for running jobs)
     if (isJpaAvailable()) {
-      ReportRepository reportRepo = getReportRepository();
-      if (reportRepo != null) {
-        Optional<Report> dbReport = reportRepo.findById(jobReportId);
+      JobDatabaseService jobDatabase = getJobDatabase();
+      if (jobDatabase != null) {
+        Optional<Report> dbReport = jobDatabase.findReport(jobReportId);
         if (dbReport.isPresent()) {
           return dbReport.get();
         }
@@ -3236,25 +3262,25 @@ public class DefaultModelService implements ModelService {
       jobReport.setId(newId);
     }
 
-    // Check if job exists in database (running job) - use DB for reports
+    // Running job in the database: save the report there (the save itself checks the job); if the ID
+    // changed, the report stored under the old ID is updated in place
     if (isJpaAvailable()) {
-      JobRepository jobRepo = getJobRepository();
-      ReportRepository reportRepo = getReportRepository();
-      if (jobRepo != null && reportRepo != null && jobRepo.existsById(jobReport.getJobId())) {
+      JobDatabaseService jobDatabase = getJobDatabase();
+      if (jobDatabase != null && JobDatabaseService.isStorableJobId(jobReport.getJobId())) {
         try {
-          // Delete old report from DB if ID changed
-          if (oldId != null && reportRepo.existsById(oldId)) {
-            reportRepo.deleteById(oldId);
-            notifyJobReportDeleted(oldId);
+          JobDatabaseService.ReportSave saved = jobDatabase.saveReport(jobReport, oldId);
+          if (saved.stored()) {
+            if (saved.previousReplaced()) {
+              notifyJobReportDeleted(oldId);
+            }
+            // index it
+            notifyJobReportCreatedOrUpdated(jobReport, cachedJob).failOnError();
+            return;
           }
-          // Save to database
-          reportRepo.save(jobReport);
-          // index it
-          notifyJobReportCreatedOrUpdated(jobReport, cachedJob).failOnError();
         } catch (Exception e) {
           LOGGER.error("Error creating/updating job report in database", e);
+          return;
         }
-        return;
       }
     }
     // Fallback to storage persistence
@@ -3291,25 +3317,25 @@ public class DefaultModelService implements ModelService {
       jobReport.setId(newId);
     }
 
-    // Check if job exists in database (running job) - use DB for reports
+    // Running job in the database: save the report there (the save itself checks the job); if the ID
+    // changed, the report stored under the old ID is updated in place
     if (isJpaAvailable()) {
-      JobRepository jobRepo = getJobRepository();
-      ReportRepository reportRepo = getReportRepository();
-      if (jobRepo != null && reportRepo != null && jobRepo.existsById(jobReport.getJobId())) {
+      JobDatabaseService jobDatabase = getJobDatabase();
+      if (jobDatabase != null && JobDatabaseService.isStorableJobId(jobReport.getJobId())) {
         try {
-          // Delete old report from DB if ID changed
-          if (oldId != null && reportRepo.existsById(oldId)) {
-            reportRepo.deleteById(oldId);
-            notifyJobReportDeleted(oldId);
+          JobDatabaseService.ReportSave saved = jobDatabase.saveReport(jobReport, oldId);
+          if (saved.stored()) {
+            if (saved.previousReplaced()) {
+              notifyJobReportDeleted(oldId);
+            }
+            // index it
+            notifyJobReportCreatedOrUpdated(jobReport, indexJob).failOnError();
+            return;
           }
-          // Save to database
-          reportRepo.save(jobReport);
-          // index it
-          notifyJobReportCreatedOrUpdated(jobReport, indexJob).failOnError();
         } catch (Exception e) {
           LOGGER.error("Error creating/updating job report in database", e);
+          return;
         }
-        return;
       }
     }
     // Fallback to storage persistence
@@ -4209,12 +4235,9 @@ public class DefaultModelService implements ModelService {
       // jobs)
       CloseableIterable<OptionalWithCause<Report>> storageReports = ResourceParseUtils.convert(getStorage(),
         listReportResources(), Report.class);
-      if (isJpaAvailable() && getReportRepository() != null) {
-        List<Report> dbReports = getReportRepository().findAll();
-        List<OptionalWithCause<Report>> wrappedDbReports = dbReports.stream().map(OptionalWithCause::of)
-          .collect(Collectors.toList());
-        CloseableIterable<OptionalWithCause<Report>> dbIterable = CloseableIterables.fromList(wrappedDbReports);
-        ret = CloseableIterables.concat(dbIterable, storageReports);
+      if (isJpaAvailable() && getJobDatabase() != null) {
+        // reports of running jobs, read page by page (flushed jobs' reports are already in storage)
+        ret = CloseableIterables.concat(getJobDatabase().iterateRunningJobReports(), storageReports);
       } else {
         ret = storageReports;
       }
@@ -4224,8 +4247,8 @@ public class DefaultModelService implements ModelService {
       final CloseableIterable<Resource> resourcesIterable = storage.listResourcesUnderContainer(containerPath, false);
       CloseableIterable<OptionalWithCause<Job>> storageJobs = ResourceParseUtils.convert(getStorage(),
         resourcesIterable, Job.class);
-      if (isJpaAvailable() && getJobRepository() != null) {
-        List<Job> dbJobs = getJobRepository().findAll();
+      if (isJpaAvailable() && getJobDatabase() != null) {
+        List<Job> dbJobs = getJobDatabase().findAllJobs();
         List<OptionalWithCause<Job>> wrappedDbJobs = dbJobs.stream().map(OptionalWithCause::of)
           .collect(Collectors.toList());
         CloseableIterable<OptionalWithCause<Job>> dbIterable = CloseableIterables.fromList(wrappedDbJobs);
@@ -4271,12 +4294,13 @@ public class DefaultModelService implements ModelService {
       // jobs)
       CloseableIterable<OptionalWithCause<LiteRODAObject>> storageReports = ResourceParseUtils.convertLite(getStorage(),
         listReportResources(), objectClass);
-      if (isJpaAvailable() && getReportRepository() != null) {
-        List<Report> dbReports = getReportRepository().findAll();
-        List<OptionalWithCause<Report>> wrappedDbReports = dbReports.stream().map(OptionalWithCause::of)
-          .collect(Collectors.toList());
-        CloseableIterable<OptionalWithCause<LiteRODAObject>> dbIterable = LiteRODAObjectFactory
-          .transformIntoLite(CloseableIterables.fromList(wrappedDbReports));
+      if (isJpaAvailable() && getJobDatabase() != null) {
+        // references to running jobs' reports, built from their ids only and read page by page (flushed
+        // jobs' reports are already in storage)
+        CloseableIterable<OptionalWithCause<LiteRODAObject>> dbIterable = CloseableIterables.concat(
+          getJobDatabase().iterateRunningJobReportIds(),
+          ids -> CloseableIterables.fromList(LiteRODAObjectFactory.get(Report.class, ids, false)
+            .map(lite -> List.of(OptionalWithCause.of(lite))).orElse(List.of())));
         ret = CloseableIterables.concat(dbIterable, storageReports);
       } else {
         ret = storageReports;
@@ -4292,8 +4316,8 @@ public class DefaultModelService implements ModelService {
       final CloseableIterable<Resource> resourcesIterable = storage.listResourcesUnderContainer(containerPath, false);
       CloseableIterable<OptionalWithCause<LiteRODAObject>> storageJobs = ResourceParseUtils.convertLite(getStorage(),
         resourcesIterable, objectClass);
-      if (isJpaAvailable() && getJobRepository() != null) {
-        List<Job> dbJobs = getJobRepository().findAll();
+      if (isJpaAvailable() && getJobDatabase() != null) {
+        List<Job> dbJobs = getJobDatabase().findAllJobs();
         List<OptionalWithCause<Job>> wrappedDbJobs = dbJobs.stream().map(OptionalWithCause::of)
           .collect(Collectors.toList());
         CloseableIterable<OptionalWithCause<LiteRODAObject>> dbIterable = LiteRODAObjectFactory
