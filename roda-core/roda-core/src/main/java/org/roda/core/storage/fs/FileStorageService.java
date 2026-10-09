@@ -1022,6 +1022,10 @@ public class FileStorageService implements StorageService {
     return historyPath;
   }
 
+  public Path getTrashPath() {
+    return trashPath;
+  }
+
   public Path getHistoryDataPath() {
     return historyDataPath;
   }
