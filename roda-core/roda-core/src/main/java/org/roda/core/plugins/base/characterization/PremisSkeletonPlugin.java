@@ -122,7 +122,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
                   for (Representation representation : aip.getRepresentations()) {
                     LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
                     PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aip.getId(),
-                      representation.getId(), algorithms, cachedJob.getUsername());
+                      representation.getId(), algorithms, cachedJob.getUsername(), false);
                     // notify is not failing because it is not crucial
                     model.notifyRepresentationUpdated(representation);
                   }
@@ -138,7 +138,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
                 for (Representation representation : aip.getRepresentations()) {
                   LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
                   PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aip.getId(),
-                    representation.getId(), algorithms, cachedJob.getUsername());
+                    representation.getId(), algorithms, cachedJob.getUsername(), false);
                   // notify is not failing because it is not crucial
                   model.notifyRepresentationUpdated(representation);
                 }
@@ -165,7 +165,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
                 try {
                   LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
                   PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aip.getId(),
-                    representation.getId(), algorithms, cachedJob.getUsername());
+                    representation.getId(), algorithms, cachedJob.getUsername(), false);
                   model.notifyRepresentationUpdated(representation);
                   state = PluginState.SUCCESS;
                 } catch (RODAException | IOException e) {
@@ -236,7 +236,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
 
       try {
         PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, representation.getAipId(),
-          representation.getId(), algorithms, cachedJob.getUsername());
+          representation.getId(), algorithms, cachedJob.getUsername(), false);
         model.notifyRepresentationUpdated(representation);
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
       } catch (RODAException | IOException e) {
