@@ -30,6 +30,7 @@ import java.util.NoSuchElementException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.Matchers;
+import org.mockito.AdditionalAnswers;
 import org.mockito.Mockito;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
@@ -1144,12 +1145,12 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     TransactionalContext context3 = transactionManager.beginTestTransaction(mainStorage);
     StorageService storage3 = context3.transactionalStorageService();
     // 3.2) update binary content now with createIfNotExists=true
-    Binary updatedBinaryContent = storage3.updateBinaryContent(binaryStoragePath, payload, asReference, true, false,
-      null);
+    storage3.updateBinaryContent(binaryStoragePath, payload, asReference, true, false, null);
     // 3.3) end third transaction
     transactionManager.endTransaction(context3.transactionLog().getId());
-    // 3.4) assert that the binary content is valid
-    testBinaryContent(updatedBinaryContent, payload);
+    // 3.4) assert that the binary content is valid (the commit moved it out of
+    // staging)
+    testBinaryContent(mainStorage.getBinary(binaryStoragePath), payload);
 
     // 4.1) start fourth transaction
     TransactionalContext context4 = transactionManager.beginTestTransaction(mainStorage);
@@ -1974,7 +1975,7 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     storage1.createBinary(binaryStoragePath2, payload2, false);
 
     Mockito.doThrow(new GenericException("Mock exception for testing rollback after commit"))
-      .when(mockMainStorageService).createBinary(Mockito.eq(binaryStoragePath2), Mockito.any(), Mockito.anyBoolean());
+      .when(mockMainStorageService).move(Mockito.any(), Mockito.eq(binaryStoragePath2), Mockito.any());
 
     // 1.5) end transaction
     try {
@@ -1991,5 +1992,60 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     Assert.assertFalse(mainStorage.exists(binaryStoragePath2), "The second binary should not exist after rollback");
     Assert.assertFalse(mainStorage.exists(containerStoragePath), "The container should not exist after rollback");
 
+  }
+
+  @Test
+  public void testCommitMovesBinariesOutOfStaging() throws RODAException, IOException {
+    // 1.1) start transaction
+    TransactionalContext context1 = transactionManager.beginTestTransaction(mainStorage);
+    TransactionalStorageService storage1 = context1.transactionalStorageService();
+    StorageService staging = storage1.getStagingStorageService();
+    // 1.2) create container and a binary
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage1.createContainer(containerStoragePath);
+    final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    final ContentPayload payload = new RandomMockContentPayload();
+    storage1.createBinary(binaryStoragePath, payload, false);
+    assertTrue(staging.exists(binaryStoragePath));
+    // 1.3) commit transaction
+    transactionManager.commitTestTransactionWithoutRemoving(context1.transactionLog().getId());
+    // 1.4) binary was moved from staging to main
+    assertFalse(staging.exists(binaryStoragePath));
+    testBinaryContent(mainStorage.getBinary(binaryStoragePath), payload);
+  }
+
+  @Test
+  public void testCommitMovesBinariesToOtherStorageAndCleansTrash() throws RODAException, IOException {
+    // main storage that is not a FileStorageService, so the move is a copy and
+    // delete (as in S3)
+    StorageService otherMainStorage = Mockito.mock(StorageService.class, AdditionalAnswers.delegatesTo(mainStorage));
+    Mockito.doAnswer(invocation -> {
+      StorageService fromService = invocation.getArgument(0);
+      StoragePath fromStoragePath = invocation.getArgument(1);
+      StorageServiceUtils.moveBetweenStorageServices(fromService, fromStoragePath, otherMainStorage,
+        invocation.getArgument(2), fromService.getEntity(fromStoragePath));
+      return null;
+    }).when(otherMainStorage).move(Mockito.any(), Mockito.any(), Mockito.any());
+
+    // 1.1) start transaction
+    TransactionalContext context1 = transactionManager.beginTestTransaction(otherMainStorage);
+    TransactionalStorageService storage1 = context1.transactionalStorageService();
+    FileStorageService staging = (FileStorageService) storage1.getStagingStorageService();
+    Path transactionTrashPath = staging.getTrashPath().resolve(context1.transactionLog().getId().toString());
+    // 1.2) create container and a binary
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage1.createContainer(containerStoragePath);
+    final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    final ContentPayload payload = new RandomMockContentPayload();
+    storage1.createBinary(binaryStoragePath, payload, false);
+    // 1.3) commit transaction
+    transactionManager.commitTestTransactionWithoutRemoving(context1.transactionLog().getId());
+    // 1.4) binary was copied to main and deleted from staging, into the trash
+    assertFalse(staging.exists(binaryStoragePath));
+    testBinaryContent(mainStorage.getBinary(binaryStoragePath), payload);
+    assertTrue(FSUtils.exists(transactionTrashPath));
+    // 1.5) cleaning the committed transaction also cleans its trash
+    transactionManager.cleanCommittedTransactions(context1.transactionLog().getId());
+    assertFalse(FSUtils.exists(transactionTrashPath));
   }
 }

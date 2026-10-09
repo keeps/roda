@@ -808,8 +808,9 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
         } else if (Directory.class.isAssignableFrom(rootEntity)) {
           mainStorageService.createDirectory(storagePath);
         } else {
-          StorageServiceUtils.copyBetweenStorageServices(stagingStorageService, storagePath, mainStorageService,
-            storagePath, rootEntity);
+          // staging is discarded after commit, so a move is enough; a rename on the
+          // file system storages, copy and delete elsewhere
+          mainStorageService.move(stagingStorageService, storagePath, storagePath);
         }
       }
     } catch (GenericException | RequestNotValidException | NotFoundException | AlreadyExistsException
@@ -866,8 +867,9 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
         } else if (Directory.class.isAssignableFrom(rootEntity)) {
           mainStorageService.createDirectory(storagePath);
         } else {
-          StorageServiceUtils.copyBetweenStorageServices(stagingStorageService, storagePath, mainStorageService,
-            storagePath, rootEntity);
+          // staging is discarded after commit, so a move is enough; a rename on the
+          // file system storages, copy and delete elsewhere
+          mainStorageService.move(stagingStorageService, storagePath, storagePath);
         }
       }
     } catch (AlreadyExistsException e) {

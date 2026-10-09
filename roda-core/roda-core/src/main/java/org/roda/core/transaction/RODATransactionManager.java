@@ -233,6 +233,12 @@ public class RODATransactionManager {
       if (FSUtils.exists(historyPath)) {
         FSUtils.deletePath(historyPath);
       }
+
+      // Resources moved out of staging by a copy and delete end up in the trash
+      Path trashPath = fileStorageService.getTrashPath().resolve(transactionId.toString());
+      if (FSUtils.exists(trashPath)) {
+        FSUtils.deletePath(trashPath);
+      }
     }
 
     // Remove the transactional storage path if it exists
