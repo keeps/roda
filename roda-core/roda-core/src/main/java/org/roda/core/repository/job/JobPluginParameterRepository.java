@@ -7,15 +7,18 @@
  */
 package org.roda.core.repository.job;
 
-import org.roda.core.data.v2.db.jobs.Job;
+import java.util.List;
+
+import org.roda.core.data.v2.db.jobs.JobPluginParameter;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Running jobs ({@code jobs}). Used through {@link JobDatabaseService}.
+ * Plugin parameters of running jobs ({@code job_plugin_parameters}). Used through {@link JobDatabaseService}.
  *
  * @author RODA Development Team
  */
 @Repository
-public interface JobRepository extends JpaRepository<Job, String> {
+public interface JobPluginParameterRepository extends JpaRepository<JobPluginParameter, Long> {
+  List<JobPluginParameter> findByJobIdOrderById(String jobId);
 }

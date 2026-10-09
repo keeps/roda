@@ -96,9 +96,12 @@ public class TestContainersManager {
     solr.start();
     LOGGER.info("Solr started and registered in ZK at {}:{}", dockerHostIp, externalSolrPort);
 
-    // PostgreSQL
+    // PostgreSQL (pg_stat_statements is preloaded so that database benchmarks,
+    // e.g. JobDatabaseBenchmark, can collect per-statement statistics)
     postgres = new GenericContainer<>(DockerImageName.parse("postgres:17")).withEnv("POSTGRES_USER", "admin")
       .withEnv("POSTGRES_PASSWORD", "roda").withEnv("POSTGRES_DB", "roda_core_db").withExposedPorts(5432)
+      .withCommand("postgres", "-c", "shared_preload_libraries=pg_stat_statements", "-c",
+        "pg_stat_statements.track=all", "-c", "track_io_timing=on")
       .waitingFor(Wait.forListeningPort().withStartupTimeout(Duration.ofSeconds(60)));
     postgres.start();
     LOGGER.info("PostgreSQL started at {}:{}", postgres.getHost(), postgres.getMappedPort(5432));

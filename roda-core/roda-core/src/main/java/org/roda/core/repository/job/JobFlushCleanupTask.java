@@ -7,15 +7,9 @@
  */
 package org.roda.core.repository.job;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.roda.core.data.v2.jobs.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -31,10 +25,11 @@ import org.springframework.stereotype.Component;
  * competing with live ingest traffic for database connections and locks.
  *
  * This task instead removes flushed jobs in batches, on a fixed schedule,
- * decoupled from the ingest hot path. Because the storage flush already
- * happened before a job is marked {@code flushedAt}, a job left behind by a
- * crash before this task runs is simply picked up on the next run -- no data
- * is at risk.
+ * decoupled from the ingest hot path, each batch with one set-based DELETE
+ * per table (see {@link JobDatabaseService#deleteFlushedJobs(int)}). Because
+ * the storage flush already happened before a job is marked {@code flushedAt},
+ * a job left behind by a crash before this task runs is simply picked up on the
+ * next run -- no data is at risk.
  *
  * @author RODA Development Team
  */
@@ -42,39 +37,26 @@ import org.springframework.stereotype.Component;
 public class JobFlushCleanupTask {
   private static final Logger LOGGER = LoggerFactory.getLogger(JobFlushCleanupTask.class);
 
-  private final JobRepository jobRepository;
-  private final ReportRepository reportRepository;
+  private final JobDatabaseService jobDatabaseService;
 
   @Value("${jobs.flush-cleanup.batch-size:500}")
   private int batchSize;
 
-  public JobFlushCleanupTask(JobRepository jobRepository, ReportRepository reportRepository) {
-    this.jobRepository = jobRepository;
-    this.reportRepository = reportRepository;
+  public JobFlushCleanupTask(JobDatabaseService jobDatabaseService) {
+    this.jobDatabaseService = jobDatabaseService;
   }
 
   @Scheduled(fixedDelayString = "${jobs.flush-cleanup.interval.millis:60000}")
   public void cleanFlushedJobs() {
-    Pageable batch = PageRequest.of(0, batchSize);
     int totalCleaned = 0;
-
-    List<Job> flushedJobs = jobRepository.findByFlushedAtIsNotNull(batch);
-    while (!flushedJobs.isEmpty()) {
-      List<String> jobIds = flushedJobs.stream().map(Job::getId).collect(Collectors.toList());
-
-      try {
-        reportRepository.deleteByJobIdIn(jobIds);
-        jobRepository.deleteAllByIdInBatch(jobIds);
-        totalCleaned += jobIds.size();
-      } catch (Exception e) {
-        LOGGER.error("Error cleaning up flushed jobs from the database", e);
-        break;
-      }
-
-      if (jobIds.size() < batchSize) {
-        break;
-      }
-      flushedJobs = jobRepository.findByFlushedAtIsNotNull(batch);
+    try {
+      int cleaned;
+      do {
+        cleaned = jobDatabaseService.deleteFlushedJobs(batchSize);
+        totalCleaned += cleaned;
+      } while (cleaned == batchSize);
+    } catch (Exception e) {
+      LOGGER.error("Error cleaning up flushed jobs from the database", e);
     }
 
     if (totalCleaned > 0) {

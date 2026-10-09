@@ -573,10 +573,26 @@ public interface ModelService extends ModelObservable {
   void createOrUpdateJob(Job job)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
 
+  /**
+   * Saves only the job's counters ({@link Job#getJobStats()}), for progress
+   * updates of a running job; the rest of the job is assumed unchanged. Falls
+   * back to {@link #createOrUpdateJob(Job)} when the job is not a running job
+   * kept in the database.
+   */
+  void updateJobStats(Job job)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
+
   Job retrieveJob(String jobId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
 
   CloseableIterable<OptionalWithCause<Report>> listJobReports(String jobId)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException;
+
+  /**
+   * Lists the job's reports written in the given RODA transaction, without
+   * going through all the job's reports when the job is kept in the database.
+   */
+  CloseableIterable<OptionalWithCause<Report>> listJobReportsByTransaction(String jobId, String transactionId)
     throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException;
 
   void deleteJob(String jobId)

@@ -7,15 +7,18 @@
  */
 package org.roda.core.repository.job;
 
-import org.roda.core.data.v2.db.jobs.Job;
+import java.util.List;
+
+import org.roda.core.data.v2.db.jobs.JobAttachment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Running jobs ({@code jobs}). Used through {@link JobDatabaseService}.
+ * Attachments of running jobs ({@code job_attachments}). Used through {@link JobDatabaseService}.
  *
  * @author RODA Development Team
  */
 @Repository
-public interface JobRepository extends JpaRepository<Job, String> {
+public interface JobAttachmentRepository extends JpaRepository<JobAttachment, Long> {
+  List<JobAttachment> findByJobIdOrderById(String jobId);
 }

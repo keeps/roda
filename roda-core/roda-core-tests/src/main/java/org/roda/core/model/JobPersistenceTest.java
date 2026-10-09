@@ -29,15 +29,20 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
+import org.roda.core.data.v2.db.jobs.JobReportStep;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
+import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.repository.job.JobDatabaseService;
 import org.roda.core.repository.job.JobFlushCleanupTask;
+import org.roda.core.repository.job.JobReportRepository;
+import org.roda.core.repository.job.JobReportStepRepository;
 import org.roda.core.repository.job.JobRepository;
-import org.roda.core.repository.job.ReportRepository;
 import org.roda.core.security.LdapUtilityTestHelper;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -71,10 +76,16 @@ public class JobPersistenceTest extends AbstractTestNGSpringContextTests {
   private JobRepository jobRepository;
 
   @Autowired
-  private ReportRepository reportRepository;
+  private JobDatabaseService jobDatabaseService;
 
   @Autowired
   private JobFlushCleanupTask jobFlushCleanupTask;
+
+  @Autowired
+  private JobReportRepository jobReportRepository;
+
+  @Autowired
+  private JobReportStepRepository jobReportStepRepository;
 
   @BeforeClass
   public void init() throws IOException, GenericException {
@@ -99,8 +110,8 @@ public class JobPersistenceTest extends AbstractTestNGSpringContextTests {
   @AfterClass
   public void cleanup() throws NotFoundException, GenericException, IOException {
     // Clean up any test data
+    // reports and the other job rows go with their job (ON DELETE CASCADE)
     jobRepository.deleteAll();
-    reportRepository.deleteAll();
 
     ldapUtilityTestHelper.shutdown();
     RodaCoreFactory.shutdown();
@@ -155,7 +166,7 @@ public class JobPersistenceTest extends AbstractTestNGSpringContextTests {
     model.createOrUpdateJobReport(report, job);
 
     // Verify report is in database
-    assertTrue(reportRepository.existsById(report.getId()), "Report should exist in database");
+    assertTrue(jobDatabaseService.findReport(report.getId()).isPresent(), "Report should exist in database");
 
     // Now update job to final state
     job.setState(JOB_STATE.COMPLETED);
@@ -169,7 +180,7 @@ public class JobPersistenceTest extends AbstractTestNGSpringContextTests {
       "Job should be marked as flushed right after flush");
 
     // Report row is likewise still present right after flush
-    assertTrue(reportRepository.existsById(report.getId()), "Report row should still exist right after flush");
+    assertTrue(jobDatabaseService.findReport(report.getId()).isPresent(), "Report row should still exist right after flush");
 
     // Job can be retrieved with its up-to-date final state (not stale), whether
     // read from the still-present DB row or, after cleanup, from storage
@@ -181,7 +192,7 @@ public class JobPersistenceTest extends AbstractTestNGSpringContextTests {
     jobFlushCleanupTask.cleanFlushedJobs();
 
     assertFalse(jobRepository.existsById(jobId), "Job should be removed from database after cleanup runs");
-    assertFalse(reportRepository.existsById(report.getId()),
+    assertFalse(jobDatabaseService.findReport(report.getId()).isPresent(),
       "Report should be removed from database after cleanup runs");
 
     // Job is still retrievable, now from storage
@@ -253,14 +264,14 @@ public class JobPersistenceTest extends AbstractTestNGSpringContextTests {
 
     // Verify they exist in DB
     assertTrue(jobRepository.existsById(jobId), "Job should exist in database");
-    assertTrue(reportRepository.existsById(report.getId()), "Report should exist in database");
+    assertTrue(jobDatabaseService.findReport(report.getId()).isPresent(), "Report should exist in database");
 
     // Delete the job
     model.deleteJob(jobId);
 
     // Verify both job and reports are deleted from DB
     assertFalse(jobRepository.existsById(jobId), "Job should be deleted from database");
-    List<Report> remainingReports = reportRepository.findByJobId(jobId);
+    List<Report> remainingReports = jobDatabaseService.findReports(jobId);
     assertTrue(remainingReports.isEmpty(), "Reports should be deleted from database");
 
     // Verify job cannot be retrieved
@@ -271,6 +282,59 @@ public class JobPersistenceTest extends AbstractTestNGSpringContextTests {
       notFound = true;
     }
     assertTrue(notFound, "Job should not be found after deletion");
+  }
+
+  /**
+   * The transaction manager reads only the reports of its own transaction: from
+   * the database while the job runs, and from storage once it was flushed and
+   * cleaned up.
+   */
+  @Test
+  public void testReportsByTransaction() throws RODAException {
+    String jobId = IdUtils.createUUID();
+    Job job = createTestJob(jobId, JOB_STATE.STARTED);
+    model.createJob(job);
+
+    String transactionA = UUID.randomUUID().toString();
+    String transactionB = UUID.randomUUID().toString();
+    Report a1 = createTestReport(jobId);
+    a1.setTransactionId(transactionA);
+    Report a2 = createTestReport(jobId);
+    a2.setTransactionId(transactionA);
+    Report b1 = createTestReport(jobId);
+    b1.setTransactionId(transactionB);
+    Report noTransaction = createTestReport(jobId);
+    for (Report report : List.of(a1, a2, b1, noTransaction)) {
+      model.createOrUpdateJobReport(report, job);
+    }
+
+    // running job: from the database
+    assertEquals(reportIdsOfTransaction(jobId, transactionA), List.of(a1.getId(), a2.getId()).stream().sorted()
+      .collect(Collectors.toList()), "Only transaction A's reports should be listed");
+    assertEquals(reportIdsOfTransaction(jobId, transactionB), List.of(b1.getId()));
+    assertTrue(reportIdsOfTransaction(jobId, UUID.randomUUID().toString()).isEmpty(),
+      "An unknown transaction should have no reports");
+
+    // flushed and cleaned up: from storage
+    job.setState(JOB_STATE.COMPLETED);
+    job.setEndDate(new Date());
+    model.createOrUpdateJob(job);
+    jobFlushCleanupTask.cleanFlushedJobs();
+    assertFalse(jobRepository.existsById(jobId), "Job should no longer be in the database");
+    assertEquals(reportIdsOfTransaction(jobId, transactionA), List.of(a1.getId(), a2.getId()).stream().sorted()
+      .collect(Collectors.toList()), "Transaction A's reports should be listed from storage");
+
+    model.deleteJob(jobId);
+  }
+
+  private List<String> reportIdsOfTransaction(String jobId, String transactionId) throws RODAException {
+    try (CloseableIterable<OptionalWithCause<Report>> reports = model.listJobReportsByTransaction(jobId,
+      transactionId)) {
+      return StreamSupport.stream(reports.spliterator(), false).filter(OptionalWithCause::isPresent)
+        .map(r -> r.get().getId()).sorted().collect(Collectors.toList());
+    } catch (IOException e) {
+      throw new GenericException("Error closing iterable", e);
+    }
   }
 
   /**
@@ -290,7 +354,7 @@ public class JobPersistenceTest extends AbstractTestNGSpringContextTests {
     model.createOrUpdateJobReport(report2, job);
 
     // Verify reports are in database
-    List<Report> dbReports = reportRepository.findByJobId(jobId);
+    List<Report> dbReports = jobDatabaseService.findReports(jobId);
     assertEquals(dbReports.size(), 2, "Should have 2 reports in database");
 
     // Verify reports can be listed through model service
@@ -320,6 +384,164 @@ public class JobPersistenceTest extends AbstractTestNGSpringContextTests {
     job.setPluginParameters(new HashMap<>());
     job.setSourceObjects(new SelectedItemsNone<>());
     return job;
+  }
+
+  /**
+   * A plugin step is saved as RUNNING and then replaced with its outcome
+   * (PluginHelper.updatePartialJobReport): the stored steps follow, both when
+   * appending and when replacing the last one.
+   */
+  @Test
+  public void testStepAppendAndReplace() throws RODAException {
+    String jobId = IdUtils.createUUID();
+    Job job = createTestJob(jobId, JOB_STATE.STARTED);
+    model.createJob(job);
+    Report report = createTestReport(jobId);
+    model.createOrUpdateJobReport(report, job);
+
+    Report first = createTestStep("org.roda.Step1", PluginState.SUCCESS, "first done");
+    Report running = createTestStep("org.roda.Step2", PluginState.RUNNING, "");
+    Report done = createTestStep("org.roda.Step2", PluginState.FAILURE, "second failed");
+
+    // append, append
+    Report stored = model.retrieveJobReport(jobId, report.getId());
+    stored.addReport(first);
+    model.createOrUpdateJobReport(stored, job);
+    stored = model.retrieveJobReport(jobId, report.getId());
+    stored.addReport(running);
+    model.createOrUpdateJobReport(stored, job);
+    assertEquals(stepStates(jobId, report.getId()), List.of(PluginState.SUCCESS, PluginState.RUNNING));
+
+    // replace the last step with its outcome
+    stored = model.retrieveJobReport(jobId, report.getId());
+    stored.getReports().remove(stored.getReports().size() - 1);
+    stored.addReport(done);
+    model.createOrUpdateJobReport(stored, job);
+    Report reread = model.retrieveJobReport(jobId, report.getId());
+    assertEquals(stepStates(jobId, report.getId()), List.of(PluginState.SUCCESS, PluginState.FAILURE));
+    assertEquals(reread.getReports().get(1).getPluginDetails(), "second failed");
+    assertEquals(reread.getStepsCompleted(), Integer.valueOf(2));
+
+    // saving the same steps again leaves the stored step rows untouched
+    List<Long> seqs = stepSeqs(report.getId());
+    model.createOrUpdateJobReport(model.retrieveJobReport(jobId, report.getId()), job);
+    assertEquals(stepSeqs(report.getId()), seqs, "Unchanged steps should not be rewritten");
+    assertEquals(stepStates(jobId, report.getId()), List.of(PluginState.SUCCESS, PluginState.FAILURE));
+
+    // appending keeps the existing rows and adds one
+    stored = model.retrieveJobReport(jobId, report.getId());
+    stored.addReport(createTestStep("org.roda.Step3", PluginState.SUCCESS, "third"));
+    model.createOrUpdateJobReport(stored, job);
+    List<Long> afterAppend = stepSeqs(report.getId());
+    assertEquals(afterAppend.subList(0, 2), seqs, "Appending should keep the existing step rows");
+    assertEquals(afterAppend.size(), 3);
+
+    model.deleteJob(jobId);
+  }
+
+  /**
+   * A job with more reports than one flush page and one delete transaction:
+   * every report reaches storage, and cleanup removes everything.
+   */
+  @Test
+  public void testLargeJobFlushAndCleanup() throws RODAException {
+    int reports = 1201;
+    String jobId = IdUtils.createUUID();
+    Job job = createTestJob(jobId, JOB_STATE.STARTED);
+    model.createJob(job);
+    for (int i = 0; i < reports; i++) {
+      model.createOrUpdateJobReport(createTestReport(jobId), job);
+    }
+    assertEquals(jobDatabaseService.findReports(jobId).size(), reports);
+
+    job.setState(JOB_STATE.COMPLETED);
+    job.setEndDate(new Date());
+    model.createOrUpdateJob(job);
+    assertEquals(listReportIds(jobId).size(), reports, "Every report should have been flushed");
+
+    jobFlushCleanupTask.cleanFlushedJobs();
+    assertFalse(jobRepository.existsById(jobId), "Job should be removed from the database");
+    assertTrue(jobDatabaseService.findReports(jobId).isEmpty(), "Reports should be removed from the database");
+    assertEquals(listReportIds(jobId).size(), reports, "Reports should be listed from storage");
+
+    model.deleteJob(jobId);
+  }
+
+  /**
+   * Listings stream the running jobs' reports from the database, and list a job
+   * flushed but not yet cleaned up only once (from storage).
+   */
+  @Test
+  public void testListingsOfRunningAndFlushedJobs() throws RODAException, IOException {
+    String runningId = IdUtils.createUUID();
+    Job running = createTestJob(runningId, JOB_STATE.STARTED);
+    model.createJob(running);
+    Report runningReport = createTestReport(runningId);
+    model.createOrUpdateJobReport(runningReport, running);
+
+    String flushedId = IdUtils.createUUID();
+    Job flushed = createTestJob(flushedId, JOB_STATE.STARTED);
+    model.createJob(flushed);
+    Report flushedReport = createTestReport(flushedId);
+    model.createOrUpdateJobReport(flushedReport, flushed);
+    flushed.setState(JOB_STATE.COMPLETED);
+    flushed.setEndDate(new Date());
+    model.createOrUpdateJob(flushed);
+    assertTrue(jobRepository.existsById(flushedId), "Flushed job is not cleaned up yet");
+
+    try (CloseableIterable<OptionalWithCause<Job>> jobs = model.list(Job.class)) {
+      List<String> ids = StreamSupport.stream(jobs.spliterator(), false).filter(OptionalWithCause::isPresent)
+        .map(j -> j.get().getId()).collect(Collectors.toList());
+      assertEquals(ids.stream().filter(runningId::equals).count(), 1L);
+      assertEquals(ids.stream().filter(flushedId::equals).count(), 1L, "Flushed job should be listed once");
+    }
+    try (CloseableIterable<OptionalWithCause<Report>> reportsIterable = model.list(Report.class)) {
+      List<String> ids = StreamSupport.stream(reportsIterable.spliterator(), false)
+        .filter(OptionalWithCause::isPresent).map(r -> r.get().getId()).collect(Collectors.toList());
+      assertEquals(ids.stream().filter(runningReport.getId()::equals).count(), 1L);
+      assertEquals(ids.stream().filter(flushedReport.getId()::equals).count(), 1L,
+        "Flushed job's report should be listed once");
+    }
+    try (CloseableIterable<OptionalWithCause<LiteRODAObject>> lites = model.listLite(Report.class)) {
+      List<String> infos = StreamSupport.stream(lites.spliterator(), false).filter(OptionalWithCause::isPresent)
+        .map(l -> l.get().getInfo()).collect(Collectors.toList());
+      assertEquals(infos.stream().filter(info -> info.contains(runningReport.getId())).count(), 1L);
+      assertEquals(infos.stream().filter(info -> info.contains(flushedReport.getId())).count(), 1L);
+    }
+
+    model.deleteJob(runningId);
+    model.deleteJob(flushedId);
+  }
+
+  private List<Long> stepSeqs(String reportId) {
+    Long pk = jobReportRepository.findByReportId(reportId).orElseThrow().getPk();
+    return jobReportStepRepository.findByReportPkOrderBySeq(pk).stream().map(JobReportStep::getSeq)
+      .collect(Collectors.toList());
+  }
+
+  private List<PluginState> stepStates(String jobId, String reportId) throws RODAException {
+    return model.retrieveJobReport(jobId, reportId).getReports().stream().map(Report::getPluginState)
+      .collect(Collectors.toList());
+  }
+
+  private List<String> listReportIds(String jobId) throws RODAException {
+    try (CloseableIterable<OptionalWithCause<Report>> reportsIterable = model.listJobReports(jobId)) {
+      return StreamSupport.stream(reportsIterable.spliterator(), false).filter(OptionalWithCause::isPresent)
+        .map(r -> r.get().getId()).collect(Collectors.toList());
+    } catch (IOException e) {
+      throw new GenericException("Error closing iterable", e);
+    }
+  }
+
+  private Report createTestStep(String plugin, PluginState state, String details) {
+    Report step = new Report();
+    step.setPlugin(plugin);
+    step.setPluginName(plugin);
+    step.setPluginVersion("1.0");
+    step.setPluginState(state);
+    step.setPluginDetails(details);
+    step.setDateCreated(new Date());
+    return step;
   }
 
   private Report createTestReport(String jobId) {

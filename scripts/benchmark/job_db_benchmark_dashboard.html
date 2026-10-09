@@ -1,0 +1,861 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Job DB Benchmark</title>
+<style>
+  :root {
+    color-scheme: light;
+    --surface-0: #f4f3f0;
+    --surface-1: #fcfcfb;
+    --border: #e2e0da;
+    --grid: #ebe9e4;
+    --axis: #b9b7b0;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #7a7973;
+    --series-baseline: #2a78d6;
+    --series-candidate: #eb6834;
+    --v1: #2a78d6;
+    --v2: #eb6834;
+    --v3: #1baf7a;
+    --v4: #eda100;
+    --better: #2a78d6;
+    --worse: #e34948;
+    --neutral: #c9c7c0;
+    --warn-bg: #fff4d6;
+    --warn-text: #6b4a00;
+    --hover: rgba(0, 0, 0, 0.04);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --surface-0: #111110;
+      --surface-1: #1a1a19;
+      --border: #2e2e2b;
+      --grid: #262624;
+      --axis: #4a4a46;
+      --text-primary: #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted: #8f8e86;
+      --series-baseline: #3987e5;
+      --series-candidate: #d95926;
+      --v1: #3987e5;
+      --v2: #d95926;
+      --v3: #199e70;
+      --v4: #c98500;
+      --better: #3987e5;
+      --worse: #e66767;
+      --neutral: #4a4a46;
+      --warn-bg: #3a2e10;
+      --warn-text: #f3d48a;
+      --hover: rgba(255, 255, 255, 0.05);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-0: #111110;
+    --surface-1: #1a1a19;
+    --border: #2e2e2b;
+    --grid: #262624;
+    --axis: #4a4a46;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #8f8e86;
+    --series-baseline: #3987e5;
+    --series-candidate: #d95926;
+    --v1: #3987e5;
+    --v2: #d95926;
+    --v3: #199e70;
+    --v4: #c98500;
+    --better: #3987e5;
+    --worse: #e66767;
+    --neutral: #4a4a46;
+    --warn-bg: #3a2e10;
+    --warn-text: #f3d48a;
+    --hover: rgba(255, 255, 255, 0.05);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--surface-0);
+    color: var(--text-primary);
+    font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 1280px; margin: 0 auto; padding: 24px 16px 64px; }
+  header { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  h1 { font-size: 22px; margin: 0; letter-spacing: -0.01em; }
+  h2 { font-size: 15px; margin: 0 0 2px; }
+  .sub { color: var(--text-secondary); margin: 4px 0 0; }
+  .muted { color: var(--text-muted); }
+  button, select {
+    font: inherit; color: var(--text-primary); background: var(--surface-1);
+    border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; cursor: pointer;
+  }
+  button:hover, select:hover { border-color: var(--axis); }
+  button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--series-baseline); outline-offset: 1px; }
+
+  .runs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0 12px; }
+  .card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; min-width: 0; }
+  .side-title { display: flex; align-items: center; gap: 8px; font-weight: 600; margin-bottom: 8px; }
+  .swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; flex: none; }
+  .run-list { max-height: 180px; overflow: auto; display: flex; flex-direction: column; gap: 2px; }
+  .run-group { font-size: 12px; color: var(--text-muted); margin: 6px 0 2px; display: flex; justify-content: space-between; }
+  .run-group button { padding: 0 6px; font-size: 12px; border: none; background: none; color: var(--text-secondary); text-decoration: underline; }
+  .run-item { display: flex; gap: 8px; align-items: center; padding: 2px 4px; border-radius: 4px; cursor: pointer; font-size: 13px; }
+  .run-item:hover { background: var(--hover); }
+  .run-item .meta { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+  .filters { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin: 4px 0 16px; }
+  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 7px; overflow: hidden; background: var(--surface-1); }
+  .seg button { border: none; border-radius: 0; padding: 5px 12px; background: none; }
+  .seg button[aria-pressed="true"] { background: var(--text-primary); color: var(--surface-1); }
+  .filter-label { color: var(--text-secondary); margin-right: 6px; font-size: 13px; }
+
+  .warning { background: var(--warn-bg); color: var(--warn-text); border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; font-size: 13px; }
+  .warning:empty { display: none; }
+
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-bottom: 12px; }
+  .kpi .label { color: var(--text-secondary); font-size: 13px; }
+  .kpi .value { font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; margin: 2px 0; letter-spacing: -0.01em; }
+  .kpi .delta { font-size: 13px; font-variant-numeric: tabular-nums; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .badge { font-size: 12px; font-weight: 600; padding: 0 6px; border-radius: 4px; border: 1px solid currentColor; }
+  .badge.better { color: var(--better); }
+  .badge.worse { color: var(--worse); }
+  .badge.same { color: var(--text-muted); }
+
+  .versions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px 24px; }
+  .versions-grid h3 { font-size: 13px; font-weight: 600; margin: 0 0 4px; color: var(--text-secondary); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .chart-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+  .legend { display: flex; gap: 14px; font-size: 13px; color: var(--text-secondary); align-items: center; flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .chart { width: 100%; position: relative; }
+  .chart svg { display: block; width: 100%; overflow: visible; }
+  .chart text { fill: var(--text-secondary); font-size: 12px; font-variant-numeric: tabular-nums; }
+  .chart .value-label { fill: var(--text-primary); }
+  .chart .hit { fill: transparent; cursor: default; }
+  .chart .hit:hover, .chart .hit:focus { fill: var(--hover); outline: none; }
+
+  #tooltip {
+    position: fixed; pointer-events: none; z-index: 10; display: none;
+    background: var(--surface-1); color: var(--text-primary); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 10px; font-size: 13px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    min-width: 180px; max-width: 360px;
+  }
+  #tooltip .t-title { color: var(--text-secondary); margin-bottom: 4px; }
+  #tooltip .t-row { display: flex; align-items: center; gap: 8px; }
+  #tooltip .t-key { width: 12px; height: 2px; flex: none; }
+  #tooltip .t-val { font-weight: 600; font-variant-numeric: tabular-nums; }
+  #tooltip .t-name { color: var(--text-secondary); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 5px 8px; border-bottom: 1px solid var(--grid); white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--text-secondary); font-weight: 600; position: sticky; top: 0; background: var(--surface-1); }
+  td.better { color: var(--better); font-weight: 600; }
+  td.worse { color: var(--worse); font-weight: 600; }
+  .scroll { overflow: auto; max-height: 520px; }
+  td.query { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; white-space: normal; text-align: left; min-width: 320px; max-width: 560px; word-break: break-word; }
+  .empty { padding: 48px 16px; text-align: center; color: var(--text-secondary); }
+
+  @media (max-width: 860px) {
+    .runs, .grid2 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>Job DB benchmark</h1>
+      <p class="sub">Baseline vs. candidate for <code>jobs</code> / <code>job_reports</code>. With several runs per side, each value is the median.</p>
+    </div>
+    <div style="display:flex; gap:8px">
+      <button id="reload" type="button" title="Re-read the results directory">Reload runs</button>
+      <button id="theme" type="button">Theme</button>
+    </div>
+  </header>
+
+  <section class="runs">
+    <div class="card">
+      <div class="side-title"><span class="swatch" style="background:var(--series-baseline)"></span>Baseline</div>
+      <div class="run-list" id="runs-baseline"></div>
+    </div>
+    <div class="card">
+      <div class="side-title"><span class="swatch" style="background:var(--series-candidate)"></span>Candidate</div>
+      <div class="run-list" id="runs-candidate"></div>
+    </div>
+  </section>
+
+  <div class="filters">
+    <div><span class="filter-label">Phase</span><span class="seg" id="phase-seg"></span></div>
+    <div><span class="filter-label">Latency</span><span class="seg" id="pct-seg"></span></div>
+  </div>
+
+  <div class="warning" id="warning"></div>
+  <div id="content"></div>
+</main>
+<div id="tooltip" role="tooltip"></div>
+
+<script>
+"use strict";
+
+// ---------- metric definitions ----------
+const PHASE_METRICS = [
+  { label: "Wall time", path: ["wallMs"], unit: "ms" },
+  { label: "Throughput", path: ["opsPerSec"], unit: "ops/s", higherBetter: true },
+  { label: "Hibernate statements", path: ["hibernate", "preparedStatements"] },
+  { label: "Hibernate transactions", path: ["hibernate", "transactions"] },
+  { label: "Hibernate entity loads", path: ["hibernate", "entityLoads"] },
+  { label: "Hibernate entity updates", path: ["hibernate", "entityUpdates"] },
+  { label: "PG statements", path: ["statementTotals", "all", "calls"] },
+  { label: "PG exec time", path: ["statementTotals", "all", "total_exec_ms"], unit: "ms" },
+  { label: "PG blocks dirtied", path: ["statementTotals", "all", "shared_blks_dirtied"] },
+  { label: "WAL generated", path: ["walBytes"], unit: "bytes" },
+];
+const TABLE_METRICS = [
+  { label: "tuples inserted", key: "tuplesInserted" },
+  { label: "tuples updated", key: "tuplesUpdated" },
+  { label: "tuples HOT updated", key: "tuplesHotUpdated", neutral: true },
+  { label: "tuples deleted", key: "tuplesDeleted" },
+  { label: "seq scans", key: "seqScans" },
+  { label: "index scans", key: "indexScans", neutral: true },
+  { label: "dead tuples after", key: "deadTuplesAfter" },
+  { label: "avg row size after", key: "avgRowBytesAfter", unit: "bytes" },
+  { label: "total size after", key: "totalBytesAfter", unit: "bytes" },
+  { label: "TOAST size after", key: "toastBytesAfter", unit: "bytes" },
+];
+const VERSION_METRICS = [
+  { label: "Wall time", path: ["wallMs"], unit: "ms" },
+  { label: "PG exec time", path: ["statementTotals", "all", "total_exec_ms"], unit: "ms" },
+  { label: "Hibernate statements", path: ["hibernate", "preparedStatements"] },
+  { label: "Rows loaded (entity loads)", path: ["hibernate", "entityLoads"] },
+  { label: "WAL generated", path: ["walBytes"], unit: "bytes" },
+  { label: "job_reports size after", path: ["tables", "job_reports", "totalBytesAfter"], unit: "bytes" },
+];
+const VERSION_SLOTS = 4;
+const KPI_LABELS = ["Wall time", "PG statements", "PG exec time", "WAL generated", "job_reports: tuples updated"];
+const OVERVIEW_METRICS = ["Wall time", "PG exec time", "PG statements", "Hibernate transactions", "WAL generated"];
+
+// ---------- state ----------
+const state = { runs: [], cache: new Map(), baseline: new Set(), candidate: new Set(), phase: "ingest", pct: "p95Ms", overview: "Wall time" };
+const STORE_KEY = "jobDbBenchmark.v1";
+function loadPrefs() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch (e) { return {}; }
+}
+function savePrefs() {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify({
+      baseline: [...state.baseline], candidate: [...state.candidate], phase: state.phase, pct: state.pct, overview: state.overview,
+      theme: document.documentElement.dataset.theme || null,
+    }));
+  } catch (e) { /* storage unavailable */ }
+}
+
+// ---------- helpers ----------
+const dig = (o, path) => path.reduce((v, k) => (v && typeof v === "object" && k in v ? v[k] : undefined), o);
+function median(values) {
+  const v = values.filter(x => typeof x === "number" && isFinite(x)).sort((a, b) => a - b);
+  if (!v.length) return undefined;
+  const m = Math.floor(v.length / 2);
+  return v.length % 2 ? v[m] : (v[m - 1] + v[m]) / 2;
+}
+function fmt(value, unit) {
+  if (value === undefined || value === null) return "–";
+  if (unit === "bytes") {
+    const units = ["B", "KB", "MB", "GB"];
+    let v = value, i = 0;
+    while (Math.abs(v) >= 1024 && i < units.length - 1) { v /= 1024; i++; }
+    return (i === 0 ? v.toFixed(0) : v.toFixed(v >= 100 ? 0 : 1)) + " " + units[i];
+  }
+  const abs = Math.abs(value);
+  const digits = Number.isInteger(value) ? 0 : abs >= 100 ? 0 : abs >= 10 ? 1 : abs >= 1 ? 2 : 3;
+  const s = value.toLocaleString("en-US", { maximumFractionDigits: digits, minimumFractionDigits: digits });
+  return unit === "ms" ? s + " ms" : unit === "ops/s" ? s + " ops/s" : s;
+}
+function compare(base, cand, metric) {
+  if (base === undefined || cand === undefined) return { pct: undefined, verdict: "same" };
+  if (base === 0) return { pct: cand === 0 ? 0 : undefined, verdict: cand === 0 ? "same" : "new" };
+  const pct = (cand - base) / Math.abs(base) * 100;
+  if (Math.abs(pct) < 0.5 || metric.neutral) return { pct, verdict: "same" };
+  const better = metric.higherBetter ? pct > 0 : pct < 0;
+  return { pct, verdict: better ? "better" : "worse" };
+}
+const fmtPct = p => p === undefined ? "–" : (p > 0 ? "+" : "") + p.toFixed(1) + "%";
+function el(tag, attrs, ...children) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (k === "class") e.className = v; else if (k === "text") e.textContent = v; else e.setAttribute(k, v);
+  }
+  for (const c of children) if (c !== null && c !== undefined) e.append(c);
+  return e;
+}
+const SVG_NS = "http://www.w3.org/2000/svg";
+function svg(tag, attrs) {
+  const e = document.createElementNS(SVG_NS, tag);
+  for (const [k, v] of Object.entries(attrs || {})) e.setAttribute(k, v);
+  return e;
+}
+function niceMax(v) {
+  if (!(v > 0)) return 1;
+  const p = Math.pow(10, Math.floor(Math.log10(v)));
+  for (const m of [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) if (m * p >= v) return m * p;
+  return 10 * p;
+}
+function roundedRightRect(x, y, w, h, r) {
+  // bar anchored at x (baseline), rounded only at the data end
+  r = Math.min(r, Math.abs(w), h / 2);
+  if (w >= 0) {
+    return `M${x},${y}H${x + w - r}Q${x + w},${y} ${x + w},${y + r}V${y + h - r}Q${x + w},${y + h} ${x + w - r},${y + h}H${x}Z`;
+  }
+  return `M${x},${y}H${x + w + r}Q${x + w},${y} ${x + w},${y + r}V${y + h - r}Q${x + w},${y + h} ${x + w + r},${y + h}H${x}Z`;
+}
+function roundedTopRect(x, y, w, h, r) {
+  r = Math.min(r, w / 2, h);
+  return `M${x},${y + h}V${y + r}Q${x},${y} ${x + r},${y}H${x + w - r}Q${x + w},${y} ${x + w},${y + r}V${y + h}Z`;
+}
+
+// ---------- tooltip ----------
+const tooltip = document.getElementById("tooltip");
+function showTooltip(evt, title, rows) {
+  tooltip.replaceChildren(el("div", { class: "t-title", text: title }));
+  for (const r of rows) {
+    const key = el("span", { class: "t-key" });
+    key.style.background = r.color || "transparent";
+    tooltip.append(el("div", { class: "t-row" }, key, el("span", { class: "t-val", text: r.value }), el("span", { class: "t-name", text: r.name })));
+  }
+  tooltip.style.display = "block";
+  moveTooltip(evt);
+}
+function moveTooltip(evt) {
+  let x, y;
+  if (evt.clientX !== undefined && evt.type !== "focus") { x = evt.clientX; y = evt.clientY; }
+  else { const b = evt.target.getBoundingClientRect(); x = b.right; y = b.top; }
+  const w = tooltip.offsetWidth, h = tooltip.offsetHeight;
+  tooltip.style.left = Math.min(x + 14, window.innerWidth - w - 8) + "px";
+  tooltip.style.top = Math.max(8, Math.min(y + 14, window.innerHeight - h - 8)) + "px";
+}
+function hideTooltip() { tooltip.style.display = "none"; }
+function attachTooltip(node, title, rows) {
+  node.setAttribute("tabindex", "0");
+  node.setAttribute("aria-label", title + ": " + rows.map(r => r.name + " " + r.value).join(", "));
+  node.addEventListener("pointermove", e => showTooltip(e, title, rows));
+  node.addEventListener("focus", e => showTooltip(e, title, rows));
+  node.addEventListener("pointerleave", hideTooltip);
+  node.addEventListener("blur", hideTooltip);
+}
+
+// ---------- data ----------
+async function fetchRuns() {
+  const res = await fetch("/api/runs", { cache: "no-store" });
+  state.runs = await res.json();
+  state.runs.sort((a, b) => runTime(a) - runTime(b));
+}
+async function fetchRun(file) {
+  if (!state.cache.has(file)) {
+    const res = await fetch("/api/runs/" + encodeURIComponent(file), { cache: "no-store" });
+    state.cache.set(file, await res.json());
+  }
+  return state.cache.get(file);
+}
+// timestamps are ISO strings (or epoch millis in older results)
+function runTime(r) {
+  const t = typeof r.timestamp === "number" ? r.timestamp : Date.parse(r.timestamp);
+  return isNaN(t) ? 0 : t;
+}
+function formatTime(r) {
+  const t = runTime(r);
+  if (!t) return "?";
+  const d = new Date(t), pad = v => String(v).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+function labelGroups() {
+  const groups = new Map();
+  for (const r of state.runs) {
+    const key = r.label || "(no label)";
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(r);
+  }
+  return groups;
+}
+function defaultSelection() {
+  const groups = [...labelGroups().values()];
+  if (groups.length >= 2) {
+    state.baseline = new Set(groups[0].map(r => r.file));
+    state.candidate = new Set(groups[groups.length - 1].map(r => r.file));
+  } else if (state.runs.length >= 2) {
+    state.baseline = new Set(state.runs.slice(0, -1).map(r => r.file));
+    state.candidate = new Set([state.runs[state.runs.length - 1].file]);
+  } else {
+    state.baseline = new Set(state.runs.map(r => r.file));
+    state.candidate = new Set();
+  }
+}
+
+// ---------- run pickers ----------
+// short description of a run's workload, e.g. "10×100×12" (synthetic) or "ingest 50 SIPs/2 jobs"
+function workloadOf(config) {
+  if (config.workload === "real-ingest") {
+    return "ingest " + config.sips + " SIPs/" + config.jobs + " jobs" + (config.ingestPlugin === "minimal" ? " (minimal)" : "");
+  }
+  return (config.jobs ?? "?") + "×" + (config.sipsPerJob ?? "?") + "×" + (config.steps ?? "?");
+}
+
+function renderRunPickers() {
+  for (const side of ["baseline", "candidate"]) {
+    const list = document.getElementById("runs-" + side);
+    list.replaceChildren();
+    if (!state.runs.length) {
+      list.append(el("div", { class: "muted", text: "No runs found in the results directory." }));
+      continue;
+    }
+    for (const [label, runs] of labelGroups()) {
+      const only = el("button", { type: "button", text: "only these" });
+      only.addEventListener("click", () => { state[side] = new Set(runs.map(r => r.file)); savePrefs(); renderRunPickers(); update(); });
+      list.append(el("div", { class: "run-group" }, el("span", { text: label }), only));
+      for (const r of runs) {
+        const cb = el("input", { type: "checkbox" });
+        cb.checked = state[side].has(r.file);
+        cb.addEventListener("change", () => {
+          if (cb.checked) state[side].add(r.file); else state[side].delete(r.file);
+          savePrefs(); update();
+        });
+        const when = formatTime(r);
+        const git = (r.git && r.git.commit ? r.git.commit + (r.git.dirty ? "*" : "") : "");
+        list.append(el("label", { class: "run-item", title: r.file }, cb,
+          el("span", { text: when }), el("span", { class: "meta", text: git + " · " + workloadOf(r.config) })));
+      }
+    }
+  }
+}
+
+function renderSeg(containerId, options, current, onPick) {
+  const seg = document.getElementById(containerId);
+  seg.replaceChildren();
+  for (const [value, label] of options) {
+    const b = el("button", { type: "button", "aria-pressed": String(value === current), text: label });
+    b.addEventListener("click", () => onPick(value));
+    seg.append(b);
+  }
+}
+
+// ---------- aggregation ----------
+function sideValues(runs, phaseName) {
+  const phases = runs.map(r => (r.phases || []).find(p => p.name === phaseName)).filter(Boolean);
+  const get = path => median(phases.map(p => dig(p, path)));
+  return { phases, get };
+}
+function allMetrics(phasesB, phasesC) {
+  const tables = [...new Set([...phasesB, ...phasesC].flatMap(p => Object.keys(p.tables || {})))].sort();
+  const metrics = PHASE_METRICS.map(m => ({ ...m }));
+  for (const t of tables) for (const m of TABLE_METRICS) metrics.push({ ...m, label: t + ": " + m.label, path: ["tables", t, m.key] });
+  return metrics;
+}
+
+// ---------- charts ----------
+function divergingChart(container, rows) {
+  // rows: {label, pct, verdict, base, cand, unit}
+  const width = container.clientWidth || 600;
+  const rowH = 22, top = 24, labelW = Math.min(250, width * 0.42), right = 64;
+  const plotW = Math.max(120, width - labelW - right);
+  const maxAbs = Math.min(100, niceMax(Math.max(5, ...rows.map(r => Math.abs(r.pct ?? 0)))));
+  const height = top + rows.length * rowH + 8;
+  const x = v => labelW + plotW / 2 + (Math.max(-maxAbs, Math.min(maxAbs, v)) / maxAbs) * (plotW / 2);
+  const s = svg("svg", { viewBox: `0 0 ${width} ${height}`, height, role: "img", "aria-label": "Percent change vs baseline per metric" });
+
+  for (const t of [-maxAbs, -maxAbs / 2, 0, maxAbs / 2, maxAbs]) {
+    s.append(svg("line", { x1: x(t), x2: x(t), y1: top - 4, y2: height - 8, stroke: t === 0 ? "var(--axis)" : "var(--grid)", "stroke-width": 1 }));
+    const tx = svg("text", { x: x(t), y: 12, "text-anchor": "middle" });
+    tx.textContent = (t > 0 ? "+" : "") + t + "%";
+    s.append(tx);
+  }
+  rows.forEach((r, i) => {
+    const y = top + i * rowH;
+    const hit = svg("rect", { class: "hit", x: 0, y, width, height: rowH });
+    const lbl = svg("text", { x: labelW - 10, y: y + rowH / 2 + 4, "text-anchor": "end" });
+    lbl.textContent = r.label;
+    s.append(lbl);
+    if (r.pct !== undefined && r.pct !== 0) {
+      const w = x(r.pct) - x(0);
+      const color = r.verdict === "better" ? "var(--better)" : r.verdict === "worse" ? "var(--worse)" : "var(--neutral)";
+      s.append(svg("path", { d: roundedRightRect(x(0), y + 5, w, rowH - 10, 4), fill: color }));
+    }
+    const v = svg("text", { class: "value-label", x: r.pct !== undefined && r.pct < 0 ? x(0) + 6 : x(0) - 6, y: y + rowH / 2 + 4,
+      "text-anchor": r.pct !== undefined && r.pct < 0 ? "start" : "end" });
+    v.textContent = r.verdict === "new" ? "new" : fmtPct(r.pct) + (Math.abs(r.pct ?? 0) > maxAbs ? " ›" : "");
+    s.append(v);
+    attachTooltip(hit, r.label, [
+      { name: "baseline", value: fmt(r.base, r.unit), color: "var(--series-baseline)" },
+      { name: "candidate", value: fmt(r.cand, r.unit), color: "var(--series-candidate)" },
+      { name: r.verdict === "same" ? "" : r.verdict, value: fmtPct(r.pct) },
+    ]);
+    s.append(hit);
+  });
+  container.replaceChildren(s);
+}
+
+function pairedBarsHorizontal(container, rows, unit) {
+  // rows: {label, base, cand}
+  const width = container.clientWidth || 600;
+  const barH = 9, gap = 2, groupGap = 12, top = 22, labelW = Math.min(190, width * 0.34), right = 80;
+  const plotW = Math.max(100, width - labelW - right);
+  const max = niceMax(Math.max(...rows.flatMap(r => [r.base ?? 0, r.cand ?? 0])));
+  const groupH = barH * 2 + gap + groupGap;
+  const height = top + rows.length * groupH;
+  const x = v => labelW + (v / max) * plotW;
+  const s = svg("svg", { viewBox: `0 0 ${width} ${height}`, height, role: "img", "aria-label": "Latency per operation, baseline vs candidate" });
+  for (let i = 0; i <= 4; i++) {
+    const t = max * i / 4;
+    s.append(svg("line", { x1: x(t), x2: x(t), y1: top - 4, y2: height - groupGap + 4, stroke: i === 0 ? "var(--axis)" : "var(--grid)" }));
+    const tx = svg("text", { x: x(t), y: 12, "text-anchor": "middle" });
+    tx.textContent = fmt(t, unit === "ms" ? undefined : unit);
+    s.append(tx);
+  }
+  rows.forEach((r, i) => {
+    const y = top + i * groupH;
+    const lbl = svg("text", { x: labelW - 10, y: y + barH + 4, "text-anchor": "end" });
+    lbl.textContent = r.label;
+    s.append(lbl);
+    [["base", "var(--series-baseline)", 0], ["cand", "var(--series-candidate)", barH + gap]].forEach(([k, color, dy]) => {
+      if (r[k] === undefined) return;
+      s.append(svg("path", { d: roundedRightRect(x(0), y + dy, Math.max(1, x(r[k]) - x(0)), barH, 3), fill: color }));
+      const v = svg("text", { class: "value-label", x: x(r[k]) + 6, y: y + dy + barH - 1 });
+      v.textContent = fmt(r[k], unit);
+      s.append(v);
+    });
+    const { pct, verdict } = compare(r.base, r.cand, {});
+    const hit = svg("rect", { class: "hit", x: 0, y: y - groupGap / 2, width, height: groupH });
+    attachTooltip(hit, r.label, [
+      { name: "baseline", value: fmt(r.base, unit), color: "var(--series-baseline)" },
+      { name: "candidate", value: fmt(r.cand, unit), color: "var(--series-candidate)" },
+      { name: verdict === "same" ? "" : verdict, value: fmtPct(pct) },
+    ]);
+    s.append(hit);
+  });
+  container.replaceChildren(s);
+}
+
+function pairedColumns(container, groups, unit) {
+  // groups: {label, base, cand}
+  const width = container.clientWidth || 600;
+  const height = 240, top = 18, bottom = 28, left = 64, right = 8;
+  const plotH = height - top - bottom, plotW = width - left - right;
+  const max = niceMax(Math.max(...groups.flatMap(g => [g.base ?? 0, g.cand ?? 0])));
+  const y = v => top + plotH - (v / max) * plotH;
+  const groupW = plotW / groups.length;
+  const barW = Math.max(6, Math.min(36, groupW * 0.3));
+  const s = svg("svg", { viewBox: `0 0 ${width} ${height}`, height, role: "img", "aria-label": "Per-phase comparison" });
+  for (let i = 0; i <= 4; i++) {
+    const t = max * i / 4;
+    s.append(svg("line", { x1: left, x2: width - right, y1: y(t), y2: y(t), stroke: i === 0 ? "var(--axis)" : "var(--grid)" }));
+    const tx = svg("text", { x: left - 8, y: y(t) + 4, "text-anchor": "end" });
+    tx.textContent = fmt(t, unit === "bytes" ? "bytes" : undefined);
+    s.append(tx);
+  }
+  groups.forEach((g, i) => {
+    const cx = left + groupW * i + groupW / 2;
+    [["base", "var(--series-baseline)", -barW - 1], ["cand", "var(--series-candidate)", 1]].forEach(([k, color, dx]) => {
+      if (g[k] === undefined) return;
+      const h = Math.max(1, y(0) - y(g[k]));
+      s.append(svg("path", { d: roundedTopRect(cx + dx, y(0) - h, barW, h, 4), fill: color }));
+      if (groupW >= 90) {
+        const v = svg("text", { class: "value-label", x: cx + dx + barW / 2, y: y(0) - h - 5, "text-anchor": "middle" });
+        v.textContent = fmt(g[k], unit === "bytes" ? "bytes" : undefined);
+        s.append(v);
+      }
+    });
+    const lbl = svg("text", { x: cx, y: height - 8, "text-anchor": "middle" });
+    lbl.textContent = g.label;
+    s.append(lbl);
+    const { pct, verdict } = compare(g.base, g.cand, g.metric || {});
+    const hit = svg("rect", { class: "hit", x: cx - groupW / 2, y: top, width: groupW, height: plotH });
+    attachTooltip(hit, g.label, [
+      { name: "baseline", value: fmt(g.base, unit), color: "var(--series-baseline)" },
+      { name: "candidate", value: fmt(g.cand, unit), color: "var(--series-candidate)" },
+      { name: verdict === "same" ? "" : verdict, value: fmtPct(pct) },
+    ]);
+    s.append(hit);
+  });
+  container.replaceChildren(s);
+}
+
+// ---------- all versions ----------
+function versionGroups(baseRuns) {
+  if (!baseRuns.length) return [];
+  const workload = JSON.stringify(baseRuns[0].config);
+  // the baseline's version first (the reference for the changes), then the others in the order they were run
+  const baseLabel = baseRuns[0].label;
+  const groups = [...labelGroups().entries()]
+    .map(([label, runs]) => ({ label, runs: runs.filter(r => JSON.stringify(r.config) === workload) }))
+    .filter(g => g.runs.length)
+    .sort((a, b) => (b.label === baseLabel) - (a.label === baseLabel));
+  return groups.length <= VERSION_SLOTS ? groups : [groups[0], ...groups.slice(-(VERSION_SLOTS - 1))];
+}
+function shortNames(labels) {
+  // drop the prefix all labels share up to a "-" (e.g. "ingest-"), keeping the full label if that empties it
+  let prefix = labels[0] || "";
+  for (const l of labels) while (!l.startsWith(prefix)) prefix = prefix.slice(0, -1);
+  prefix = prefix.slice(0, prefix.lastIndexOf("-") + 1);
+  return labels.map(l => l.slice(prefix.length) || l);
+}
+async function versionsCard(baseRuns) {
+  const groups = versionGroups(baseRuns);
+  if (groups.length < 3) return null;
+  const data = await Promise.all(groups.map(async g => ({ ...g, full: await Promise.all(g.runs.map(r => fetchRun(r.file))) })));
+  const names = shortNames(groups.map(g => g.label));
+  const legend = el("div", { class: "legend" });
+  names.forEach((n, i) => legend.append(el("span", {}, swatch(`var(--v${i + 1})`), n)));
+  const grid = el("div", { class: "versions-grid" });
+  const charts = [];
+  for (const metric of VERSION_METRICS) {
+    const values = data.map(g => sideValues(g.full, state.phase).get(metric.path));
+    if (values.every(v => v === undefined)) continue;
+    const box = el("div", { class: "chart" });
+    grid.append(el("div", {}, el("h3", { text: metric.label }), box));
+    charts.push([box, metric, values]);
+  }
+  const card = el("div", { class: "card" },
+    el("div", { class: "chart-head" },
+      el("div", {}, el("h2", { text: "All versions · " + state.phase }),
+        el("div", { class: "muted", text: "Runs with the same workload as the baseline, medians per version; change vs. " + names[0] })),
+      legend),
+    grid);
+  card.renderCharts = () => charts.forEach(([box, metric, values]) => versionBars(box, names, values, metric));
+  return card;
+}
+function versionBars(container, names, values, metric) {
+  const width = container.clientWidth || 300;
+  const rowH = 22, labelW = Math.min(110, width * 0.36), right = 118;
+  const plotW = Math.max(60, width - labelW - right);
+  const max = niceMax(Math.max(...values.map(v => v ?? 0)));
+  const height = names.length * rowH + 2;
+  const s = svg("svg", { viewBox: `0 0 ${width} ${height}`, height, role: "img", "aria-label": metric.label + " per version" });
+  names.forEach((name, i) => {
+    const y = i * rowH;
+    const lbl = svg("text", { x: labelW - 8, y: y + rowH / 2 + 4, "text-anchor": "end" });
+    lbl.textContent = name;
+    s.append(lbl);
+    const v = values[i];
+    if (v === undefined) return;
+    const w = Math.max(1, (v / max) * plotW);
+    s.append(svg("path", { d: roundedRightRect(labelW, y + 5, w, rowH - 10, 3), fill: `var(--v${i + 1})` }));
+    const c = i === 0 ? null : compare(values[0], v, metric);
+    const t = svg("text", { class: "value-label", x: labelW + w + 6, y: y + rowH / 2 + 4 });
+    t.textContent = fmt(v, metric.unit) + (c && c.pct !== undefined ? "  " + fmtPct(c.pct) : "");
+    s.append(t);
+    const hit = svg("rect", { class: "hit", x: 0, y, width, height: rowH });
+    attachTooltip(hit, metric.label, [{ name, value: fmt(v, metric.unit), color: `var(--v${i + 1})` }]
+      .concat(c ? [{ name: c.verdict === "same" ? "vs " + names[0] : c.verdict + " vs " + names[0], value: fmtPct(c.pct) }] : []));
+    s.append(hit);
+  });
+  container.replaceChildren(s);
+}
+
+// ---------- main render ----------
+let renderSeq = 0;
+async function update() {
+  const seq = ++renderSeq;
+  const content = document.getElementById("content");
+  content.style.opacity = "0.5";
+  const [baseRuns, candRuns] = await Promise.all([
+    Promise.all([...state.baseline].map(fetchRun)),
+    Promise.all([...state.candidate].map(fetchRun)),
+  ]);
+  if (seq !== renderSeq) return;
+  content.style.opacity = "";
+
+  const allRuns = [...baseRuns, ...candRuns];
+  const phaseNames = [...new Set(allRuns.flatMap(r => (r.phases || []).map(p => p.name)))];
+  if (phaseNames.length && !phaseNames.includes(state.phase)) state.phase = phaseNames.includes("ingest") ? "ingest" : phaseNames[0];
+  renderSeg("phase-seg", phaseNames.map(p => [p, p]), state.phase, v => { state.phase = v; savePrefs(); update(); });
+  renderSeg("pct-seg", [["p50Ms", "p50"], ["p95Ms", "p95"], ["p99Ms", "p99"]], state.pct, v => { state.pct = v; savePrefs(); update(); });
+
+  const configs = new Set(allRuns.map(r => JSON.stringify(r.config)));
+  document.getElementById("warning").textContent = configs.size > 1
+    ? "⚠ The selected runs used different workload configurations, so differences may come from the workload rather than the code." : "";
+
+  if (!baseRuns.length || !candRuns.length) {
+    content.replaceChildren(el("div", { class: "card empty", text: "Select at least one baseline run and one candidate run." }));
+    return;
+  }
+
+  const B = sideValues(baseRuns, state.phase), C = sideValues(candRuns, state.phase);
+  const metrics = allMetrics(B.phases, C.phases).map(m => {
+    const base = B.get(m.path), cand = C.get(m.path);
+    return { ...m, base, cand, ...compare(base, cand, m) };
+  });
+  const byLabel = new Map(metrics.map(m => [m.label, m]));
+  const n = (runs) => runs.length + " run" + (runs.length > 1 ? "s" : "");
+
+  // KPI row
+  const kpis = el("div", { class: "kpis" });
+  for (const label of KPI_LABELS) {
+    const m = byLabel.get(label);
+    if (!m) continue;
+    const badge = el("span", { class: "badge " + (m.verdict === "new" ? "worse" : m.verdict), text: m.verdict === "same" ? "≈ same" : (m.verdict === "better" ? "▼ " : "▲ ") + m.verdict });
+    if (m.higherBetter && m.verdict !== "same") badge.textContent = (m.pct > 0 ? "▲ " : "▼ ") + m.verdict;
+    kpis.append(el("div", { class: "card kpi" },
+      el("div", { class: "label", text: label }),
+      el("div", { class: "value", text: fmt(m.cand, m.unit) }),
+      el("div", { class: "delta" }, el("span", { text: fmtPct(m.pct) }), badge, el("span", { class: "muted", text: "vs " + fmt(m.base, m.unit) }))));
+  }
+
+  // diverging change chart
+  const changeRows = metrics.filter(m => !(m.base === 0 && m.cand === 0) && m.base !== undefined);
+  const changeCard = el("div", { class: "card" },
+    el("div", { class: "chart-head" },
+      el("div", {}, el("h2", { text: "Change vs. baseline · " + state.phase }), el("div", { class: "muted", text: "Values are clipped at ±100%; hover for absolute values" })),
+      el("div", { class: "legend" },
+        el("span", {}, swatch("var(--better)"), "better"), el("span", {}, swatch("var(--worse)"), "worse"), el("span", {}, swatch("var(--neutral)"), "unchanged / informational"))),
+    el("div", { class: "chart", id: "chart-change" }));
+
+  // latency chart
+  const ops = [...new Set([...B.phases, ...C.phases].flatMap(p => Object.keys(p.latency || {})))].sort();
+  const latencyRows = ops.map(op => ({ label: op, base: B.get(["latency", op, state.pct]), cand: C.get(["latency", op, state.pct]) }));
+  const latencyCard = el("div", { class: "card" },
+    el("div", { class: "chart-head" },
+      el("div", {}, el("h2", { text: "Latency per operation (" + state.pct.replace("Ms", "") + ")" }), el("div", { class: "muted", text: "Client-side, ms. Varies between runs, so compare medians of several runs" })),
+      seriesLegend()),
+    el("div", { class: "chart", id: "chart-latency" }));
+
+  // overview across phases
+  const overviewSelect = el("select", { "aria-label": "Overview metric" });
+  for (const label of OVERVIEW_METRICS) {
+    const o = el("option", { value: label, text: label });
+    if (label === state.overview) o.selected = true;
+    overviewSelect.append(o);
+  }
+  overviewSelect.addEventListener("change", () => { state.overview = overviewSelect.value; savePrefs(); update(); });
+  const overviewMetric = PHASE_METRICS.find(m => m.label === state.overview) || PHASE_METRICS[0];
+  const overviewGroups = phaseNames.map(p => ({
+    label: p, metric: overviewMetric,
+    base: sideValues(baseRuns, p).get(overviewMetric.path), cand: sideValues(candRuns, p).get(overviewMetric.path),
+  }));
+  const overviewCard = el("div", { class: "card" },
+    el("div", { class: "chart-head" },
+      el("div", {}, el("h2", { text: "All phases" }), el("div", { class: "muted", text: "Baseline " + n(baseRuns) + " · candidate " + n(candRuns) })),
+      el("div", { style: "display:flex; gap:12px; align-items:center; flex-wrap:wrap" }, overviewSelect, seriesLegend())),
+    el("div", { class: "chart", id: "chart-overview" }));
+
+  // metrics table
+  const tbody = el("tbody");
+  for (const m of metrics) {
+    tbody.append(el("tr", {},
+      el("td", { text: m.label }), el("td", { text: fmt(m.base, m.unit) }), el("td", { text: fmt(m.cand, m.unit) }),
+      el("td", { class: m.verdict === "same" ? "" : (m.verdict === "new" ? "worse" : m.verdict), text: m.verdict === "new" ? "new" : fmtPct(m.pct) })));
+  }
+  for (const r of latencyRows) {
+    const c = compare(r.base, r.cand, {});
+    tbody.append(el("tr", {},
+      el("td", { text: r.label + " " + state.pct.replace("Ms", "") }), el("td", { text: fmt(r.base, "ms") }), el("td", { text: fmt(r.cand, "ms") }),
+      el("td", { class: c.verdict === "same" ? "" : c.verdict, text: fmtPct(c.pct) })));
+  }
+  const tableCard = el("div", { class: "card" },
+    el("div", { class: "chart-head" }, el("h2", { text: "All metrics · " + state.phase })),
+    el("div", { class: "scroll" }, el("table", {},
+      el("thead", {}, el("tr", {}, el("th", { text: "metric" }), el("th", { text: "baseline" }), el("th", { text: "candidate" }), el("th", { text: "delta" }))),
+      tbody)));
+
+  // top statements
+  const stmtCard = el("div", { class: "card" },
+    el("div", { class: "chart-head" },
+      el("div", {}, el("h2", { text: "Top statements · " + state.phase }), el("div", { class: "muted", text: "From pg_stat_statements, matched by query text (median per side), sorted by candidate total time" }))),
+    el("div", { class: "scroll" }, statementsTable(B.phases, C.phases)));
+
+  const allVersions = await versionsCard(baseRuns);
+  if (seq !== renderSeq) return;
+  content.replaceChildren(kpis, ...(allVersions ? [allVersions] : []), overviewCard, el("div", { class: "grid2" }, changeCard, latencyCard), tableCard, el("div", { style: "height:12px" }), stmtCard);
+  if (allVersions) allVersions.renderCharts();
+  divergingChart(document.getElementById("chart-change"), changeRows);
+  pairedBarsHorizontal(document.getElementById("chart-latency"), latencyRows, "ms");
+  pairedColumns(document.getElementById("chart-overview"), overviewGroups, overviewMetric.unit);
+}
+
+function swatch(color) {
+  const s = el("span", { class: "swatch" });
+  s.style.background = color;
+  return s;
+}
+function seriesLegend() {
+  return el("div", { class: "legend" },
+    el("span", {}, swatch("var(--series-baseline)"), "baseline"), el("span", {}, swatch("var(--series-candidate)"), "candidate"));
+}
+
+function statementsTable(phasesB, phasesC) {
+  const collect = phases => {
+    const map = new Map();
+    for (const p of phases) for (const s of p.topStatements || []) {
+      if (!map.has(s.query)) map.set(s.query, []);
+      map.get(s.query).push(s);
+    }
+    const out = new Map();
+    for (const [q, list] of map) {
+      out.set(q, { calls: median(list.map(s => Number(s.calls))), total: median(list.map(s => Number(s.total_exec_ms))), wal: median(list.map(s => Number(s.wal_bytes))) });
+    }
+    return out;
+  };
+  const b = collect(phasesB), c = collect(phasesC);
+  const queries = [...new Set([...b.keys(), ...c.keys()])]
+    .sort((x, y) => ((c.get(y)?.total ?? -1) - (c.get(x)?.total ?? -1)) || ((b.get(y)?.total ?? 0) - (b.get(x)?.total ?? 0)));
+  const tbody = el("tbody");
+  for (const q of queries) {
+    const bs = b.get(q), cs = c.get(q);
+    const short = q.length > 180 ? q.slice(0, 180) + "…" : q;
+    const td = el("td", { class: "query", title: q, text: short });
+    tbody.append(el("tr", {}, td,
+      el("td", { text: fmt(bs?.calls) }), el("td", { text: fmt(cs?.calls) }),
+      el("td", { text: fmt(bs?.total, "ms") }), el("td", { text: fmt(cs?.total, "ms") }),
+      el("td", { text: fmt(bs?.wal, "bytes") }), el("td", { text: fmt(cs?.wal, "bytes") })));
+  }
+  if (!queries.length) tbody.append(el("tr", {}, el("td", { colspan: "7", class: "muted", text: "No pg_stat_statements data for this phase." })));
+  return el("table", {},
+    el("thead", {}, el("tr", {}, el("th", { text: "query" }), el("th", { text: "calls · base" }), el("th", { text: "calls · cand" }),
+      el("th", { text: "time · base" }), el("th", { text: "time · cand" }), el("th", { text: "WAL · base" }), el("th", { text: "WAL · cand" }))),
+    tbody);
+}
+
+// ---------- boot ----------
+async function boot(keepSelection) {
+  await fetchRuns();
+  const files = new Set(state.runs.map(r => r.file));
+  const prefs = keepSelection ? null : loadPrefs();
+  if (keepSelection) {
+    state.baseline = new Set([...state.baseline].filter(f => files.has(f)));
+    state.candidate = new Set([...state.candidate].filter(f => files.has(f)));
+  } else if (prefs && prefs.baseline) {
+    state.baseline = new Set(prefs.baseline.filter(f => files.has(f)));
+    state.candidate = new Set((prefs.candidate || []).filter(f => files.has(f)));
+    state.phase = prefs.phase || state.phase;
+    state.pct = prefs.pct || state.pct;
+    state.overview = prefs.overview || state.overview;
+  }
+  const hash = new URLSearchParams(location.hash.slice(1));
+  if (!keepSelection && (hash.get("b") || hash.get("c"))) {
+    const filesOf = label => new Set(state.runs.filter(r => r.label === label).map(r => r.file));
+    if (hash.get("b")) state.baseline = filesOf(hash.get("b"));
+    if (hash.get("c")) state.candidate = filesOf(hash.get("c"));
+    if (hash.get("phase")) state.phase = hash.get("phase");
+  }
+  if (!state.baseline.size && !state.candidate.size) defaultSelection();
+  renderRunPickers();
+  await update();
+}
+
+document.getElementById("reload").addEventListener("click", () => { state.cache.clear(); boot(true); });
+document.getElementById("theme").addEventListener("click", () => {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+  savePrefs();
+});
+(() => { const t = loadPrefs().theme; if (t) document.documentElement.dataset.theme = t; })();
+let resizeTimer;
+window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(update, 150); });
+boot(false).catch(e => {
+  document.getElementById("content").replaceChildren(el("div", { class: "card empty", text: "Could not load runs: " + e.message }));
+});
+</script>
+</body>
+</html>

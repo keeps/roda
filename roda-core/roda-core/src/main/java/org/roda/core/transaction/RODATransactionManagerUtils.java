@@ -44,15 +44,14 @@ public class RODATransactionManagerUtils {
   public static List<Report> getReportsForTransaction(Plugin<IsRODAObject> plugin, UUID transactionId,
     ModelService model) throws RODATransactionException {
     try {
-      Job job = model.retrieveJob(PluginHelper.getJobId(plugin));
+      // only the transaction's reports (not all the job's reports, which would make each block's
+      // commit cost grow with the job)
       List<Report> reports = new ArrayList<>();
-      try (CloseableIterable<OptionalWithCause<Report>> reportList = model.listJobReports(job.getId())) {
+      try (CloseableIterable<OptionalWithCause<Report>> reportList = model
+        .listJobReportsByTransaction(PluginHelper.getJobId(plugin), transactionId.toString())) {
         for (OptionalWithCause<Report> optionalReport : reportList) {
           if (optionalReport.isPresent()) {
-            Report innerReport = optionalReport.get();
-            if (innerReport.getTransactionId().equals(transactionId.toString())) {
-              reports.add(innerReport);
-            }
+            reports.add(optionalReport.get());
           }
         }
       }

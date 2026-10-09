@@ -7,15 +7,20 @@
  */
 package org.roda.core.repository.job;
 
-import org.roda.core.data.v2.db.jobs.Job;
+import java.util.List;
+
+import java.util.Optional;
+
+import org.roda.core.data.v2.db.jobs.PluginDescriptor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Running jobs ({@code jobs}). Used through {@link JobDatabaseService}.
+ * Plugins referenced by job reports and their steps ({@code plugins}). Used through {@link JobDatabaseService}.
  *
  * @author RODA Development Team
  */
 @Repository
-public interface JobRepository extends JpaRepository<Job, String> {
+public interface PluginDescriptorRepository extends JpaRepository<PluginDescriptor, Integer> {
+  Optional<PluginDescriptor> findByClassNameAndVersion(String className, String version);
 }

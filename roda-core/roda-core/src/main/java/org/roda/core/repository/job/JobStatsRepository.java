@@ -7,15 +7,15 @@
  */
 package org.roda.core.repository.job;
 
-import org.roda.core.data.v2.db.jobs.Job;
+import org.roda.core.data.v2.db.jobs.JobStats;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Running jobs ({@code jobs}). Used through {@link JobDatabaseService}.
+ * Progress counters of running jobs ({@code job_stats}). Used through {@link JobDatabaseService}.
  *
  * @author RODA Development Team
  */
 @Repository
-public interface JobRepository extends JpaRepository<Job, String> {
+public interface JobStatsRepository extends JpaRepository<JobStats, String> {
 }
