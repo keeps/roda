@@ -43,6 +43,17 @@ public class PremisSkeletonPluginUtils {
   public static void createPremisSkeletonOnRepresentation(ModelService model, String aipId, String representationId,
     Collection<String> fixityAlgorithms, String username) throws IOException, RequestNotValidException,
     GenericException, NotFoundException, AuthorizationDeniedException, ValidationException {
+    createPremisSkeletonOnRepresentation(model, aipId, representationId, fixityAlgorithms, username, true);
+  }
+
+  /**
+   * @param notifyFiles
+   *          whether each file is reindexed as its PREMIS is created; callers
+   *          that reindex the whole representation afterwards pass false
+   */
+  public static void createPremisSkeletonOnRepresentation(ModelService model, String aipId, String representationId,
+    Collection<String> fixityAlgorithms, String username, boolean notifyFiles) throws IOException,
+    RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, ValidationException {
     gov.loc.premis.v3.Representation representation;
 
     if (model.preservationRepresentationExists(aipId, representationId)) {
@@ -59,7 +70,7 @@ public class PremisSkeletonPluginUtils {
           if (!file.isDirectory()) {
             if (!model.preservationFileExists(aipId, representationId, file.getPath(), file.getId())) {
               PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, fixityAlgorithms, representation,
-                username);
+                username, notifyFiles);
             }
           }
         } else {
@@ -100,6 +111,12 @@ public class PremisSkeletonPluginUtils {
   public static void createPremisSkeletonOnFile(ModelService model, File file, Collection<String> fixityAlgorithms,
     Representation representation, String username)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, NotFoundException {
+    createPremisSkeletonOnFile(model, file, fixityAlgorithms, representation, username, true);
+  }
+
+  private static void createPremisSkeletonOnFile(ModelService model, File file, Collection<String> fixityAlgorithms,
+    Representation representation, String username, boolean notifyFile)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, NotFoundException {
     boolean notifyInSteps = false;
 
     if (!file.isDirectory()) {
@@ -111,12 +128,16 @@ public class PremisSkeletonPluginUtils {
           PreservationMetadata pm = model.createPreservationMetadata(PreservationMetadataType.FILE, file.getAipId(),
             file.getRepresentationId(), file.getPath(), file.getId(), filePreservation, username, notifyInSteps);
           pmId = pm.getId();
-          model.notifyFileCreated(file).failOnError();
+          if (notifyFile) {
+            model.notifyFileCreated(file).failOnError();
+          }
         } catch (AlreadyExistsException e1) {
           pmId = IdUtils.getPreservationFileId(file.getId(), RODAInstanceUtils.getLocalInstanceIdentifier());
           model.updatePreservationMetadata(pmId, PreservationMetadataType.FILE, file.getAipId(),
             file.getRepresentationId(), file.getPath(), file.getId(), filePreservation, username, notifyInSteps);
-          model.notifyFileUpdated(file).failOnError();
+          if (notifyFile) {
+            model.notifyFileUpdated(file).failOnError();
+          }
         }
 
         PremisV3Utils.linkFileToRepresentation(file.getId(), file.getPath(),
