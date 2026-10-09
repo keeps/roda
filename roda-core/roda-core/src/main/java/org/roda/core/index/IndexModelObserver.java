@@ -13,8 +13,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.StreamSupport;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -123,20 +125,33 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> aipCreated(final AIP aip) {
+    return indexAIPAndChildren(aip, null);
+  }
+
+  /**
+   * Indexes the AIP, its representations, files and preservation events.
+   *
+   * @param written
+   *          if not null, receives the ids of every representation, file and
+   *          event document written
+   */
+  private ReturnWithExceptions<Void, ModelObserver> indexAIPAndChildren(final AIP aip, final Set<String> written) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
     try {
       List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
 
-      indexAIP(aip, ancestors).addTo(ret);
+      // the AIP document is built once, with its disposal information
+      ReturnWithExceptions<Void, ModelObserver> disposalErrors = new ReturnWithExceptions<>(this);
+      DisposalInfo disposalInfo = getDisposalInfo(aip, disposalErrors);
+      indexAIP(aip, ancestors, disposalInfo.schedule(), disposalInfo.retentionPeriod(), disposalInfo.onHold())
+        .addTo(ret);
       if (ret.isEmpty()) {
-        indexRepresentations(aip, ancestors).addTo(ret);
+        indexRepresentations(aip, ancestors, written).addTo(ret);
         if (ret.isEmpty()) {
-          indexPreservationsEvents(aip.getId(), null).addTo(ret);
-          if (ret.isEmpty()) {
-            indexRetentionPeriod(aip, ancestors).addTo(ret);
-          }
+          indexPreservationsEvents(aip.getId(), null, written).addTo(ret);
         }
       }
+      disposalErrors.addTo(ret);
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error getting ancestors when creating AIP", e);
       ret.add(e);
@@ -193,6 +208,11 @@ public class IndexModelObserver implements ModelObserver {
 
   public ReturnWithExceptions<Void, ModelObserver> indexPreservationsEvents(final String aipId,
     final String representationId) {
+    return indexPreservationsEvents(aipId, representationId, null);
+  }
+
+  private ReturnWithExceptions<Void, ModelObserver> indexPreservationsEvents(final String aipId,
+    final String representationId, final Set<String> written) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
     try (CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadata = (representationId == null)
@@ -204,6 +224,7 @@ public class IndexModelObserver implements ModelObserver {
           PreservationMetadata pm = opm.get();
           if (pm.getType().equals(PreservationMetadataType.EVENT)) {
             indexPreservationEvent(pm).addTo(ret);
+            addWritten(written, pm.getId());
           }
         } else {
           LOGGER.error("Cannot index premis event", opm.getCause());
@@ -237,10 +258,11 @@ public class IndexModelObserver implements ModelObserver {
     return ret;
   }
 
-  private ReturnWithExceptions<Void, ModelObserver> indexRepresentations(final AIP aip, final List<String> ancestors) {
+  private ReturnWithExceptions<Void, ModelObserver> indexRepresentations(final AIP aip, final List<String> ancestors,
+    final Set<String> written) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
     for (Representation representation : aip.getRepresentations()) {
-      indexRepresentation(aip, representation, ancestors).addTo(ret);
+      indexRepresentation(aip, representation, ancestors, written).addTo(ret);
     }
 
     return ret;
@@ -248,7 +270,13 @@ public class IndexModelObserver implements ModelObserver {
 
   private ReturnWithExceptions<Void, ModelObserver> indexRepresentation(final AIP aip,
     final Representation representation, final List<String> ancestors) {
+    return indexRepresentation(aip, representation, ancestors, null);
+  }
+
+  private ReturnWithExceptions<Void, ModelObserver> indexRepresentation(final AIP aip,
+    final Representation representation, final List<String> ancestors, final Set<String> written) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+    addWritten(written, IdUtils.getRepresentationId(representation));
     Long sizeInBytes = 0L;
     Long numberOfDataFiles = 0L;
     Long numberOfDataFolders = 0L;
@@ -262,10 +290,10 @@ public class IndexModelObserver implements ModelObserver {
           if (FSUtils.isManifestOfExternalFiles(file.get().getId())) {
             representation.setHasShallowFiles(true);
             aip.setHasShallowFiles(true);
-            indexAIP(aip, ancestors).addTo(ret);
+            indexRetentionPeriod(aip, ancestors).addTo(ret);
           }
 
-          sizeInBytes += indexFile(aip, file.get(), ancestors, false).addTo(ret).getReturnedObject();
+          sizeInBytes += indexFile(aip, file.get(), ancestors, false, written).addTo(ret).getReturnedObject();
 
           if (file.get().isDirectory()) {
             numberOfDataFolders++;
@@ -325,6 +353,31 @@ public class IndexModelObserver implements ModelObserver {
     return ret;
   }
 
+  private record DisposalInfo(DisposalSchedule schedule, Map<String, String> retentionPeriod, boolean onHold) {
+  }
+
+  /**
+   * Disposal hold status, schedule and retention period of the AIP, as indexed in
+   * its document. Errors are added to {@code errors} and leave the information
+   * that could not be read empty.
+   */
+  private DisposalInfo getDisposalInfo(final AIP aip, ReturnWithExceptions<Void, ModelObserver> errors) {
+    boolean onDisposalHold = false;
+    DisposalSchedule disposalSchedule = null;
+    Map<String, String> retentionPeriod = null;
+    try {
+      onDisposalHold = model.onDisposalHold(aip.getId());
+      if (aip.getDisposalScheduleId() != null) {
+        disposalSchedule = model.retrieveDisposalSchedule(aip.getDisposalScheduleId());
+        retentionPeriod = SolrUtils.getRetentionPeriod(disposalSchedule, aip);
+      }
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException e) {
+      LOGGER.error("Cannot index retention period", e);
+      errors.add(e);
+    }
+    return new DisposalInfo(disposalSchedule, retentionPeriod, onDisposalHold);
+  }
+
   private ReturnWithExceptions<Void, ModelObserver> indexRetentionPeriod(final AIP aip, final List<String> ancestors) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
@@ -355,6 +408,11 @@ public class IndexModelObserver implements ModelObserver {
 
   private ReturnWithExceptions<Long, ModelObserver> indexFile(AIP aip, File file, List<String> ancestors,
     boolean recursive) {
+    return indexFile(aip, file, ancestors, recursive, null);
+  }
+
+  private ReturnWithExceptions<Long, ModelObserver> indexFile(AIP aip, File file, List<String> ancestors,
+    boolean recursive, Set<String> written) {
     ReturnWithExceptions<Long, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
     Long sizeInBytes = 0L;
@@ -374,6 +432,7 @@ public class IndexModelObserver implements ModelObserver {
             shallowFile.get().setInstanceId(aip.getInstanceId());
             SolrUtils.create2(index, model, (ModelObserver) this, IndexedFile.class, shallowFile.get(), info)
               .addTo(ret);
+            addWritten(written, IdUtils.getFileId(shallowFile.get()));
           }
         }
         sizeInBytes = model.getExternalFilesTotalSize(file);
@@ -384,6 +443,7 @@ public class IndexModelObserver implements ModelObserver {
 
     } else {
       SolrUtils.create2(index, model, (ModelObserver) this, IndexedFile.class, file, info).addTo(ret);
+      addWritten(written, IdUtils.getFileId(file));
       sizeInBytes = (Long) info.getAccumulators().get(RodaConstants.FILE_SIZE);
     }
 
@@ -392,7 +452,8 @@ public class IndexModelObserver implements ModelObserver {
         try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(file, true)) {
           for (OptionalWithCause<File> subfile : allFiles) {
             if (subfile.isPresent()) {
-              sizeInBytes += indexFile(aip, subfile.get(), ancestors, false).addTo(ret).getReturnedObject();
+              sizeInBytes += indexFile(aip, subfile.get(), ancestors, false, written).addTo(ret)
+                .getReturnedObject();
             } else {
               LOGGER.error("Cannot index file", subfile.getCause());
               ret.add(subfile.getCause());
@@ -412,11 +473,20 @@ public class IndexModelObserver implements ModelObserver {
     return ret;
   }
 
+  /**
+   * Reindexes the AIP in place: its documents are overwritten by id, and only the
+   * representation, file and event documents that were not written again (the
+   * ones that no longer exist) are deleted.
+   */
   @Override
   public ReturnWithExceptions<Void, ModelObserver> aipUpdated(AIP aip) {
-    // TODO Is this the best way to update?
-    ReturnWithExceptions<Void, ModelObserver> ret = aipDeleted(aip.getId(), false);
-    aipCreated(aip).addTo(ret);
+    Set<String> written = new HashSet<>();
+    ReturnWithExceptions<Void, ModelObserver> ret = indexAIPAndChildren(aip, written);
+    deleteStaleDocuments(IndexedRepresentation.class, RodaConstants.REPRESENTATION_AIP_ID, aip.getId(), written)
+      .addTo(ret);
+    deleteStaleDocuments(IndexedFile.class, RodaConstants.FILE_AIP_ID, aip.getId(), written).addTo(ret);
+    deleteStaleDocuments(IndexedPreservationEvent.class, RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId(),
+      written).addTo(ret);
     return ret;
   }
 
@@ -957,14 +1027,19 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> representationCreated(Representation representation) {
+    return indexRepresentationAndChildren(representation, null);
+  }
+
+  private ReturnWithExceptions<Void, ModelObserver> indexRepresentationAndChildren(Representation representation,
+    Set<String> written) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
     try {
       AIP aip = model.retrieveAIP(representation.getAipId());
       List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
 
-      indexRepresentation(aip, representation, ancestors).addTo(ret);
+      indexRepresentation(aip, representation, ancestors, written).addTo(ret);
       if (ret.isEmpty()) {
-        indexPreservationsEvents(aip.getId(), representation.getId()).addTo(ret);
+        indexPreservationsEvents(aip.getId(), representation.getId(), written).addTo(ret);
 
         if (aip.getRepresentations().size() == 1) {
           SolrUtils.update(index, IndexedAIP.class, aip.getId(),
@@ -979,11 +1054,19 @@ public class IndexModelObserver implements ModelObserver {
     return ret;
   }
 
+  /**
+   * Reindexes the representation in place, then deletes the file and event
+   * documents that were not written again (see {@link #aipUpdated(AIP)}).
+   */
   @Override
   public ReturnWithExceptions<Void, ModelObserver> representationUpdated(Representation representation) {
-    ReturnWithExceptions<Void, ModelObserver> ret = representationDeleted(representation.getAipId(),
-      representation.getId(), false);
-    representationCreated(representation).addTo(ret);
+    Set<String> written = new HashSet<>();
+    ReturnWithExceptions<Void, ModelObserver> ret = indexRepresentationAndChildren(representation, written);
+    String representationUUID = IdUtils.getRepresentationId(representation);
+    deleteStaleDocuments(IndexedFile.class, RodaConstants.FILE_REPRESENTATION_UUID, representationUUID, written)
+      .addTo(ret);
+    deleteStaleDocuments(IndexedPreservationEvent.class, RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID,
+      representationUUID, written).addTo(ret);
     return ret;
   }
 
@@ -1210,6 +1293,44 @@ public class IndexModelObserver implements ModelObserver {
   private <T extends IsIndexed, M extends IsModelObject> ReturnWithExceptions<Void, ModelObserver> addDocumentToIndex(
     Class<T> classToAdd, M instance, boolean commit) {
     return SolrUtils.create(index, model, classToAdd, instance, this, commit);
+  }
+
+  private static void addWritten(Set<String> written, String id) {
+    if (written != null) {
+      written.add(id);
+    }
+  }
+
+  /**
+   * Deletes, by id, the documents whose {@code parentField} is {@code parentId}
+   * and whose id is not in {@code keep}. Replaces a delete by query before a
+   * reindex: the listing only sees changes older than the soft commit interval,
+   * which is enough as removed objects are also deleted by id when they are
+   * removed.
+   */
+  private <T extends IsIndexed> ReturnWithExceptions<Void, ModelObserver> deleteStaleDocuments(Class<T> indexClass,
+    String parentField, String parentId, Set<String> keep) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+    List<String> stale = new ArrayList<>();
+    try (IterableIndexResult<T> indexed = new IterableIndexResult<>(index, indexClass,
+      new Filter(new SimpleFilterParameter(parentField, parentId)), null, false,
+      Collections.singletonList(RodaConstants.INDEX_UUID))) {
+      for (T document : indexed) {
+        if (!keep.contains(document.getUUID())) {
+          stale.add(document.getUUID());
+        }
+      }
+    } catch (IOException | RuntimeException e) {
+      LOGGER.error("Cannot list {} documents of {} to remove stale ones", indexClass.getSimpleName(), parentId, e);
+      ret.add(e);
+      return ret;
+    }
+
+    if (!stale.isEmpty()) {
+      LOGGER.debug("Removing {} stale {} documents of {}", stale.size(), indexClass.getSimpleName(), parentId);
+      SolrUtils.delete(index, indexClass, stale, (ModelObserver) this).addTo(ret);
+    }
+    return ret;
   }
 
   private <T extends IsIndexed> ReturnWithExceptions<Void, ModelObserver> deleteDocumentFromIndex(
