@@ -7,6 +7,7 @@
  */
 package org.roda.core.repository.transaction;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,6 +17,9 @@ import io.micrometer.core.annotation.Timed;
 import org.roda.core.entity.transaction.TransactionLog;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
@@ -31,4 +35,9 @@ public interface TransactionLogRepository extends JpaRepository<TransactionLog, 
   Optional<TransactionLog> findById(@NonNull UUID id);
 
   List<TransactionLog> findAllByStatusInOrderByCreatedAt(List<TransactionLog.TransactionStatus> transactionStatus);
+
+  @Modifying
+  @Query("UPDATE TransactionLog t SET t.status = :status, t.updatedAt = :updatedAt WHERE t.id = :id")
+  int updateStatus(@Param("id") UUID id, @Param("status") TransactionLog.TransactionStatus status,
+    @Param("updatedAt") LocalDateTime updatedAt);
 }
