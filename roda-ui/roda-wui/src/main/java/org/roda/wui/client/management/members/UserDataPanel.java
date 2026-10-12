@@ -56,7 +56,11 @@ public class UserDataPanel extends Composite implements GenericDataPanel<User>, 
     this.passwordPanel = new PasswordPanel(editMode);
 
     // 1. Setup Generic Fields
-    userForm.addReadOnlyField(messages.username(), User::getName, true);
+    if (editMode) {
+      userForm.addReadOnlyField(messages.username(), User::getName, true);
+    } else {
+      userForm.addTextField(messages.username(), User::getName, User::setName, true);
+    }
     userForm.addTextField(messages.fullname(), User::getFullName, User::setFullName, true, false);
 
     // Email with Regex Validation
@@ -64,8 +68,12 @@ public class UserDataPanel extends Composite implements GenericDataPanel<User>, 
       "^[_A-Za-z0-9-%+]+(\\.[_A-Za-z0-9-%+]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[_A-Za-z0-9-]+)",
       messages.emailNotValid());
 
-    // userForm.addCustomWidget(passwordPanel);
+    userForm.addCustomWidget(passwordPanel);
     userForm.addCustomWidget(extraFieldsPanel);
+
+    if (!editMode) {
+      userForm.setModel(new User());
+    }
 
     // 3. Assemble Main Layout
     mainContainer.add(userForm);
@@ -91,6 +99,11 @@ public class UserDataPanel extends Composite implements GenericDataPanel<User>, 
     this.userExtra = user.getExtra();
     createForm(this.userExtra);
     this.changed = false;
+  }
+
+  public void setUserExtra(Set<MetadataValue> userExtra) {
+    this.userExtra = userExtra;
+    createForm(userExtra);
   }
 
   public void createForm(Set<MetadataValue> userExtra) {
