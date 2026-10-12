@@ -1,5 +1,13 @@
 # Changelog
 
+## v5.8.2 (12/10/2026)
+#### Bug fixes
+
+- Fixed move bug where descendants were not reindexed (https://github.com/keeps/roda/commit/6e9c6036cc75e7595651a332c8ca823d9568c57a)
+- Fixed empty preservationLevelValue (https://github.com/keeps/roda/commit/02689f1765fcbc2cef59ddeb9b1603666b0808d7)
+
+---
+
 ## v5.8.1 (14/07/2026)
 #### Bug fixes
 
