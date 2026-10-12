@@ -775,7 +775,7 @@ public class IndexModelObserver implements ModelObserver {
           try {
             LOGGER.debug("Reindexing aip {} descendant {}", aip.getId(), item.getId());
             List<String> ancestors = SolrUtils.getAncestors(item.getParentID(), model);
-            SolrUtils.update(index, IndexedAIP.class, aip.getId(),
+            SolrUtils.update(index, IndexedAIP.class, item.getId(),
               Collections.singletonMap(RodaConstants.AIP_ANCESTORS, ancestors), (ModelObserver) this).addTo(ret);
 
             // update representation and file ancestors information
