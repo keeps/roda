@@ -52,8 +52,10 @@ public class PasswordPanel extends SimplePanel implements HasValueChangeHandlers
     editPasswordRepeat = new PasswordTextBox();
     editPasswordLabel = new Label(messages.password());
     editPasswordLabel.addStyleName("form-label");
+    editPasswordLabel.addStyleName("form-label-mandatory");
     editPasswordRepeatLabel = new Label(messages.passwordConfirmation());
     editPasswordRepeatLabel.addStyleName("form-label");
+    editPasswordRepeatLabel.addStyleName("form-label-mandatory");
     editPasswordNote = new Label(messages.passwordNote());
 
     // Build the layout using the generic form structure
@@ -117,13 +119,13 @@ public class PasswordPanel extends SimplePanel implements HasValueChangeHandlers
    */
   private FlowPanel createFieldRow(Widget labelWidget, Widget inputWidget) {
     FlowPanel searchField = new FlowPanel();
-    searchField.addStyleName("search-field");
+    searchField.addStyleName("generic-form-field");
 
     FlowPanel leftPanel = new FlowPanel();
-    leftPanel.addStyleName("search-field-left-panel");
+    leftPanel.addStyleName("generic-form-field-left-panel");
 
     FlowPanel inputPanel = new FlowPanel();
-    inputPanel.addStyleName("search-field-input-panel full_width");
+    inputPanel.addStyleName("generic-form-field-input-panel full_width");
 
     // Assemble the DOM
     inputPanel.add(inputWidget);
