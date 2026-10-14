@@ -168,6 +168,10 @@
             <artifactId>solr-solrj</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-solrj-jetty</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.roda-community</groupId>
             <artifactId>roda-common-data</artifactId>
         </dependency>

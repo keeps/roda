@@ -46,6 +46,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.impl.ZkClientClusterStateProvider;
+import org.apache.solr.client.solrj.jetty.HttpJettySolrClient;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest.Create;
 import org.apache.solr.client.solrj.response.CollectionAdminResponse;
@@ -1061,7 +1062,11 @@ public class RodaCoreFactory {
       zkChroot = Optional.empty();
     }
 
-    CloudSolrClient cloudSolrClient = new CloudSolrClient.Builder(zkHosts, zkChroot).build();
+    // Use HTTP/1.1: with HTTP/2 all requests share a single multiplexed connection, and under heavy
+    // concurrent indexing (e.g. rebuilding all indexes) that connection can stall on flow control,
+    // blocking every Solr request (including UI searches) until it times out.
+    CloudSolrClient cloudSolrClient = new CloudSolrClient.Builder(zkHosts, zkChroot)
+      .withHttpClientBuilder(new HttpJettySolrClient.Builder().useHttp1_1(true)).build();
 
     waitForSolrCluster(cloudSolrClient);
 
