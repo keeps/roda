@@ -159,6 +159,12 @@ public class SolrUtils {
   public static final String SCHEMA = "managed-schema.xml";
   private static final Logger LOGGER = LoggerFactory.getLogger(SolrUtils.class);
   private static final String DEFAULT_QUERY_PARSER_OPERATOR = "AND";
+  /**
+   * Excludes nested/block-join child documents (Solr-managed {@code _nest_path_} field) from
+   * ordinary IndexedAIP queries, so they never appear as flat top-level hits alongside their
+   * parent AIP unless explicitly requested via a nested-document filter.
+   */
+  private static final String NOT_NESTED_DOCUMENT_FILTER_QUERY = "-_nest_path_:*";
   private static final Set<String> NON_REPEATABLE_FIELDS = new HashSet<>(Arrays.asList(RodaConstants.AIP_TITLE,
     RodaConstants.AIP_LEVEL, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL));
   private static Map<String, List<String>> liteFieldsForEachClass = new HashMap<>();
@@ -310,6 +316,9 @@ public class SolrUtils {
     if (hasPermissionFilters(classToRetrieve)) {
       query.addFilterQuery(getFilterQueries(user, justActive, classToRetrieve));
     }
+    if (IndexedAIP.class.isAssignableFrom(classToRetrieve) && !hasNestedDocumentsFilter(filter, classToRetrieve)) {
+      query.addFilterQuery(NOT_NESTED_DOCUMENT_FILTER_QUERY);
+    }
 
     query.set(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
     query.setRows(pageSize);
@@ -356,25 +365,18 @@ public class SolrUtils {
     query.setRows(findRequest.getSublist().getMaximumElementCount());
     query.setFields(parseFieldsToReturn(findRequest));
     parseAndConfigureFacets(findRequest.getFacets(), query);
-    if (hasPermissionFilters(classToRetrieve) && !hasNestedDocumentsFilter(findRequest.getFilter(), classToRetrieve)) {
+    boolean isNestedDocumentsFilter = hasNestedDocumentsFilter(findRequest.getFilter(), classToRetrieve);
+    if (hasPermissionFilters(classToRetrieve) && !isNestedDocumentsFilter) {
       query.addFilterQuery(getFilterQueries(user, findRequest.isOnlyActive(), classToRetrieve));
     }
-
-    if (hasNestedDocumentsFilter(findRequest.getFilter(), classToRetrieve)) {
-      ChildOfFilterParameter childOfFilter = (ChildOfFilterParameter) findRequest.getFilter().getParameters()
-        .getFirst();
-      if (childOfFilter.getParentFilter() != null) {
-        FilterParameter filterParameter = buildQueryPermissions(user);
-        AndFiltersParameters andFiltersParameters = new AndFiltersParameters(
-          List.of(childOfFilter.getParentFilter(), filterParameter));
-        childOfFilter.setParentFilter(andFiltersParameters);
-      } else {
-        childOfFilter.setParentFilter(buildQueryPermissions(user));
-      }
-      query.setQuery(parseFilter(findRequest.getFilter()));
-    } else {
-      query.setQuery(parseFilter(findRequest.getFilter()));
+    if (IndexedAIP.class.isAssignableFrom(classToRetrieve) && !isNestedDocumentsFilter) {
+      query.addFilterQuery(NOT_NESTED_DOCUMENT_FILTER_QUERY);
     }
+
+    if (isNestedDocumentsFilter) {
+      applyNestedDocumentsPermissions(findRequest.getFilter().getParameters(), user);
+    }
+    query.setQuery(parseFilter(findRequest.getFilter()));
 
     if (findRequest.getCollapse() != null) {
       query.addFilterQuery(parseCollapse(findRequest.getCollapse()));
@@ -405,11 +407,55 @@ public class SolrUtils {
   }
 
   private static <T extends IsIndexed> boolean hasNestedDocumentsFilter(Filter filter, Class<T> classToRetrieve) {
-    if (!IndexedAIP.class.isAssignableFrom(classToRetrieve)) {
+    if (filter == null || !IndexedAIP.class.isAssignableFrom(classToRetrieve)) {
       return false;
     }
 
-    return filter.getParameters().stream().anyMatch(ChildOfFilterParameter.class::isInstance);
+    return containsChildOfFilterParameter(filter.getParameters());
+  }
+
+  /**
+   * Recurses into {@link FiltersParameters} (AND/OR groups) since a real nested-document query
+   * always combines {@link ChildOfFilterParameter} with additional child-level conditions, which
+   * means it is never a bare top-level filter parameter.
+   */
+  private static boolean containsChildOfFilterParameter(List<FilterParameter> parameters) {
+    for (FilterParameter parameter : parameters) {
+      if (parameter instanceof ChildOfFilterParameter) {
+        return true;
+      }
+      if (parameter instanceof FiltersParameters nested && containsChildOfFilterParameter(nested.getValues())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * ANDs the requesting user's permission check into every {@link ChildOfFilterParameter}'s
+   * parentFilter found at any depth. Permission fields only exist on the parent AIP document,
+   * never on the returned child, so the check has to be applied against the parent-selecting
+   * clause of the block-join query rather than as a top-level result filter. Admin is exempted,
+   * mirroring the bypass in getFilterQueryPermissions used for the top-level permission filter.
+   */
+  private static void applyNestedDocumentsPermissions(List<FilterParameter> parameters, User user) {
+    if (user != null && RodaConstants.ADMIN.equals(user.getName())) {
+      return;
+    }
+
+    for (FilterParameter parameter : parameters) {
+      if (parameter instanceof ChildOfFilterParameter childOfFilter) {
+        FilterParameter permissions = buildQueryPermissions(user);
+        if (childOfFilter.getParentFilter() != null) {
+          childOfFilter
+            .setParentFilter(new AndFiltersParameters(List.of(childOfFilter.getParentFilter(), permissions)));
+        } else {
+          childOfFilter.setParentFilter(permissions);
+        }
+      } else if (parameter instanceof FiltersParameters nested) {
+        applyNestedDocumentsPermissions(nested.getValues(), user);
+      }
+    }
   }
 
   /*
@@ -1058,6 +1104,15 @@ public class SolrUtils {
     }
   }
 
+  /**
+   * Escapes a sub-query string for embedding as a Solr local-params inline value (e.g.
+   * {@code {!child of=X v='<escaped>'}}). Backslashes must be escaped first, then single quotes,
+   * per Solr's local-params string escaping rules.
+   */
+  private static String escapeLocalParamValue(String value) {
+    return value.replace("\\", "\\\\").replace("'", "\\'");
+  }
+
   private static void appendBlockJoinChildrenFilterParameter(StringBuilder ret, ChildOfFilterParameter parameter,
     boolean prefixWithANDOperatorIfBuilderNotEmpty) throws RequestNotValidException {
     StringBuilder blockMask = new StringBuilder();
@@ -1068,7 +1123,13 @@ public class SolrUtils {
       StringBuilder someParents = new StringBuilder();
       parseFilterParameter(someParents, parameter.getParentFilter(), prefixWithANDOperatorIfBuilderNotEmpty);
 
-      ret.append("{!child of=").append(replace).append("} ").append(someParents);
+      // The parent-selector sub-query is bound via the local-params "v" value (rather than left as
+      // positional trailing text) so Solr's query parser treats the whole "{!child of=...}" clause
+      // as one self-contained unit. Trailing text is not reliably bound as this qparser's argument
+      // when the clause is embedded among sibling AND/OR conditions (e.g. inside AndFiltersParameters),
+      // which silently degenerates the block-join into a flat, incorrect boolean query instead.
+      ret.append("{!child of=").append(replace).append(" v='").append(escapeLocalParamValue(someParents.toString()))
+        .append("'}");
     } else {
       ret.append("{!child of=").append(replace).append("}");
     }
@@ -1084,7 +1145,10 @@ public class SolrUtils {
       StringBuilder someChildren = new StringBuilder();
       parseFilterParameter(someChildren, parameter.getChildrenFilter(), prefixWithANDOperatorIfBuilderNotEmpty);
 
-      ret.append("{!parent which=").append(replace).append("} ").append(someChildren);
+      // Same rationale as appendBlockJoinChildrenFilterParameter above: bind via "v" instead of
+      // trailing text so this remains correct if ever combined with sibling conditions.
+      ret.append("{!parent which=").append(replace).append(" v='")
+        .append(escapeLocalParamValue(someChildren.toString())).append("'}");
     } else {
       ret.append("{!parent which=").append(replace).append("}");
     }
