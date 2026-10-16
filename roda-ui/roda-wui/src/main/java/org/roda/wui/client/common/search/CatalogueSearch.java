@@ -20,7 +20,9 @@ import java.util.function.Supplier;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.AllFilterParameter;
+import org.roda.core.data.v2.index.filter.ChildOfFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -35,6 +37,8 @@ import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.common.client.ClientLogger;
+import org.roda.wui.common.client.tools.ConfigurationManager;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -83,48 +87,91 @@ public class CatalogueSearch extends Composite {
 
     searchWrapper = new SearchWrapper(true);
 
+    // 1. Intellectual Entities (AIP)
     String preselectedDropdownValue = null;
-    for (Class<? extends IsIndexed> searchableClass : searchableClasses) {
-      if (classFilters.containsKey(searchableClass.getSimpleName())) {
+    if (classFilters.containsKey(IndexedAIP.class.getSimpleName())
+      && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
+      Filter filter = classFilters.get(IndexedAIP.class.getSimpleName());
+      ListBuilder<IndexedAIP> listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
+        new AsyncTableCellOptions<>(IndexedAIP.class, itemsListId)
+          .withActionable(AipSearchWrapperActions.getWithoutNoAipActions(null, AIPState.ACTIVE, permissions))
+          .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()
+          .withFilter(filter).withStartHidden(startHidden)
+          .withActionBlacklist(List.of(AipSearchWrapperActions.AipSearchWrapperAction.NEW_CHILD_AIP_BELOW,
+            AipSearchWrapperActions.AipSearchWrapperAction.APPRAISAL_ACCEPT,
+            AipSearchWrapperActions.AipSearchWrapperAction.APPRAISAL_REJECT)));
+      preselectedDropdownValue = IndexedAIP.class.getSimpleName();
+      searchWrapper.createListAndSearchPanel(listBuilder, true, true);
+    }
 
-        Filter filter = classFilters.get(searchableClass.getSimpleName());
-        ListBuilder<?> listBuilder = null;
-        if (searchableClass.equals(IndexedAIP.class)
-          && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
+    // 2. Virtual catalogues (after AIPs, before Representations/Files)
+    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
+      List<String> virtualCatalogueIds = ConfigurationManager
+        .getStringList(RodaConstants.UI_CATALOGUE_VIRTUAL_PROPERTY);
+      for (String virtualListId : virtualCatalogueIds) {
+        String childOfFilterStr = ConfigurationManager.getString(RodaConstants.UI_LISTS_PROPERTY, virtualListId,
+          RodaConstants.UI_LISTS_CATALOGUE_CHILDOF_FILTER);
+        String filterStr = ConfigurationManager.getString(RodaConstants.UI_LISTS_PROPERTY, virtualListId,
+          RodaConstants.UI_LISTS_CATALOGUE_FILTER);
 
-          listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
-            new AsyncTableCellOptions<>(IndexedAIP.class, itemsListId)
-              .withActionable(AipSearchWrapperActions.getWithoutNoAipActions(null, AIPState.ACTIVE, permissions))
-              .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()
-              .withFilter(filter).withStartHidden(startHidden)
-              .withActionBlacklist(List.of(AipSearchWrapperActions.AipSearchWrapperAction.NEW_CHILD_AIP_BELOW,
-                AipSearchWrapperActions.AipSearchWrapperAction.APPRAISAL_ACCEPT,
-                AipSearchWrapperActions.AipSearchWrapperAction.APPRAISAL_REJECT)));
-        } else if (searchableClass.equals(IndexedRepresentation.class)
-          && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION)) {
+        ListBuilder<IndexedAIP> virtualListBuilder = null;
 
-          listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
-            new AsyncTableCellOptions<>(IndexedRepresentation.class, representationsListId)
-              .withActionable(RepresentationSearchWrapperActions.getWithoutNoRepresentationActions(null, null))
-              .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()
-              .withFilter(filter).withStartHidden(startHidden));
-        } else if (searchableClass.equals(IndexedFile.class)
-          && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_FILE)) {
-
-          listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
-            new AsyncTableCellOptions<>(IndexedFile.class, filesListId)
-              .withActionable(FileSearchWrapperActions.getWithoutNoFileActions(null, null, null, null, null))
-              .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()
-              .withFilter(filter).withStartHidden(startHidden));
+        if (childOfFilterStr != null && !childOfFilterStr.isEmpty()) {
+          SimpleFilterParameter maskParam = parseFieldValueFilter(childOfFilterStr);
+          if (maskParam != null) {
+            Filter childFilter = new Filter(new ChildOfFilterParameter(null, maskParam));
+            virtualListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
+              new AsyncTableCellOptions<>(IndexedAIP.class, virtualListId).withFilter(childFilter)
+                .withIncludeNestedDocuments(true).withStartHidden(startHidden)
+                .withCustomOpener(aip -> {
+                  String id = aip.getId();
+                  String parentId = id.contains("/") ? id.split("/")[0] : id;
+                  HistoryUtils.newHistory(HistoryUtils.getHistoryBrowse(parentId));
+                }));
+          }
+        } else if (filterStr != null && !filterStr.isEmpty()) {
+          SimpleFilterParameter filterParam = parseFieldValueFilter(filterStr);
+          if (filterParam != null) {
+            Filter aipFilter = new Filter(filterParam);
+            virtualListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
+              new AsyncTableCellOptions<>(IndexedAIP.class, virtualListId).withFilter(aipFilter)
+                .withJustActive(justActive).bindOpener().withStartHidden(startHidden));
+          }
         }
 
-        if (listBuilder != null) {
-          if (preselectedDropdownValue == null) {
-            preselectedDropdownValue = searchableClass.getSimpleName();
-          }
-          searchWrapper.createListAndSearchPanel(listBuilder, true, true);
+        if (virtualListBuilder != null) {
+          searchWrapper.createVirtualListAndSearchPanel(virtualListBuilder, true, true);
         }
       }
+    }
+
+    // 3. Representations and Files
+    if (classFilters.containsKey(IndexedRepresentation.class.getSimpleName())
+      && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION)) {
+      Filter filter = classFilters.get(IndexedRepresentation.class.getSimpleName());
+      ListBuilder<IndexedRepresentation> listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
+        new AsyncTableCellOptions<>(IndexedRepresentation.class, representationsListId)
+          .withActionable(RepresentationSearchWrapperActions.getWithoutNoRepresentationActions(null, null))
+          .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()
+          .withFilter(filter).withStartHidden(startHidden));
+      if (preselectedDropdownValue == null) {
+        preselectedDropdownValue = IndexedRepresentation.class.getSimpleName();
+      }
+      searchWrapper.createListAndSearchPanel(listBuilder, true, true);
+    }
+
+    if (classFilters.containsKey(IndexedFile.class.getSimpleName())
+      && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_FILE)) {
+      Filter filter = classFilters.get(IndexedFile.class.getSimpleName());
+      ListBuilder<IndexedFile> listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
+        new AsyncTableCellOptions<>(IndexedFile.class, filesListId)
+          .withActionable(FileSearchWrapperActions.getWithoutNoFileActions(null, null, null, null, null))
+          .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()
+          .withFilter(filter).withStartHidden(startHidden));
+      if (preselectedDropdownValue == null) {
+        preselectedDropdownValue = IndexedFile.class.getSimpleName();
+      }
+      searchWrapper.createListAndSearchPanel(listBuilder, true, true);
     }
 
     if (preselectedDropdownValue != null) {
@@ -132,6 +179,16 @@ public class CatalogueSearch extends Composite {
     }
 
     initWidget(uiBinder.createAndBindUi(this));
+  }
+
+  private static SimpleFilterParameter parseFieldValueFilter(String filterStr) {
+    int colonIdx = filterStr.indexOf(':');
+    if (colonIdx > 0 && colonIdx < filterStr.length() - 1) {
+      String field = filterStr.substring(0, colonIdx).trim();
+      String value = filterStr.substring(colonIdx + 1).trim();
+      return new SimpleFilterParameter(field, value);
+    }
+    return null;
   }
 
   public CatalogueSearch(boolean justActive, String itemsListId, String representationsListId, String filesListId,

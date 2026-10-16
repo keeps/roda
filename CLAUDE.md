@@ -84,7 +84,7 @@ roda/
 
 1. **Java 21** (Oracle JDK) — strictly required for compilation
 2. **Maven 3.8.6+** — build tool
-3. **Docker & Docker Compose** — for running Solr, PostgreSQL, LDAP, etc.
+3. **Docker** — required for running the application locally and for tests (via Testcontainers — no manual `docker compose` needed for tests)
 4. **GitHub account with PAT** — required for GitHub Packages dependency resolution
 
 **Configure Maven for GitHub Packages** (`~/.m2/settings.xml`):
@@ -112,6 +112,10 @@ The PAT must have `read:packages` permission. Without this, the build will fail 
 
 ### Starting Development Dependencies
 
+**For running tests:** No manual setup needed — tests use **Testcontainers** (`TestContainersManager`) which automatically starts ZooKeeper, Solr, PostgreSQL, Mailpit, ClamAV, and Siegfried as ephemeral Docker containers. The `RodaContainersLifecycleListener` TestNG suite listener wires this up before any test class loads. Docker must be running on the host, but no `docker compose` command is required.
+
+**For running the application locally:**
+
 ```bash
 # Create required data directories
 mkdir -p $HOME/.roda/data/{storage,staging-storage}
@@ -120,7 +124,7 @@ mkdir -p $HOME/.roda/data/{storage,staging-storage}
 docker compose -f deploys/standalone/docker-compose-dev.yaml up -d
 ```
 
-Services and ports:
+Services and ports (for local app, not tests):
 - ZooKeeper: `2181`
 - Apache Solr: `8983`
 - PostgreSQL: `5432`
@@ -209,14 +213,7 @@ mvn -Dtestng.groups="travis" -Denforcer.skip=true clean org.jacoco:jacoco-maven-
 mvn clean package -Dmaven.test.skip=true
 ```
 
-### Required Environment Variables (for tests matching CI)
-
-```
-RODA_CORE_SOLR_TYPE=CLOUD
-SIEGFRIED_MODE=standalone
-```
-
-See `.github/workflows/CI.yml` for the full CI test environment configuration.
+See `.github/workflows/CI.yml` for the full CI configuration.
 
 ### Key Test Classes
 
