@@ -27,6 +27,7 @@ import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
+import org.roda.core.plugins.NonTransactionalPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
@@ -41,7 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
+public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> implements NonTransactionalPlugin {
   private static final Logger LOGGER = LoggerFactory.getLogger(ReindexAllRodaEntitiesPlugin.class);
 
   @Override

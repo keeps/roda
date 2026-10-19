@@ -619,3 +619,51 @@ Structural:
 Before tackling 2–5 and 7–13, extend `IngestDatabaseBenchmark` with the transaction manager on, larger SIPs
 and many files per representation, and record Solr request counts alongside the database counters; the
 current benchmark cannot see most of these costs.
+
+## 10. Proof of concept: index at transaction commit (item 13)
+
+What changed (details in the issue draft "Index only after the transaction commits"):
+
+- The staging model of a transaction no longer has an index observer. A recorder
+  (`DeferredNotificationJournal`) records every model notification; after the storage commit they are
+  consolidated and replayed against the main model's observers, with AIPs, representations and files read
+  again from the main storage. Nothing reaches Solr before commit, and a rollback no longer touches the index.
+- Consolidation (`core.transaction.index.absorb_partial_updates`, default true): drop notifications on objects
+  deleted later in the transaction, keep the last of exact duplicates, drop partial AIP notifications and
+  notifications on objects of an AIP that is fully re-indexed, one full re-index per AIP.
+- Structural lookups (parent/ghost resolution, SIP update lookup, `fixParents`) use a new `catalog_aip` table,
+  written at commit, plus an in-memory view of the AIPs written by the transaction.
+- `Reindex*` plugins run outside transactions (`NonTransactionalPlugin`).
+
+`IngestDatabaseBenchmark` now accepts `-Dbenchmark.transactions=true` (plugins run inside RODA transactions,
+as in a running RODA) and records Solr's own update metrics (`solrUpdates` in the result). Defaults (50 SIPs,
+2 jobs, block size 10, default workflow with virus check and format identification), two runs each, same
+machine, transactions on:
+
+| | Before (`690746a7a`) | Index at commit, no consolidation | Index at commit (default) |
+|---|---|---|---|
+| Ingest wall time | 5,908 / 6,184 ms | 5,764 / 5,780 ms | **5,086 / 5,406 ms** |
+| Solr update requests, total | 2,951 | 3,041 | **1,691** (−43 %) |
+| AIP | 703 | 201 | **51** |
+| Representation | 152 | 150 | **50** |
+| File | 152 | 150 | **50** |
+| PreservationEvent | 902 | 1,500 | **500** |
+| JobReport / Job / TransferredResource | 850 / 84 / 106 | same | same |
+| Job outcome | 2 × 25 partial success | same | same |
+
+- Replaying without consolidation sends about as many requests as before: fewer AIP documents, but each
+  replayed `aipCreated`/`aipUpdated` re-indexes all events of the AIP in its final state, while inline the early
+  ones ran when the AIP had few events.
+- With consolidation, AIP-related documents go from 1,909 to 651 requests (−66 %); the rest (job reports, jobs,
+  transferred resources) is written outside transactions and unchanged.
+- Wall time gains are small here (tiny SIPs, one file each, Solr local); the request reduction grows with files
+  per representation and with network latency to Solr.
+
+Found on the way and fixed:
+
+- Transactional storage: after deleting `aip/<id>`, reading `aip/<id>/aip.json` in the same transaction returned
+  the main storage copy (only the exact deleted path was tracked). Descendants of a deleted path are now deleted
+  too.
+- `SolrUtils.getRetentionPeriod` read the retention trigger from the AIP's own index document, so indexing an
+  AIP with a disposal schedule for the first time (or re-indexing a cleared index) failed with
+  `NotFoundException` and an NPE. The trigger is now computed from the descriptive metadata.

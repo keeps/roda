@@ -5582,6 +5582,13 @@ public class DefaultModelService implements ModelService {
     observers.remove(observer);
   }
 
+  /**
+   * @return the observers registered on this model, in registration order
+   */
+  public List<ModelObserver> getModelObservers() {
+    return Collections.unmodifiableList(new ArrayList<>(observers));
+  }
+
   private ReturnWithExceptionsWrapper notifyObserversSafely(Function<ModelObserver, ReturnWithExceptions<?, ?>> func) {
     ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {

@@ -112,6 +112,18 @@ public class IndexService {
     configIterableIndexResult(metricRegistry, rodaConfiguration);
   }
 
+  /**
+   * Creates a view over the same index, model and observer as {@code other},
+   * without registering a new observer.
+   */
+  protected IndexService(IndexService other) {
+    super();
+    this.solrClient = other.solrClient;
+    this.model = other.model;
+    this.observer = other.observer;
+    this.nodeType = other.nodeType;
+  }
+
   private void configIterableIndexResult(MetricRegistry metricRegistry, Configuration rodaConfiguration) {
     Histogram iterableIndexResultHistogram = metricRegistry
       .histogram(MetricRegistry.name(IterableIndexResult.class.getSimpleName(), "iterableIndexResultHistogram"));
@@ -627,8 +639,7 @@ public class IndexService {
     }
   }
 
-  @SafeVarargs
-  public final void commit(boolean handleAuthorizationExceptionSilently, Class<? extends IsIndexed>... classToCommit)
+  public void commit(boolean handleAuthorizationExceptionSilently, Class<? extends IsIndexed>... classToCommit)
     throws GenericException, AuthorizationDeniedException {
     try {
       RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);

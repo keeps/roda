@@ -33,6 +33,9 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.catalog.CatalogAip;
+import org.roda.core.catalog.CatalogReader;
+import org.roda.core.catalog.Catalogs;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.pekko.Messages;
 import org.roda.core.common.pekko.messages.jobs.JobPartialUpdate;
@@ -74,6 +77,7 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
@@ -101,6 +105,7 @@ import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.TransactionalModelService;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexAIPPlugin;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexActionLogPlugin;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexDIPPlugin;
@@ -971,6 +976,11 @@ public final class PluginHelper {
       return computedSearchScope;
     }
 
+    Optional<CatalogReader> catalog = Catalogs.reader(model);
+    if (catalog.isPresent()) {
+      return getAncestorByIdFromCatalog(catalog.get(), model, ancestor, computedSearchScope, aipField, jobUser);
+    }
+
     Optional<String> ancestorBySIPId = Optional.empty();
     Filter ancestorFilter = new Filter(new SimpleFilterParameter(aipField, ancestor));
     if (computedSearchScope.isPresent()) {
@@ -1003,6 +1013,62 @@ public final class PluginHelper {
       LOGGER.error("Error getting ancestor", e);
     }
     return ancestorBySIPId;
+  }
+
+  /**
+   * Same as the index based lookup, using the catalog: AIPs written by the
+   * current transaction are visible, and so are their parents.
+   */
+  private static Optional<String> getAncestorByIdFromCatalog(CatalogReader catalog, ModelService model,
+    String ancestor, Optional<String> computedSearchScope, String aipField, User jobUser) {
+    List<CatalogAip> candidates = RodaConstants.INGEST_SIP_IDS.equals(aipField) ? catalog.findByIngestSIPId(ancestor)
+      : catalog.get(ancestor).map(List::of).orElse(List.of());
+
+    Optional<String> scope = computedSearchScope.filter(id -> catalog.get(id).isPresent());
+    for (CatalogAip candidate : candidates) {
+      if (scope.isPresent() && !catalog.isAncestor(scope.get(), candidate.id())) {
+        continue;
+      }
+      try {
+        AIP aip = model.retrieveAIP(candidate.id());
+        if (jobUser != null) {
+          UserUtility.checkAIPPermissions(jobUser, aip, PermissionType.READ);
+        }
+        return Optional.of(aip.getId());
+      } catch (NotFoundException | AuthorizationDeniedException e) {
+        // not visible to the job user, try the next candidate
+      } catch (RequestNotValidException | GenericException e) {
+        LOGGER.error("Error getting ancestor", e);
+      }
+    }
+    return Optional.empty();
+  }
+
+  /**
+   * Finds the AIP updated by an update SIP, using the catalog: an active (or
+   * under appraisal) AIP with the SIP id among its ingest SIP ids, or else the
+   * AIP whose id is the SIP id; restricted to descendants of the search scope
+   * unless it is forced.
+   */
+  public static String findAIPToUpdate(CatalogReader catalog, String sipId, Optional<String> searchScope,
+    boolean forceSearchScope) throws NotFoundException {
+    Optional<String> scope = forceSearchScope ? Optional.empty() : searchScope;
+    List<CatalogAip> bySIPId = catalog.findByIngestSIPId(sipId).stream()
+      .filter(aip -> aip.state() == AIPState.ACTIVE || aip.state() == AIPState.UNDER_APPRAISAL)
+      .filter(aip -> scope.isEmpty() || catalog.isAncestor(scope.get(), aip.id())).toList();
+    if (bySIPId.size() == 1) {
+      return bySIPId.get(0).id();
+    }
+
+    List<CatalogAip> byId = catalog.get(sipId)
+      .filter(aip -> scope.isEmpty() || catalog.isAncestor(scope.get(), aip.id())).map(List::of).orElse(List.of());
+    if (byId.size() == 1) {
+      return byId.get(0).id();
+    }
+
+    throw new NotFoundException("Unable to find one & only one AIP created with SIP ID or AIP ID " + sipId
+      + (searchScope.isPresent() ? " under AIP " + searchScope.get() : "") + " (found " + bySIPId.size()
+      + " when searching by id and " + byId.size() + " when searching by SIP id or anscestor id)");
   }
 
   /*******************************************************/
@@ -1582,6 +1648,11 @@ public final class PluginHelper {
   public static void fixParents(IndexService index, ModelService model, Optional<String> jobId,
     Optional<String> computedSearchScope, String updatedBy)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+    Optional<CatalogReader> catalog = Catalogs.reader(model);
+    if (catalog.isPresent()) {
+      fixParents(catalog.get(), model, jobId, computedSearchScope, updatedBy);
+      return;
+    }
 
     // collect all ghost ids
     Map<String, List<String>> aipIdToGhost = new HashMap<>();
@@ -1639,6 +1710,65 @@ public final class PluginHelper {
           }
         }
       }
+    }
+  }
+
+  /**
+   * Same as the index based version, using the catalog (committed data, and the
+   * changes made here are written to it right away by the main model).
+   */
+  private static void fixParents(CatalogReader catalog, ModelService model, Optional<String> jobId,
+    Optional<String> computedSearchScope, String updatedBy) throws GenericException, AuthorizationDeniedException {
+    Map<String, List<String>> sipIdToGhost = new HashMap<>();
+    for (CatalogAip ghost : catalog.findGhosts(jobId.orElse(null))) {
+      String key = ghost.ingestSIPIds().isEmpty() ? null : ghost.ingestSIPIds().get(0);
+      if (key != null) {
+        sipIdToGhost.computeIfAbsent(key, k -> new ArrayList<>()).add(ghost.id());
+      }
+    }
+
+    for (Map.Entry<String, List<String>> entry : sipIdToGhost.entrySet()) {
+      List<CatalogAip> nonGhosts = catalog.findByIngestSIPId(entry.getKey()).stream().filter(aip -> !aip.ghost())
+        .filter(aip -> computedSearchScope.isEmpty() || catalog.isAncestor(computedSearchScope.get(), aip.id()))
+        .toList();
+
+      if (nonGhosts.size() > 1) {
+        LOGGER.debug("Couldn't find non-ghost AIP with ingest SIP ids {}", entry.getKey());
+      } else if (nonGhosts.size() == 1) {
+        for (String ghostId : entry.getValue()) {
+          moveChildrenAndDeleteGhost(catalog, model, ghostId, nonGhosts.get(0).id(), computedSearchScope, updatedBy);
+        }
+      } else if (entry.getValue().size() > 1) {
+        String ghostIdToKeep = entry.getValue().get(0);
+        for (int i = 1; i < entry.getValue().size(); i++) {
+          moveChildrenAndDeleteGhost(catalog, model, entry.getValue().get(i), ghostIdToKeep, computedSearchScope,
+            updatedBy);
+        }
+      }
+    }
+  }
+
+  private static void moveChildrenAndDeleteGhost(CatalogReader catalog, ModelService model, String ghostId,
+    String newParentId, Optional<String> searchScope, String updatedBy)
+    throws GenericException, AuthorizationDeniedException {
+    for (CatalogAip child : catalog.findChildren(ghostId)) {
+      if (searchScope.isPresent() && !catalog.isAncestor(searchScope.get(), child.id())) {
+        continue;
+      }
+      try {
+        model.moveAIP(child.id(), newParentId, updatedBy);
+      } catch (NotFoundException e) {
+        LOGGER.debug("Can't move child. It wasn't found.", e);
+      } catch (RequestNotValidException e) {
+        LOGGER.error("Can't move child {}", child.id(), e);
+      }
+    }
+    try {
+      model.deleteAIP(ghostId);
+    } catch (NotFoundException e) {
+      LOGGER.debug("Can't delete ghost or move node. It wasn't found.", e);
+    } catch (RequestNotValidException e) {
+      LOGGER.error("Can't delete ghost {}", ghostId, e);
     }
   }
 

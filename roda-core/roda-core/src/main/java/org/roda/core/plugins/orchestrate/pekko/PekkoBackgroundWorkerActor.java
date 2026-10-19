@@ -25,6 +25,7 @@ import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.NonTransactionalPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
@@ -76,7 +77,9 @@ public class PekkoBackgroundWorkerActor extends PekkoBaseActor {
     boolean writeIsAllowed = RodaCoreFactory.checkIfWriteIsAllowed(RodaCoreFactory.getNodeType());
 
     try {
-      if (writeIsAllowed && RODATransactionManager != null && RODATransactionManager.isInitialized()) {
+      // plugins that only rebuild derived views from the main storage run outside a transaction
+      if (writeIsAllowed && RODATransactionManager != null && RODATransactionManager.isInitialized()
+        && !(messagePlugin instanceof NonTransactionalPlugin)) {
         RODATransactionManager.runPluginInTransaction(messagePlugin, objectsToBeProcessed);
       } else {
         messagePlugin.execute(index, model, objectsToBeProcessed);

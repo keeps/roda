@@ -87,6 +87,10 @@ import org.roda.core.model.iterables.LogEntryFileSystemIterable;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
+import org.roda.core.catalog.CatalogReader;
+import org.roda.core.catalog.CatalogService;
+import org.roda.core.catalog.Catalogs;
+import org.roda.core.catalog.TransactionCatalogReader;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.Directory;
@@ -112,6 +116,10 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   private final TransactionLog transaction;
   private final TransactionLogService transactionLogService;
   private final TransactionalModelOperationRegistry operationRegistry;
+  private TransactionCatalogReader catalogReader;
+  // only set when recovering unfinished transactions, whose index state is
+  // unknown; a live transaction never wrote anything to the index
+  private boolean reconcileIndexOnRollback = false;
 
   public DefaultTransactionalModelService(ModelService mainModelService, ModelService stagingModelService,
     TransactionLog transaction, TransactionLogService transactionLogService) {
@@ -125,6 +133,34 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
 
   private ModelService getModelService() {
     return stagingModelService;
+  }
+
+  @Override
+  public synchronized Optional<CatalogReader> getCatalogReader() {
+    if (catalogReader == null) {
+      Optional<CatalogService> catalog = Catalogs.service();
+      if (catalog.isEmpty()) {
+        return Optional.empty();
+      }
+      catalogReader = new TransactionCatalogReader(catalog.get(), this, operationRegistry::getWrittenAIPIds);
+      operationRegistry.setAIPWriteListener(catalogReader::invalidate);
+    }
+    return Optional.of(catalogReader);
+  }
+
+  @Override
+  public Set<String> getWrittenAIPIds() {
+    return operationRegistry.getWrittenAIPIds();
+  }
+
+  /**
+   * @param reconcileIndexOnRollback
+   *          when true, a rollback re-indexes (from the main storage) or removes
+   *          every object touched by the transaction; only needed when the index
+   *          state is unknown, i.e. when recovering unfinished transactions
+   */
+  public void setReconcileIndexOnRollback(boolean reconcileIndexOnRollback) {
+    this.reconcileIndexOnRollback = reconcileIndexOnRollback;
   }
 
   @Override
@@ -4582,9 +4618,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     for (TransactionalModelOperationLog modelOperation : transactionLogService
       .getModelOperations(transaction.getId())) {
       transactionLogService.updateModelOperationState(modelOperation.getId(), OperationState.ROLLING_BACK);
+      if (!reconcileIndexOnRollback) {
+        // notifications were deferred, so nothing of this transaction reached the
+        // index: there is nothing to undo there
+        transactionLogService.updateModelOperationState(modelOperation.getId(), OperationState.ROLLED_BACK);
+        PluginHelper.releaseObjectLock(modelOperation.getLiteObject(), transaction.getRequestId().toString());
+        continue;
+      }
+
       LiteRODAObject liteRODAObject = new LiteRODAObject(modelOperation.getLiteObject());
       OptionalWithCause<IsRODAObject> isRODAObjectOptionalWithCause = LiteRODAObjectFactory.get(this, liteRODAObject);
-
       if (isRODAObjectOptionalWithCause.isPresent()) {
         IsRODAObject rodaObject = isRODAObjectOptionalWithCause.get();
         try {

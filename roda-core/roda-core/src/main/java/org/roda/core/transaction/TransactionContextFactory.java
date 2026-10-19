@@ -39,6 +39,8 @@ import io.micrometer.core.annotation.Timed;
 @Timed
 public class TransactionContextFactory {
   private static final Logger LOGGER = LoggerFactory.getLogger(TransactionContextFactory.class);
+  /** Log index reads, inside a transaction, of objects written by that transaction. */
+  public static final String LOG_OWN_WRITE_READS_PROPERTY = "core.transaction.index.log_own_write_reads";
   private final ConfigurationManager configurationManager = ConfigurationManager.getInstance();
   private final TransactionLogService transactionLogService;
 
@@ -50,11 +52,15 @@ public class TransactionContextFactory {
     throws RODATransactionException {
     TransactionalStorageService storageService = createTransactionalStorageService(mainModelService.getStorage(),
       transactionLog);
+    // notifications of the staging model are recorded, not delivered: nothing
+    // reaches the index (or any other observer) before the commit
+    DeferredNotificationJournal journal = new DeferredNotificationJournal();
     TransactionalModelService modelService = createTransactionalModelService(mainModelService, storageService,
-      transactionLog);
-    IndexService indexService = createTransactionalIndexService(modelService);
+      transactionLog, journal);
+    IndexService indexService = new TransactionIndexService(RodaCoreFactory.getIndexService(), transactionLog.getId(),
+      journal, Boolean.parseBoolean(configurationManager.getConfigurationString(LOG_OWN_WRITE_READS_PROPERTY, "true")));
 
-    return new TransactionalContext(transactionLog, storageService, modelService, indexService);
+    return new TransactionalContext(transactionLog, storageService, modelService, indexService, journal);
   }
 
   public TransactionalStorageService createTransactionalStorageService(StorageService mainStorageService,
@@ -103,17 +109,14 @@ public class TransactionContextFactory {
   }
 
   private TransactionalModelService createTransactionalModelService(ModelService mainModelService,
-    StorageService storageService, TransactionLog transactionLog) {
+    StorageService storageService, TransactionLog transactionLog, DeferredNotificationJournal journal) {
     ModelService stagingModelService = new DefaultModelService(storageService, RodaCoreFactory.getEventsManager(),
       RodaCoreFactory.getNodeType(), RodaCoreFactory.getInstanceId());
+    stagingModelService.addModelObserver(journal.recorder());
     ((DefaultTransactionalStorageService) storageService).setInitialized(true);
 
     return new DefaultTransactionalModelService(mainModelService, stagingModelService, transactionLog,
       transactionLogService);
   }
 
-  private IndexService createTransactionalIndexService(ModelService modelService) {
-    return new IndexService(RodaCoreFactory.getIndexService().getSolrClient(), modelService,
-      RodaCoreFactory.getMetrics(), configurationManager.getRodaConfiguration(), RodaCoreFactory.getNodeType());
-  }
 }

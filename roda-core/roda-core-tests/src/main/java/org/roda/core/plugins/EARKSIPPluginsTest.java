@@ -24,6 +24,7 @@ import com.google.common.collect.Lists;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
+import org.roda.core.TransactionalTestSupport;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
 import org.roda.core.data.common.RodaConstants;
@@ -60,6 +61,7 @@ import org.roda.core.plugins.base.maintenance.FixAncestorsPlugin;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexAIPPlugin;
 import org.roda.core.security.LdapUtilityTestHelper;
 import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.transaction.RODATransactionManager;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -189,6 +191,14 @@ public class EARKSIPPluginsTest {
     return ingestCorpora(pluginClass, model, index, ingestCorpora, false);
   }
 
+  /**
+   * @return true to run the tests with RODA transactions on (see the
+   *         Transactional* subclasses)
+   */
+  protected boolean useTransactions() {
+    return false;
+  }
+
   @BeforeClass
   public void setUp() throws IOException, URISyntaxException {
     basePath = TestsHelper.createBaseTempDir(getClass(), true);
@@ -200,8 +210,13 @@ public class EARKSIPPluginsTest {
     boolean deployOrchestrator = true;
     boolean deployPluginManager = true;
     boolean deployDefaultResources = false;
+    RODATransactionManager transactionManager = useTransactions() ? TransactionalTestSupport.transactionManager()
+      : null;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
-      deployPluginManager, deployDefaultResources, false, ldapUtilityTestHelper.getLdapUtility());
+      deployPluginManager, deployDefaultResources, false, ldapUtilityTestHelper.getLdapUtility(), transactionManager);
+    if (transactionManager != null) {
+      TransactionalTestSupport.activate(transactionManager);
+    }
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
 

@@ -30,6 +30,7 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.DIPFile;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -303,16 +304,30 @@ public class UserUtility {
 
   public static void checkAIPPermissions(User user, IndexedAIP aip, PermissionType permissionType)
     throws AuthorizationDeniedException {
+    checkAIPPermissions(user, aip.getId(), aip.getPermissions(), permissionType);
+  }
+
+  /**
+   * Checks the permissions of an AIP read from the model (e.g. inside a RODA
+   * transaction, where the index only holds committed data).
+   */
+  public static void checkAIPPermissions(User user, AIP aip, PermissionType permissionType)
+    throws AuthorizationDeniedException {
+    checkAIPPermissions(user, aip.getId(), aip.getPermissions(), permissionType);
+  }
+
+  private static void checkAIPPermissions(User user, String aipId, Permissions permissions,
+    PermissionType permissionType) throws AuthorizationDeniedException {
 
     if (isAdministrator(user)) {
       return;
     }
 
-    Set<String> users = aip.getPermissions().getUsers().get(permissionType);
-    Set<String> groups = aip.getPermissions().getGroups().get(permissionType);
+    Set<String> users = permissions.getUsers().get(permissionType);
+    Set<String> groups = permissions.getGroups().get(permissionType);
 
     LOGGER.debug("Checking if user '{}' has permissions to {} object {} (object read permissions: {} & {})",
-      user.getId(), permissionType, aip.getId(), users, groups);
+      user.getId(), permissionType, aipId, users, groups);
 
     if (!users.contains(user.getId()) && iterativeDisjoint(groups, user.getGroups())) {
       throw new AuthorizationDeniedException(

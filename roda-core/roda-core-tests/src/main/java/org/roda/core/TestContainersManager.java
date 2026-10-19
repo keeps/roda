@@ -95,6 +95,8 @@ public class TestContainersManager {
             .forPort(externalSolrPort).forStatusCode(200).withStartupTimeout(Duration.ofMinutes(3)));
     solr.start();
     LOGGER.info("Solr started and registered in ZK at {}:{}", dockerHostIp, externalSolrPort);
+    // for benchmarks that read Solr's own metrics
+    System.setProperty(SOLR_BASE_URL_PROPERTY, "http://localhost:" + externalSolrPort + "/solr");
 
     // PostgreSQL (pg_stat_statements is preloaded so that database benchmarks,
     // e.g. JobDatabaseBenchmark, can collect per-statement statistics)
@@ -145,6 +147,9 @@ public class TestContainersManager {
 
     Runtime.getRuntime().addShutdownHook(new Thread(this::stopAll, "testcontainers-shutdown"));
   }
+
+  /** System property with the base URL of the test Solr (e.g. http://localhost:1234/solr). */
+  public static final String SOLR_BASE_URL_PROPERTY = "roda.test.solr.base_url";
 
   public static TestContainersManager getInstance() {
     if (INSTANCE == null) {

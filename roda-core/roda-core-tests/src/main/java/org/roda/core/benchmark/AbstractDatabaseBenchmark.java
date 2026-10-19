@@ -38,6 +38,7 @@ import org.roda.core.config.ConfigurationManager;
 import org.roda.core.repository.job.JobFlushCleanupTask;
 import org.roda.core.security.LdapUtilityTestHelper;
 import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.transaction.RODATransactionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,8 +104,16 @@ public abstract class AbstractDatabaseBenchmark extends AbstractTestNGSpringCont
     basePath = TestsHelper.createBaseTempDir(getClass(), true);
     ConfigurationManager.resetInstanceAfterTest();
     ldapUtilityTestHelper = new LdapUtilityTestHelper();
+    // -Dbenchmark.transactions=true runs plugins inside RODA transactions, as in a running RODA
+    RODATransactionManager transactionManager = Boolean.getBoolean("benchmark.transactions")
+      ? applicationContext.getBean(RODATransactionManager.class)
+      : null;
     RodaCoreFactory.instantiateTest(deploySolr, true, deployFolderMonitor, deployOrchestrator, deployPluginManager,
-      false, false, ldapUtilityTestHelper.getLdapUtility());
+      false, false, ldapUtilityTestHelper.getLdapUtility(), transactionManager);
+    if (transactionManager != null) {
+      transactionManager.setMainModelService(RodaCoreFactory.getModelService());
+      transactionManager.setInitialized(true);
+    }
     Path rodaHome = RodaCoreFactory.getRodaHomePath();
     if (!rodaHome.toAbsolutePath().normalize().startsWith(basePath.toAbsolutePath().normalize())) {
       throw new IllegalStateException(

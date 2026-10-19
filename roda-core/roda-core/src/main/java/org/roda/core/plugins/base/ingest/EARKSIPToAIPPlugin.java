@@ -18,6 +18,8 @@ import java.util.Optional;
 
 import org.apache.commons.io.FilenameUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.catalog.CatalogReader;
+import org.roda.core.catalog.Catalogs;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -213,7 +215,26 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     boolean forceSearchScope) throws GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException, AlreadyExistsException, ValidationException, LockingException {
     String searchScopeString = searchScope.orElse(null);
+    IndexedAIP indexedAIP;
 
+    Optional<CatalogReader> catalog = Catalogs.reader(model);
+    if (catalog.isPresent()) {
+      indexedAIP = new IndexedAIP();
+      indexedAIP.setId(PluginHelper.findAIPToUpdate(catalog.get(), sip.getId(), searchScope, forceSearchScope));
+    } else {
+      indexedAIP = findAIPToUpdateInIndex(index, sip, searchScopeString, forceSearchScope);
+    }
+
+    String jobUsername = PluginHelper.getJobUsername(this, index);
+    String jobId = PluginHelper.getJobId(this);
+
+    // Update the AIP
+    return EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP, model, jobUsername, searchScope, jobId, null,
+      this);
+  }
+
+  private IndexedAIP findAIPToUpdateInIndex(IndexService index, SIP sip, String searchScopeString,
+    boolean forceSearchScope) throws GenericException, RequestNotValidException, NotFoundException {
     List<FilterParameter> possibleStates = new ArrayList<>();
     possibleStates.add(new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.toString()));
     possibleStates.add(new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.UNDER_APPRAISAL.toString()));
@@ -247,13 +268,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
           + " when searching by id and " + result.getTotalCount() + " when searching by SIP id or anscestor id)");
       }
     }
-
-    String jobUsername = PluginHelper.getJobUsername(this, index);
-    String jobId = PluginHelper.getJobId(this);
-
-    // Update the AIP
-    return EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP, model, jobUsername, searchScope, jobId, null,
-      this);
+    return indexedAIP;
   }
 
   @Override

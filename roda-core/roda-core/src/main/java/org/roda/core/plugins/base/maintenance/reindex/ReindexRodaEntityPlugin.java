@@ -35,6 +35,7 @@ import org.roda.core.index.schema.SolrCollectionRegistry;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
+import org.roda.core.plugins.NonTransactionalPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
@@ -50,7 +51,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
+public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlugin<T>
+  implements NonTransactionalPlugin {
   private static final Logger LOGGER = LoggerFactory.getLogger(ReindexRodaEntityPlugin.class);
   private boolean clearIndexes = false;
   private boolean optimizeIndexes = false;
@@ -150,6 +152,7 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
         ReturnWithExceptions<Void, ModelObserver> exceptions = index.reindex(object);
         List<Exception> exceptionList = exceptions.getExceptions();
         if (exceptionList.isEmpty()) {
+          afterReindex(model, object);
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
         } else {
           jobPluginInfo.incrementObjectsProcessedWithFailure();
@@ -214,6 +217,14 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
     }
 
     return new Report();
+  }
+
+  /**
+   * Called after an object has been re-indexed successfully, to refresh other
+   * views derived from the main storage.
+   */
+  protected void afterReindex(ModelService model, T object) {
+    // nothing by default
   }
 
   public abstract void clearSpecificIndexes(IndexService index, List<String> ids)

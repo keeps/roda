@@ -9,22 +9,36 @@ package org.roda.core.transaction;
 
 import java.nio.file.Path;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.catalog.CatalogModelObserver;
+import org.roda.core.catalog.Catalogs;
 import org.roda.core.config.ConfigurationManager;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.entity.transaction.TransactionLog;
+import org.roda.core.entity.transaction.TransactionalModelOperationLog;
+import org.roda.core.model.DefaultModelService;
+import org.roda.core.model.DefaultTransactionalModelService;
+import org.roda.core.model.LiteRODAObjectFactory;
+import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.TransactionalModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
@@ -47,6 +61,12 @@ import io.micrometer.core.annotation.Timed;
 @Timed
 public class RODATransactionManager {
   private static final Logger LOGGER = LoggerFactory.getLogger(RODATransactionManager.class);
+  /**
+   * When true (default), notifications on objects of an AIP (and partial AIP
+   * updates) are not replayed if the AIP itself is fully re-indexed by the same
+   * transaction, and the AIP is fully re-indexed only once.
+   */
+  public static final String ABSORB_PARTIAL_UPDATES_PROPERTY = "core.transaction.index.absorb_partial_updates";
   private final TransactionLogService transactionLogService;
   private final TransactionContextFactory transactionContextFactory;
   private final Map<UUID, TransactionalContext> transactionsContext = new ConcurrentHashMap<>();
@@ -62,6 +82,13 @@ public class RODATransactionManager {
 
   public void setMainModelService(ModelService mainModelService) {
     this.mainModelService = mainModelService;
+    // AIP changes made directly on the main model (outside a transaction) must
+    // also reach the catalog; changes made inside a transaction reach it at commit
+    if (mainModelService instanceof DefaultModelService defaultModel && defaultModel.getModelObservers().stream()
+      .noneMatch(CatalogModelObserver::isCatalogObserver)) {
+      Catalogs.service().ifPresent(catalog -> mainModelService.addModelObserver(
+        CatalogModelObserver.create(catalog, mainModelService)));
+    }
   }
 
   public boolean isInitialized() {
@@ -169,12 +196,86 @@ public class RODATransactionManager {
       context.transactionalStorageService().commit();
     }
 
+    // the data is now in the main storage: publish it to the catalog and the
+    // index before releasing the locks (done by the model commit)
+    publishCommittedChanges(context);
+
     if (context.transactionalModelService() != null) {
       context.transactionalModelService().commit();
     }
 
     transactionsContext.remove(transactionID);
     transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.COMMITTED);
+  }
+
+  /**
+   * Writes the AIPs changed by the transaction to the catalog, then replays the
+   * model notifications recorded during the transaction against the observers of
+   * the main model (e.g. the index). Failures are logged and never undo the
+   * committed data.
+   */
+  private void publishCommittedChanges(TransactionalContext context) {
+    TransactionalModelService transactionalModel = context.transactionalModelService();
+    DeferredNotificationJournal journal = context.notificationJournal();
+    if (transactionalModel == null || journal == null) {
+      return;
+    }
+    UUID transactionId = context.transactionLog().getId();
+    long start = System.currentTimeMillis();
+
+    Set<String> writtenAIPIds = transactionalModel.getWrittenAIPIds();
+    try {
+      Catalogs.service().ifPresent(catalog -> catalog.synchronize(writtenAIPIds, mainModelService));
+    } catch (RuntimeException e) {
+      LOGGER.error("[transactionId:{}] Could not update the catalog for AIPs {}; run the catalog rebuild job",
+        transactionId, writtenAIPIds, e);
+    }
+    long catalogDone = System.currentTimeMillis();
+
+    int replayed = replay(journal, transactionId);
+
+    // commits plugins asked for inside the transaction, now that the changes are
+    // in the index
+    List<Class<? extends IsIndexed>> deferredCommits = journal.getDeferredCommits();
+    if (!deferredCommits.isEmpty()) {
+      try {
+        RodaCoreFactory.getIndexService().commit(true, deferredCommits.toArray(new Class[0]));
+      } catch (GenericException | AuthorizationDeniedException e) {
+        LOGGER.warn("[transactionId:{}] Could not commit the index after publishing changes", transactionId, e);
+      }
+    }
+
+    LOGGER.info("[transactionId:{}] Published committed changes: {} AIPs to the catalog in {} ms, {} of {} recorded"
+      + " notifications replayed in {} ms", transactionId, writtenAIPIds.size(), catalogDone - start, replayed,
+      journal.size(), System.currentTimeMillis() - catalogDone);
+    journal.clear();
+  }
+
+  /**
+   * Replays the consolidated notifications of {@code journal} against the
+   * observers of the main model, except the catalog one (the catalog is
+   * synchronized separately).
+   *
+   * @return number of notifications replayed
+   */
+  private int replay(DeferredNotificationJournal journal, UUID transactionId) {
+    if (journal == null || journal.isEmpty()) {
+      return 0;
+    }
+    boolean absorbPartialUpdates = Boolean.parseBoolean(
+      ConfigurationManager.getInstance().getConfigurationString(ABSORB_PARTIAL_UPDATES_PROPERTY, "true"));
+    List<DeferredNotificationJournal.Entry> toReplay = journal.consolidate(absorbPartialUpdates);
+    List<ModelObserver> observers = mainModelService instanceof DefaultModelService defaultModel
+      ? defaultModel.getModelObservers().stream().filter(o -> !CatalogModelObserver.isCatalogObserver(o)).toList()
+      : List.of();
+    List<ReturnWithExceptions<?, ?>> results = DeferredNotificationJournal.replay(toReplay, mainModelService,
+      observers);
+    long failures = results.stream().filter(r -> !r.getExceptions().isEmpty()).count();
+    if (failures > 0) {
+      LOGGER.error("[transactionId:{}] {} of {} notifications failed when publishing committed changes; run a reindex"
+        + " of the affected objects", transactionId, failures, toReplay.size());
+    }
+    return toReplay.size();
   }
 
   public void rollbackTransaction(UUID transactionID) {
@@ -211,11 +312,36 @@ public class RODATransactionManager {
       try {
         TransactionalContext context = getContext(unfinishedTransaction);
         transactionsContext.put(unfinishedTransaction.getId(), context);
+        // the index and catalog state of an interrupted transaction is unknown:
+        // reconcile every touched object with the main storage
+        if (context.transactionalModelService() instanceof DefaultTransactionalModelService transactionalModel) {
+          transactionalModel.setReconcileIndexOnRollback(true);
+        }
+        Set<String> touchedAIPIds = getTouchedAIPIds(unfinishedTransaction.getId());
         rollbackTransaction(unfinishedTransaction.getId());
+        // the reconciliation notifies removals through the staging model, whose
+        // notifications are recorded: deliver them to the index now
+        replay(context.notificationJournal(), unfinishedTransaction.getId());
+        Catalogs.service().ifPresent(catalog -> catalog.synchronize(touchedAIPIds, mainModelService));
       } catch (RODATransactionException e) {
         LOGGER.error("Error during cleanup of unfinished transaction: {}", unfinishedTransaction.getId(), e);
       }
     }
+  }
+
+  private Set<String> getTouchedAIPIds(UUID transactionId) throws RODATransactionException {
+    Set<String> aipIds = new HashSet<>();
+    for (TransactionalModelOperationLog operation : transactionLogService.getModelOperations(transactionId)) {
+      String[] split = operation.getLiteObject().split(LiteRODAObjectFactory.SEPARATOR_REGEX);
+      if (split.length >= 2 && AIP.class.getName().equals(split[0])) {
+        try {
+          aipIds.add(LiteRODAObjectFactory.decodeId(split[1]));
+        } catch (GenericException e) {
+          LOGGER.warn("Could not decode AIP id from {}", operation.getLiteObject(), e);
+        }
+      }
+    }
+    return aipIds;
   }
 
   public void cleanCommittedTransactions(UUID transactionId)
@@ -273,7 +399,8 @@ public class RODATransactionManager {
       .createTransactionLog(TransactionLog.TransactionRequestType.NON_DEFINED, UUID.randomUUID());
     TransactionalStorageService transactionalStorageService = transactionContextFactory
       .createTransactionalStorageService(mainStorage, transactionLog);
-    TransactionalContext context = new TransactionalContext(transactionLog, transactionalStorageService, null, null);
+    TransactionalContext context = new TransactionalContext(transactionLog, transactionalStorageService, null, null,
+      null);
     ((DefaultTransactionalStorageService) transactionalStorageService).setInitialized(true);
 
     transactionsContext.put(transactionLog.getId(), context);
@@ -290,6 +417,8 @@ public class RODATransactionManager {
     if (context.transactionalStorageService() != null) {
       context.transactionalStorageService().commit();
     }
+
+    publishCommittedChanges(context);
 
     if (context.transactionalModelService() != null) {
       context.transactionalModelService().commit();

@@ -213,7 +213,7 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
           reportItem.setPluginState(state).setPluginDetails(outcomeDetailsText);
           jobPluginInfo.incrementObjectsProcessedWithSkipped();
         } else {
-          disposalRuleUsed = ApplyDisposalRulesPluginUtils.applyRule(aip, disposalRules, index);
+          disposalRuleUsed = ApplyDisposalRulesPluginUtils.applyRule(aip, disposalRules, index, model);
 
           if (disposalRuleUsed.isPresent()) {
             // Schedule was applied

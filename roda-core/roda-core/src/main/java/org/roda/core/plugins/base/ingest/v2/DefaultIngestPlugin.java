@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.catalog.Catalogs;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -210,7 +211,10 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     LOGGER.debug("Doing stuff in afterAllExecute");
 
     try {
-      index.commitAIPs();
+      if (Catalogs.reader(model).isEmpty()) {
+        // fixParents searches the index, which must see the AIPs of this job
+        index.commitAIPs();
+      }
       boolean skipFixParents = RodaCoreFactory.getRodaConfiguration()
         .getBoolean(RodaConstants.CORE_INGEST_SKIP_FIX_PARENTS, false);
       if (!skipFixParents) {

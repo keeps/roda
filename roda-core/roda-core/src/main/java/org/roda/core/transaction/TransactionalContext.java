@@ -17,5 +17,5 @@ import org.roda.core.storage.TransactionalStorageService;
  */
 public record TransactionalContext(TransactionLog transactionLog,
   TransactionalStorageService transactionalStorageService, TransactionalModelService transactionalModelService,
-  IndexService indexService) {
+  IndexService indexService, DeferredNotificationJournal notificationJournal) {
 }

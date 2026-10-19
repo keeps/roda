@@ -13,6 +13,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -63,6 +66,10 @@ public class TransactionalModelOperationRegistry {
   private final TransactionLog transaction;
   private final TransactionLogService transactionLogService;
   private final ModelService mainModelService;
+  // AIPs written (created, updated or deleted, directly or through one of their
+  // objects) by the transaction, kept in memory for catalog lookups and commit
+  private final Set<String> writtenAIPIds = ConcurrentHashMap.newKeySet();
+  private volatile Consumer<String> aipWriteListener;
 
   public TransactionalModelOperationRegistry(TransactionLog transaction, TransactionLogService transactionLogService,
     ModelService mainModelService) {
@@ -496,6 +503,7 @@ public class TransactionalModelOperationRegistry {
       // purposes
       return null;
     }
+    trackWrittenAIP(liteInfo);
     try {
       LOGGER.debug("[transactionId:{}] Registering operation {} for liteInfo {}", transaction.getId(), operation,
         liteInfo);
@@ -504,6 +512,38 @@ public class TransactionalModelOperationRegistry {
       throw new IllegalArgumentException(
         "[transactionId:" + transaction.getId() + "] Cannot register operation for liteInfo: " + liteInfo, e);
     }
+  }
+
+  private void trackWrittenAIP(String liteInfo) {
+    String[] split = liteInfo.split(LiteRODAObjectFactory.SEPARATOR_REGEX);
+    if (split.length >= 2 && AIP.class.getName().equals(split[0])) {
+      try {
+        String aipId = LiteRODAObjectFactory.decodeId(split[1]);
+        writtenAIPIds.add(aipId);
+        Consumer<String> listener = aipWriteListener;
+        if (listener != null) {
+          listener.accept(aipId);
+        }
+      } catch (GenericException e) {
+        LOGGER.warn("[transactionId:{}] Could not decode AIP id from {}", transaction.getId(), liteInfo, e);
+      }
+    }
+  }
+
+  /**
+   * @return ids of the AIPs written by the transaction so far
+   */
+  public Set<String> getWrittenAIPIds() {
+    return Collections.unmodifiableSet(writtenAIPIds);
+  }
+
+  /**
+   * @param listener
+   *          called with the AIP id every time an operation that writes an AIP is
+   *          registered
+   */
+  public void setAIPWriteListener(Consumer<String> listener) {
+    this.aipWriteListener = listener;
   }
 
   private TransactionalModelOperationLog saveOperation(TransactionalModelOperationLog operationLog) {

@@ -292,7 +292,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     NotFoundException {
     TransactionalStoragePathOperationLog operationLog;
 
-    if (!deletedStoragePaths.contains(storagePath.toString()) && mainStorageService.exists(storagePath)) {
+    if (!isDeletedInTransaction(storagePath) && mainStorageService.exists(storagePath)) {
       throw new AlreadyExistsException("Binary already exists: " + storagePath);
     }
 
@@ -321,7 +321,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
 
     Binary ret;
 
-    if (!deletedStoragePaths.contains(storagePath.toString()) && mainStorageService.exists(storagePath)) {
+    if (!isDeletedInTransaction(storagePath) && mainStorageService.exists(storagePath)) {
       ret = getBinary(storagePath);
       updateOperationState(operationLog, OperationState.SKIPPED);
       return ret;
@@ -1114,11 +1114,36 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
         storagePathAsString);
       return stagingStorageService;
     }
-    if (!deletedStoragePaths.contains(storagePathAsString)) {
+    if (!isDeletedInTransaction(storagePathAsString)) {
       LOGGER.debug("[transactionId:{}] Using main storage service for storage path: {}", transaction.getId(),
         storagePathAsString);
       return mainStorageService;
     }
     throw new NotFoundException("[transactionId:" + transaction.getId() + "] Resource was deleted in this transaction.");
+  }
+
+  private boolean isDeletedInTransaction(StoragePath storagePath) {
+    return isDeletedInTransaction(stagingStorageService.getStoragePathAsString(storagePath, false));
+  }
+
+  /**
+   * A resource is deleted for this transaction if it, or any of its ancestors,
+   * was deleted by it (and it was not created again in the staging storage).
+   */
+  private boolean isDeletedInTransaction(String storagePathAsString) {
+    if (deletedStoragePaths.isEmpty()) {
+      return false;
+    }
+    String path = storagePathAsString;
+    while (true) {
+      if (deletedStoragePaths.contains(path)) {
+        return true;
+      }
+      int separator = path.lastIndexOf('/');
+      if (separator <= 0) {
+        return false;
+      }
+      path = path.substring(0, separator);
+    }
   }
 }

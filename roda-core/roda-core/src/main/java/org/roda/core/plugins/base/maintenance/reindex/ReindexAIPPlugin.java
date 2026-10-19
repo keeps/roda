@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.base.maintenance.reindex;
 
+import org.roda.core.catalog.Catalogs;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -18,6 +19,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.index.IndexService;
+import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 
 import java.util.Arrays;
@@ -43,6 +45,13 @@ public class ReindexAIPPlugin extends ReindexRodaEntityPlugin<AIP> {
   @Override
   public List<Class<AIP>> getObjectClasses() {
     return Arrays.asList(AIP.class);
+  }
+
+  @Override
+  protected void afterReindex(ModelService model, AIP aip) {
+    if (Catalogs.isTransactionalModeActive()) {
+      Catalogs.service().ifPresent(catalog -> catalog.synchronize(List.of(aip.getId()), model));
+    }
   }
 
   @Override

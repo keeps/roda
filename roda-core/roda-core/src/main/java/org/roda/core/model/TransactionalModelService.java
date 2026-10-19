@@ -7,6 +7,10 @@
  */
 package org.roda.core.model;
 
+import java.util.Optional;
+import java.util.Set;
+
+import org.roda.core.catalog.CatalogReader;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -22,4 +26,19 @@ public interface TransactionalModelService extends ModelService, TransactionalSe
     default void createOrUpdateJob(Job job) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
     }
+
+  /**
+   * @return the catalog view of this transaction (committed AIPs plus the AIPs
+   *         written by it), or empty when the catalog is not available
+   */
+  default Optional<CatalogReader> getCatalogReader() {
+    return Optional.empty();
+  }
+
+  /**
+   * @return ids of the AIPs written by this transaction so far
+   */
+  default Set<String> getWrittenAIPIds() {
+    return Set.of();
+  }
 }

@@ -136,14 +136,20 @@ public class IngestDatabaseBenchmark extends AbstractDatabaseBenchmark {
     }
 
     collector.resetTables();
+    Map<String, Double> solrBefore = SolrUpdateMetrics.read();
     IngestRun run = runIngest("run", config.sips, config.jobs);
+    Map<String, Double> solrUpdates = SolrUpdateMetrics.difference(solrBefore, SolrUpdateMetrics.read());
 
     Map<String, Object> result = resultHeader(config.toMap());
     result.put("phases", run.phases);
     result.put("ingestOutcome", run.outcome);
+    result.put("transactions", Boolean.getBoolean("benchmark.transactions"));
+    result.put("solrUpdates", solrUpdates);
     Path output = writeResult(result);
     LOGGER.info("Ingest database benchmark results:\n{}", summary(run.phases));
     LOGGER.info("Ingest database benchmark job outcomes: {}", run.outcome);
+    LOGGER.info("Ingest database benchmark Solr update requests (transactions={}): {}",
+      Boolean.getBoolean("benchmark.transactions"), solrUpdates);
     LOGGER.info("Ingest database benchmark results written to {}", output.toAbsolutePath());
   }
 

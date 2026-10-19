@@ -17,7 +17,6 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -108,7 +107,7 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
         "Done with checking user authorization for AIP {0}", aip.getId()));
 
     if (cachedJob != null) {
-      processAIPPermissions(index, cachedJob, aip, reportItem);
+      processAIPPermissions(index, model, cachedJob, aip, reportItem);
     } else {
       reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(PluginHelper
         .getPreservationEventText("plugin.verifyUserAuthorizationPlugin.event.unableToDetermineJob",
@@ -137,13 +136,15 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
   }
 
-  private void processAIPPermissions(IndexService index, Job cachedJob, AIP aip, Report reportItem) {
+  private void processAIPPermissions(IndexService index, ModelService model, Job cachedJob, AIP aip,
+    Report reportItem) {
     try {
       String jobCreatorUsername = cachedJob.getUsername();
       if (aip.getParentId() != null) {
         try {
-          IndexedAIP parentAIP = index.retrieve(IndexedAIP.class, aip.getParentId(),
-            RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+          // the parent is read from the model: it may have been created earlier in
+          // the same transaction, and the index only holds committed data
+          AIP parentAIP = model.retrieveAIP(aip.getParentId());
           User user = (User) index.retrieve(RODAMember.class, IdUtils.getUserId(jobCreatorUsername),
             userFieldsToReturn);
           UserUtility.checkAIPPermissions(user, parentAIP, PermissionType.CREATE);
@@ -169,7 +170,7 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
           LOGGER.debug("User doesn't have CREATE_TOP_LEVEL_AIP_PERMISSION permission...");
         }
       }
-    } catch (GenericException | NotFoundException e) {
+    } catch (GenericException | NotFoundException | RequestNotValidException e) {
       LOGGER.error("Error processing AIP permissions", e);
       reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
     }

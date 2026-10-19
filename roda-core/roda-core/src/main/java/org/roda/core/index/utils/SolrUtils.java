@@ -1945,6 +1945,47 @@ public class SolrUtils {
 
   public static Map<String, String> getRetentionPeriod(DisposalSchedule disposalSchedule, AIP aip)
     throws NotFoundException, GenericException {
+    return getRetentionPeriod(disposalSchedule, aip, null);
+  }
+
+  private static Object getRetentionTriggerValue(String field, AIP aip, ModelService model)
+    throws NotFoundException, GenericException {
+    if (model != null && StringUtils.isNotBlank(field)) {
+      SolrInputDocument doc = new SolrInputDocument();
+      try {
+        indexDescriptiveMetadataFields(model, aip.getId(), null, aip.getDescriptiveMetadata(), doc);
+      } catch (RequestNotValidException | AuthorizationDeniedException e) {
+        throw new GenericException("Could not read the descriptive metadata of AIP " + aip.getId(), e);
+      }
+      Object value = doc.getFieldValue(field);
+      if (value != null) {
+        Date date = value instanceof String ? objectToDate(value) : null;
+        return date != null ? date : value;
+      }
+    }
+
+    // not produced by the descriptive metadata: read it from the index
+    try {
+      IndexedAIP indexedAIP = retrieve(RodaCoreFactory.getSolr(), IndexedAIP.class, aip.getId(),
+        Collections.singletonList(field));
+      return indexedAIP.getFields().get(field);
+    } catch (NotFoundException e) {
+      if (model != null) {
+        // not indexed yet (e.g. indexed for the first time at transaction commit)
+        return null;
+      }
+      throw e;
+    }
+  }
+
+  /**
+   * @param model
+   *          when given, the retention trigger value is computed from the AIP's
+   *          descriptive metadata (with the ingest crosswalks), so that it does
+   *          not depend on the AIP being already indexed
+   */
+  public static Map<String, String> getRetentionPeriod(DisposalSchedule disposalSchedule, AIP aip,
+    ModelService model) throws NotFoundException, GenericException {
     Map<String, String> values = new HashMap<>();
 
     if (DisposalActionCode.RETAIN_PERMANENTLY.equals(disposalSchedule.getActionCode())) {
@@ -1955,10 +1996,7 @@ public class SolrUtils {
     Integer retentionPeriodDuration = disposalSchedule.getRetentionPeriodDuration();
     Calendar cal = Calendar.getInstance();
 
-    IndexedAIP retrieve = retrieve(RodaCoreFactory.getSolr(), IndexedAIP.class, aip.getId(),
-      Collections.singletonList(disposalSchedule.getRetentionTriggerElementId()));
-
-    Object o = retrieve.getFields().get(disposalSchedule.getRetentionTriggerElementId());
+    Object o = getRetentionTriggerValue(disposalSchedule.getRetentionTriggerElementId(), aip, model);
 
     if (o == null) {
       values.put(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_DETAILS, "Retention period start date is missing");
