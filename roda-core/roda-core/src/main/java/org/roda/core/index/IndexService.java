@@ -301,7 +301,7 @@ public class IndexService {
   public ReturnWithExceptions<Void, ModelObserver> reindexFile(File file) {
     ReturnWithExceptions<Void, ModelObserver> ret = RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseReturn(nodeType);
     if (ret.isEmpty()) {
-      ret = observer.fileCreated(file);
+      ret = observer.fileCreated(file, false);
     }
     return ret;
   }

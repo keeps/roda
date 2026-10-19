@@ -9,6 +9,7 @@ package org.roda.core.index.schema.collections;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -102,6 +103,8 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     fields.add(new Field(RodaConstants.AIP_DESCRIPTION, Field.TYPE_TEXT).setMultiValued(true));
     fields.add(new Field(RodaConstants.AIP_DATE_INITIAL, Field.TYPE_DATE));
     fields.add(new Field(RodaConstants.AIP_DATE_FINAL, Field.TYPE_DATE));
+
+    fields.add(new Field(RodaConstants.AIP_FULLTEXT, Field.TYPE_TEXT).setMultiValued(true).setStored(true));
 
     fields.add(new Field(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.AIP_DISPOSAL_SCHEDULE_NAME, Field.TYPE_STRING));
@@ -244,19 +247,21 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     private final DisposalSchedule disposalSchedule;
     private final Map<String, String> retentionPeriod;
     private final boolean disposalHoldStatus;
+    private final List<String> fulltext;
 
     public Info(List<String> ancestors, boolean safeMode) {
-      this(ancestors, safeMode, null, null, false);
+      this(ancestors, safeMode, null, null, false, Collections.emptyList());
     }
 
     public Info(List<String> ancestors, boolean safeMode, DisposalSchedule disposalSchedule,
-      Map<String, String> retentionPeriod, boolean disposalHoldStatus) {
+      Map<String, String> retentionPeriod, boolean disposalHoldStatus, List<String> fulltext) {
       super();
       this.ancestors = ancestors;
       this.safeMode = safeMode;
       this.disposalSchedule = disposalSchedule;
       this.retentionPeriod = retentionPeriod;
       this.disposalHoldStatus = disposalHoldStatus;
+      this.fulltext = fulltext;
     }
 
     @Override
@@ -275,6 +280,9 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
         preCalculatedFields.put(RodaConstants.AIP_DISPOSAL_ACTION, disposalSchedule.getActionCode().name());
       }
       preCalculatedFields.put(RodaConstants.AIP_DISPOSAL_HOLD_STATUS, disposalHoldStatus);
+      if (fulltext != null && !fulltext.isEmpty()) {
+        preCalculatedFields.put(RodaConstants.AIP_FULLTEXT, fulltext);
+      }
       return preCalculatedFields;
     }
 
