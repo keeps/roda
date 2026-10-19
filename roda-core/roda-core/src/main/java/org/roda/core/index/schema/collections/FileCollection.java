@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.roda.core.RodaCoreFactory;
@@ -223,8 +224,9 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
 
     // Add full text
     String fulltext = getFileFulltext(model, file);
-    if (fulltext != null) {
+    if (StringUtils.isNotBlank(fulltext)) {
       doc.addField(RodaConstants.FILE_FULLTEXT, fulltext);
+      info.getAccumulators().put(RodaConstants.FILE_FULLTEXT, fulltext);
     }
 
     doc.addField(RodaConstants.FILE_CREATED_ON, SolrUtils.formatDate(file.getCreatedOn()));
