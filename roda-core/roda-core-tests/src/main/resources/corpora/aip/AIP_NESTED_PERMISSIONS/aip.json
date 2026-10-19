@@ -1,0 +1,16 @@
+{
+  "parentId": null,
+  "state": "ACTIVE",
+  "type": "MIXED",
+  "permissions": {
+    "users": {},
+    "groups": {
+      "READ": ["testgroup"]
+    }
+  },
+  "descriptiveMetadata": [{
+    "id": "bob.xml",
+    "type": "bob"
+  }],
+  "representations": []
+}

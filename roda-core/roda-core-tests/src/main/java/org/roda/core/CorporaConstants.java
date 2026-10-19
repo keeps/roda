@@ -37,6 +37,7 @@ public final class CorporaConstants {
   public static final String SOURCE_AIP_CONVERTER_2 = "AIP_CONVERTER_2";
   public static final String SOURCE_AIP_CONVERTER_3 = "AIP_CONVERTER_3";
   public static final String SOURCE_AIP_PERMISSIONS = "AIP_PERMISSIONS";
+  public static final String SOURCE_AIP_NESTED_PERMISSIONS = "AIP_NESTED_PERMISSIONS";
   public static final String SOURCE_AIP_WITH_INVALID_METADATA = "AIP_WITH_INVALID_METADATA";
   public static final String SOURCE_AIP_CORRUPTED = "AIP_CORRUPTED";
   public static final String SOURCE_AIP_EMPTY = "AIP_EMPTY";
