@@ -1099,6 +1099,7 @@ public final class RodaConstants {
   public static final String AIP_GHOST = "ghost";
   public static final String AIP_HAS_SHALLOW_FILES = "hasShallowFiles";
   public static final String AIP_CHILDREN = "aip_children";
+  public static final String AIP_FULLTEXT = "fulltext";
 
   public static final String AIP_DESCRIPTIVE_METADATA = "descriptiveMetadata";
   public static final String AIP_REPRESENTATIONS = "representations";
@@ -1170,6 +1171,7 @@ public final class RodaConstants {
   public static final String REPRESENTATION_UPDATED_ON = "updatedOn";
   public static final String REPRESENTATION_UPDATED_BY = "updatedBy";
   public static final String REPRESENTATION_STATES = "representationStates";
+  public static final String REPRESENTATION_FULLTEXT = "fulltext";
 
   // Representation types
   public static final String REPRESENTATION_TYPE_MIXED = "MIXED";
