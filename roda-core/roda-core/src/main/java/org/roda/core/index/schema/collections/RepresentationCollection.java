@@ -83,6 +83,9 @@ public class RepresentationCollection extends AbstractSolrCollection<IndexedRepr
 
     fields.add(new Field(RodaConstants.REPRESENTATION_STATES, Field.TYPE_STRING).setMultiValued(true));
 
+    fields.add(
+      new Field(RodaConstants.REPRESENTATION_FULLTEXT, Field.TYPE_TEXT).setMultiValued(true).setStored(true));
+
     // AIP
     fields.add(new Field(RodaConstants.INGEST_SIP_IDS, Field.TYPE_STRING).setMultiValued(true));
     fields.add(new Field(RodaConstants.INGEST_JOB_ID, Field.TYPE_STRING));
@@ -172,17 +175,19 @@ public class RepresentationCollection extends AbstractSolrCollection<IndexedRepr
     private final Long sizeInBytes;
     private final Long numberOfDataFiles;
     private final Long numberOfDataFolders;
+    private final List<String> fulltext;
 
     private final boolean safemode;
 
     public Info(AIP aip, List<String> ancestors, Long sizeInBytes, Long numberOfDataFiles, Long numberOfDataFolders,
-      boolean safemode) {
+      List<String> fulltext, boolean safemode) {
       super();
       this.aip = aip;
       this.ancestors = ancestors;
       this.sizeInBytes = sizeInBytes;
       this.numberOfDataFiles = numberOfDataFiles;
       this.numberOfDataFolders = numberOfDataFolders;
+      this.fulltext = fulltext;
       this.safemode = safemode;
     }
 
@@ -194,6 +199,10 @@ public class RepresentationCollection extends AbstractSolrCollection<IndexedRepr
       preCalculatedFields.put(RodaConstants.REPRESENTATION_SIZE_IN_BYTES, sizeInBytes);
       preCalculatedFields.put(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES, numberOfDataFiles);
       preCalculatedFields.put(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FOLDERS, numberOfDataFolders);
+
+      if (fulltext != null && !fulltext.isEmpty()) {
+        preCalculatedFields.put(RodaConstants.REPRESENTATION_FULLTEXT, fulltext);
+      }
 
       // indexing active state and permissions
       preCalculatedFields.put(RodaConstants.INDEX_STATE, SolrUtils.formatEnum(aip.getState()));
