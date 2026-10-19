@@ -87,6 +87,9 @@ import org.roda.core.index.schema.collections.JobReportCollection;
 import org.roda.core.index.schema.collections.PreservationEventCollection;
 import org.roda.core.index.schema.collections.RepresentationCollection;
 import org.roda.core.index.schema.collections.RiskCollection;
+import org.roda.core.index.utils.FulltextIndexUtils;
+import org.roda.core.index.utils.FulltextIndexUtils.FulltextAccumulator;
+import org.roda.core.index.utils.FulltextIndexUtils.RepresentationFulltext;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.LiteRODAObjectFactory;
@@ -158,8 +161,12 @@ public class IndexModelObserver implements ModelObserver {
       indexAIP(aip, ancestors, disposalInfo.schedule(), disposalInfo.retentionPeriod(), disposalInfo.onHold())
         .addTo(ret);
       if (ret.isEmpty()) {
-        indexRepresentations(aip, ancestors, written).addTo(ret);
+        List<RepresentationFulltext> representationsFulltext = indexRepresentations(aip, ancestors, written)
+          .addTo(ret).getReturnedObject();
         if (ret.isEmpty()) {
+          List<String> fulltext = AIPState.DESTROYED.equals(aip.getState()) ? Collections.emptyList()
+            : FulltextIndexUtils.selectAipFulltext(representationsFulltext);
+          aipFulltextUpdated(aip, fulltext).addTo(ret);
           indexPreservationsEvents(aip.getId(), null, written).addTo(ret);
         }
       }
@@ -173,32 +180,29 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   private ReturnWithExceptions<Void, ModelObserver> indexAIP(final AIP aip, final List<String> ancestors) {
-    return indexAIP(aip, ancestors, false, null, null, false);
+    return indexAIP(aip, ancestors, false, null, null, false, null);
   }
 
   private ReturnWithExceptions<Void, ModelObserver> indexAIP(final AIP aip, final List<String> ancestors,
     DisposalSchedule disposalSchedule, Map<String, String> retentionPeriodCalculation) {
-    return indexAIP(aip, ancestors, false, disposalSchedule, retentionPeriodCalculation, false);
+    return indexAIP(aip, ancestors, false, disposalSchedule, retentionPeriodCalculation, false, null);
   }
 
   private ReturnWithExceptions<Void, ModelObserver> indexAIP(final AIP aip, final List<String> ancestors,
     DisposalSchedule disposalSchedule, Map<String, String> retentionPeriodCalculation, boolean disposalHoldStatus) {
-    return indexAIP(aip, ancestors, false, disposalSchedule, retentionPeriodCalculation, disposalHoldStatus);
-  }
-
-  private ReturnWithExceptions<Void, ModelObserver> indexAIP(final AIP aip, final List<String> ancestors,
-    boolean safemode) {
-    return indexAIP(aip, ancestors, safemode, null, null, false);
+    return indexAIP(aip, ancestors, false, disposalSchedule, retentionPeriodCalculation, disposalHoldStatus, null);
   }
 
   private ReturnWithExceptions<Void, ModelObserver> indexAIP(final AIP aip, final List<String> ancestors,
     boolean safemode, DisposalSchedule disposalSchedule, Map<String, String> retentionPeriodCalculation,
-    boolean disposalHoldStatus) {
+    boolean disposalHoldStatus, List<String> fulltext) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
+    List<String> aipFulltext = fulltext != null ? fulltext : collectAipFulltext(aip).getReturnedObject();
+
     SolrUtils
-      .create2(index, model, (ModelObserver) this, IndexedAIP.class, aip,
-        new AIPCollection.Info(ancestors, safemode, disposalSchedule, retentionPeriodCalculation, disposalHoldStatus))
+      .create2(index, model, (ModelObserver) this, IndexedAIP.class, aip, new AIPCollection.Info(ancestors, safemode,
+        disposalSchedule, retentionPeriodCalculation, disposalHoldStatus, aipFulltext))
       .addTo(ret);
 
     // if there was an error indexing, try in safe mode; not when Solr failed, as it
@@ -206,13 +210,39 @@ public class IndexModelObserver implements ModelObserver {
     if (!ret.isEmpty()) {
       if (!safemode && !solrFailed(ret)) {
         LOGGER.error("Error indexing AIP, trying safe mode", ret.getExceptions().getFirst());
-        indexAIP(aip, ancestors, true).addTo(ret);
+        indexAIP(aip, ancestors, true, null, null, false, aipFulltext).addTo(ret);
       } else {
         LOGGER.error("Cannot index created AIP", ret.getExceptions().getFirst());
       }
     }
 
     return ret;
+  }
+
+  private ReturnWithExceptions<List<String>, ModelObserver> collectAipFulltext(final AIP aip) {
+    ReturnWithExceptions<List<String>, ModelObserver> ret = new ReturnWithExceptions<>(this);
+    try {
+      ret.setReturnedObject(FulltextIndexUtils.collectAipFulltext(index, aip));
+    } catch (GenericException e) {
+      LOGGER.error("Cannot collect the full-text of AIP {}", aip.getId(), e);
+      ret.add(e);
+      ret.setReturnedObject(Collections.emptyList());
+    }
+    return ret;
+  }
+
+  private ReturnWithExceptions<Void, ModelObserver> aipFulltextUpdated(final AIP aip) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+    List<String> fulltext = collectAipFulltext(aip).addTo(ret).getReturnedObject();
+    if (ret.isEmpty()) {
+      aipFulltextUpdated(aip, fulltext).addTo(ret);
+    }
+    return ret;
+  }
+
+  private ReturnWithExceptions<Void, ModelObserver> aipFulltextUpdated(final AIP aip, final List<String> fulltext) {
+    return SolrUtils.update(index, IndexedAIP.class, aip.getId(),
+      Collections.singletonMap(RodaConstants.AIP_FULLTEXT, fulltext), (ModelObserver) this);
   }
 
   public ReturnWithExceptions<Void, ModelObserver> indexPreservationsEvents(final String aipId) {
@@ -275,31 +305,36 @@ public class IndexModelObserver implements ModelObserver {
     return ret;
   }
 
-  private ReturnWithExceptions<Void, ModelObserver> indexRepresentations(final AIP aip, final List<String> ancestors,
-    final Set<String> written) {
-    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+  private ReturnWithExceptions<List<RepresentationFulltext>, ModelObserver> indexRepresentations(final AIP aip,
+    final List<String> ancestors, final Set<String> written) {
+    ReturnWithExceptions<List<RepresentationFulltext>, ModelObserver> ret = new ReturnWithExceptions<>(this);
+    List<RepresentationFulltext> representationsFulltext = new ArrayList<>();
     for (Representation representation : aip.getRepresentations()) {
-      indexRepresentation(aip, representation, ancestors, written).addTo(ret);
+      RepresentationFulltext representationFulltext = indexRepresentation(aip, representation, ancestors, written)
+        .addTo(ret).getReturnedObject();
       if (solrFailed(ret)) {
         break;
       }
+      representationsFulltext.add(representationFulltext);
     }
 
+    ret.setReturnedObject(representationsFulltext);
     return ret;
   }
 
-  private ReturnWithExceptions<Void, ModelObserver> indexRepresentation(final AIP aip,
+  private ReturnWithExceptions<RepresentationFulltext, ModelObserver> indexRepresentation(final AIP aip,
     final Representation representation, final List<String> ancestors) {
     return indexRepresentation(aip, representation, ancestors, null);
   }
 
-  private ReturnWithExceptions<Void, ModelObserver> indexRepresentation(final AIP aip,
+  private ReturnWithExceptions<RepresentationFulltext, ModelObserver> indexRepresentation(final AIP aip,
     final Representation representation, final List<String> ancestors, final Set<String> written) {
-    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+    ReturnWithExceptions<RepresentationFulltext, ModelObserver> ret = new ReturnWithExceptions<>(this);
     addWritten(written, IdUtils.getRepresentationId(representation));
     Long sizeInBytes = 0L;
     Long numberOfDataFiles = 0L;
     Long numberOfDataFolders = 0L;
+    FulltextAccumulator fulltext = new FulltextAccumulator();
 
     representation.setInstanceId(aip.getInstanceId());
 
@@ -313,10 +348,13 @@ public class IndexModelObserver implements ModelObserver {
             indexRetentionPeriod(aip, ancestors).addTo(ret);
           }
 
-          sizeInBytes += indexFile(aip, file.get(), ancestors, false, written).addTo(ret).getReturnedObject();
+          FileIndexResult fileResult = indexFile(aip, file.get(), ancestors, false, written).addTo(ret)
+            .getReturnedObject();
           if (solrFailed(ret)) {
             return ret;
           }
+          sizeInBytes += fileResult.sizeInBytes;
+          fulltext.addAll(fileResult.fulltext);
 
           if (file.get().isDirectory()) {
             numberOfDataFolders++;
@@ -363,8 +401,13 @@ public class IndexModelObserver implements ModelObserver {
       // TODO support safemode
       boolean safemode = false;
 
+      if (fulltext.isTruncated()) {
+        LOGGER.info("Full-text of representation {} truncated to {} bytes", IdUtils.getRepresentationId(representation),
+          fulltext.getMaxBytes());
+      }
+
       RepresentationCollection.Info info = new RepresentationCollection.Info(aip, ancestors, sizeInBytes,
-        numberOfDataFiles, numberOfDataFolders, safemode);
+        numberOfDataFiles, numberOfDataFolders, fulltext.getFulltext(), safemode);
       SolrUtils.create2(index, model, (ModelObserver) this, IndexedRepresentation.class, representation, info)
         .addTo(ret);
       childWritten(aip.getId());
@@ -374,6 +417,8 @@ public class IndexModelObserver implements ModelObserver {
       ret.add(e);
     }
 
+    ret.setReturnedObject(new RepresentationFulltext(representation.isOriginal(),
+      representation.getRepresentationStates(), fulltext.getFulltext()));
     return ret;
   }
 
@@ -430,16 +475,33 @@ public class IndexModelObserver implements ModelObserver {
     return ret;
   }
 
-  private ReturnWithExceptions<Long, ModelObserver> indexFile(AIP aip, File file, List<String> ancestors,
-    boolean recursive) {
+  private static final class FileIndexResult {
+    private long sizeInBytes = 0L;
+    private final List<String> fulltext = new ArrayList<>();
+
+    private void addFulltext(IndexingAdditionalInfo info) {
+      Object fileFulltext = info.getAccumulators().get(RodaConstants.FILE_FULLTEXT);
+      if (fileFulltext != null) {
+        fulltext.add((String) fileFulltext);
+      }
+    }
+
+    private void add(FileIndexResult other) {
+      sizeInBytes += other.sizeInBytes;
+      fulltext.addAll(other.fulltext);
+    }
+  }
+
+  private ReturnWithExceptions<FileIndexResult, ModelObserver> indexFile(AIP aip, File file,
+    List<String> ancestors, boolean recursive) {
     return indexFile(aip, file, ancestors, recursive, null);
   }
 
-  private ReturnWithExceptions<Long, ModelObserver> indexFile(AIP aip, File file, List<String> ancestors,
-    boolean recursive, Set<String> written) {
-    ReturnWithExceptions<Long, ModelObserver> ret = new ReturnWithExceptions<>(this);
+  private ReturnWithExceptions<FileIndexResult, ModelObserver> indexFile(AIP aip, File file,
+    List<String> ancestors, boolean recursive, Set<String> written) {
+    ReturnWithExceptions<FileIndexResult, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
-    Long sizeInBytes = 0L;
+    FileIndexResult result = new FileIndexResult();
 
     file.setInstanceId(aip.getInstanceId());
 
@@ -454,13 +516,15 @@ public class IndexModelObserver implements ModelObserver {
         for (OptionalWithCause<File> shallowFile : allExternalFiles) {
           if (shallowFile.isPresent()) {
             shallowFile.get().setInstanceId(aip.getInstanceId());
-            SolrUtils.create2(index, model, (ModelObserver) this, IndexedFile.class, shallowFile.get(), info)
+            FileCollection.Info shallowInfo = new FileCollection.Info(aip, ancestors);
+            SolrUtils.create2(index, model, (ModelObserver) this, IndexedFile.class, shallowFile.get(), shallowInfo)
               .addTo(ret);
             childWritten(aip.getId());
             addWritten(written, IdUtils.getFileId(shallowFile.get()));
+            result.addFulltext(shallowInfo);
           }
         }
-        sizeInBytes = model.getExternalFilesTotalSize(file);
+        result.sizeInBytes = model.getExternalFilesTotalSize(file);
       } catch (IOException | RequestNotValidException | GenericException | AuthorizationDeniedException
         | NotFoundException e) {
         e.printStackTrace();
@@ -470,7 +534,8 @@ public class IndexModelObserver implements ModelObserver {
       SolrUtils.create2(index, model, (ModelObserver) this, IndexedFile.class, file, info).addTo(ret);
       childWritten(aip.getId());
       addWritten(written, IdUtils.getFileId(file));
-      sizeInBytes = (Long) info.getAccumulators().get(RodaConstants.FILE_SIZE);
+      result.sizeInBytes = (Long) info.getAccumulators().getOrDefault(RodaConstants.FILE_SIZE, 0L);
+      result.addFulltext(info);
     }
 
     if (ret.isEmpty()) {
@@ -478,8 +543,7 @@ public class IndexModelObserver implements ModelObserver {
         try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(file, true)) {
           for (OptionalWithCause<File> subfile : allFiles) {
             if (subfile.isPresent()) {
-              sizeInBytes += indexFile(aip, subfile.get(), ancestors, false, written).addTo(ret)
-                .getReturnedObject();
+              result.add(indexFile(aip, subfile.get(), ancestors, false, written).addTo(ret).getReturnedObject());
             } else {
               LOGGER.error("Cannot index file", subfile.getCause());
               ret.add(subfile.getCause());
@@ -495,7 +559,7 @@ public class IndexModelObserver implements ModelObserver {
       LOGGER.error("Cannot index file: {}", file);
     }
 
-    ret.setReturnedObject(sizeInBytes);
+    ret.setReturnedObject(result);
     return ret;
   }
 
@@ -567,6 +631,7 @@ public class IndexModelObserver implements ModelObserver {
       descriptivesMetadataUpdated(aip).add(ret);
       if (ret.isEmpty()) {
         representationsStateUpdated(aip).addTo(ret);
+        aipFulltextUpdated(aip).addTo(ret);
         if (ret.isEmpty()) {
           preservationEventsStateUpdated(aip).addTo(ret);
         }
@@ -660,9 +725,13 @@ public class IndexModelObserver implements ModelObserver {
 
     try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(representation.getAipId(),
       representation.getId(), true)) {
-      SolrUtils.update(index, IndexedRepresentation.class, IdUtils.getRepresentationId(representation),
-        Collections.singletonMap(RodaConstants.INDEX_STATE, SolrUtils.formatEnum(aip.getState())), (ModelObserver) this)
-        .addTo(ret);
+      Map<String, Object> updatedFields = new HashMap<>();
+      updatedFields.put(RodaConstants.INDEX_STATE, SolrUtils.formatEnum(aip.getState()));
+      if (AIPState.DESTROYED.equals(aip.getState())) {
+        updatedFields.put(RodaConstants.REPRESENTATION_FULLTEXT, Collections.emptyList());
+      }
+      SolrUtils.update(index, IndexedRepresentation.class, IdUtils.getRepresentationId(representation), updatedFields,
+        (ModelObserver) this).addTo(ret);
 
       if (ret.isEmpty()) {
         for (OptionalWithCause<File> file : allFiles) {
@@ -1120,6 +1189,7 @@ public class IndexModelObserver implements ModelObserver {
       indexRepresentation(aip, representation, ancestors, written).addTo(ret);
       if (ret.isEmpty()) {
         indexPreservationsEvents(aip.getId(), representation.getId(), written).addTo(ret);
+        aipFulltextUpdated(aip).addTo(ret);
 
         if (aip.getRepresentations().size() == 1) {
           SolrUtils.update(index, IndexedAIP.class, aip.getId(),
@@ -1182,6 +1252,7 @@ public class IndexModelObserver implements ModelObserver {
         SolrUtils.update(index, IndexedAIP.class, aip.getId(),
           Collections.singletonMap(RodaConstants.AIP_HAS_REPRESENTATIONS, false), (ModelObserver) this).addTo(ret);
       }
+      aipFulltextUpdated(aip).addTo(ret);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
       LOGGER.error("Cannot update hasRepresentations flag on AIP", e);
       ret.add(e);
@@ -1192,6 +1263,10 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> fileCreated(File file) {
+    return fileCreated(file, true);
+  }
+
+  public ReturnWithExceptions<Void, ModelObserver> fileCreated(File file, boolean updateRepresentationFulltext) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
     try {
       AIP aip = model.retrieveAIP(file.getAipId());
@@ -1202,13 +1277,17 @@ public class IndexModelObserver implements ModelObserver {
       ret.add(e);
     }
 
+    if (updateRepresentationFulltext && ret.isEmpty()) {
+      representationFulltextUpdated(file.getAipId(), file.getRepresentationId()).addTo(ret);
+    }
+
     return ret;
   }
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> fileUpdated(File file) {
     ReturnWithExceptions<Void, ModelObserver> ret = fileDeleted(file.getAipId(), file.getRepresentationId(),
-      file.getPath(), file.getId(), false);
+      file.getPath(), file.getId(), false, false);
     fileCreated(file).addTo(ret);
     return ret;
   }
@@ -1216,6 +1295,11 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public ReturnWithExceptions<Void, ModelObserver> fileDeleted(String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId, boolean deleteIncidences) {
+    return fileDeleted(aipId, representationId, fileDirectoryPath, fileId, deleteIncidences, true);
+  }
+
+  private ReturnWithExceptions<Void, ModelObserver> fileDeleted(String aipId, String representationId,
+    List<String> fileDirectoryPath, String fileId, boolean deleteIncidences, boolean updateRepresentationFulltext) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
     String uuid = IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId);
@@ -1224,6 +1308,60 @@ public class IndexModelObserver implements ModelObserver {
     if (deleteIncidences) {
       makeChildrenVisible(aipId, Collections.singletonList(RiskIncidence.class)).addTo(ret);
       deleteDocumentsFromIndex(RiskIncidence.class, RodaConstants.RISK_INCIDENCE_FILE_ID, fileId).addTo(ret);
+    }
+
+    if (updateRepresentationFulltext && ret.isEmpty()) {
+      representationFulltextUpdated(aipId, representationId).addTo(ret);
+    }
+
+    return ret;
+  }
+
+  private ReturnWithExceptions<Void, ModelObserver> representationFulltextUpdated(String aipId,
+    String representationId) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+
+    try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aipId, representationId, true)) {
+      List<String> fileUUIDs = new ArrayList<>();
+      for (OptionalWithCause<File> file : allFiles) {
+        if (file.isPresent()) {
+          if (FSUtils.isManifestOfExternalFiles(file.get().getId())) {
+            try (CloseableIterable<OptionalWithCause<File>> externalFiles = model.listExternalFilesUnder(file.get())) {
+              for (OptionalWithCause<File> externalFile : externalFiles) {
+                if (externalFile.isPresent()) {
+                  fileUUIDs.add(IdUtils.getFileId(externalFile.get()));
+                }
+              }
+            }
+          } else if (!file.get().isDirectory()) {
+            fileUUIDs.add(IdUtils.getFileId(file.get()));
+          }
+        } else {
+          LOGGER.error("Cannot list representation file", file.getCause());
+          ret.add(file.getCause());
+        }
+      }
+
+      if (ret.isEmpty()) {
+        FulltextAccumulator fulltext = FulltextIndexUtils.collectRepresentationFulltext(index, fileUUIDs);
+        if (fulltext.isTruncated()) {
+          LOGGER.info("Full-text of representation {} truncated to {} bytes",
+            IdUtils.getRepresentationId(aipId, representationId), fulltext.getMaxBytes());
+        }
+
+        SolrUtils.update(index, IndexedRepresentation.class, IdUtils.getRepresentationId(aipId, representationId),
+          Collections.singletonMap(RodaConstants.REPRESENTATION_FULLTEXT, fulltext.getFulltext()), (ModelObserver) this)
+          .addTo(ret);
+
+        if (ret.isEmpty()) {
+          aipFulltextUpdated(model.retrieveAIP(aipId)).addTo(ret);
+        }
+      }
+    } catch (NotFoundException e) {
+      LOGGER.debug("Representation {} of AIP {} no longer exists, skipping full-text update", representationId, aipId);
+    } catch (IOException | RequestNotValidException | GenericException | AuthorizationDeniedException e) {
+      LOGGER.error("Cannot update the full-text of representation {} of AIP {}", representationId, aipId, e);
+      ret.add(e);
     }
 
     return ret;
