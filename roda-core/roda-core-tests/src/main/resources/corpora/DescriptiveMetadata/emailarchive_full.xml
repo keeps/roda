@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<emailArchive xmlns="https://roda-community.org/schemas/emailarchive/v1">
+  <custodian>João Silva</custodian>
+  <emailAddress>joao.silva@empresa.pt</emailAddress>
+  <dateStart>2020-01-01</dateStart>
+  <dateEnd>2023-12-31</dateEnd>
+  <totalMessages>3</totalMessages>
+  <originalFormat>PST</originalFormat>
+  <archivingMotive>Offboarding</archivingMotive>
+
+  <email>
+    <messageId>&lt;msg001@empresa.pt&gt;</messageId>
+    <subject>Quarterly Report Q1 2021</subject>
+    <sender>joao.silva@empresa.pt</sender>
+    <recipients>ana.costa@empresa.pt</recipients>
+    <recipients>rui.pinto@empresa.pt</recipients>
+    <sentDate>2021-03-15T09:42:00Z</sentDate>
+    <folderPath>Inbox/Projects</folderPath>
+    <hasAttachments>true</hasAttachments>
+    <filePath>Inbox/Projects/msg_001.eml</filePath>
+  </email>
+
+  <email>
+    <messageId>&lt;msg002@empresa.pt&gt;</messageId>
+    <subject>Re: Quarterly Report Q1 2021</subject>
+    <sender>ana.costa@empresa.pt</sender>
+    <recipients>joao.silva@empresa.pt</recipients>
+    <sentDate>2021-03-15T11:05:00Z</sentDate>
+    <folderPath>Inbox/Projects</folderPath>
+    <hasAttachments>false</hasAttachments>
+    <filePath>Inbox/Projects/msg_002.eml</filePath>
+  </email>
+
+  <email>
+    <messageId>&lt;msg003@empresa.pt&gt;</messageId>
+    <subject>Budget Approval Request</subject>
+    <sender>joao.silva@empresa.pt</sender>
+    <recipients>board@empresa.pt</recipients>
+    <sentDate>2021-06-01T08:00:00Z</sentDate>
+    <folderPath>Sent</folderPath>
+    <hasAttachments>true</hasAttachments>
+    <filePath>Sent/msg_003.eml</filePath>
+  </email>
+</emailArchive>

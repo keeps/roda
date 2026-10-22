@@ -94,6 +94,10 @@ public final class CorporaConstants {
 
   public static final String SOURCE_DESC_METADATA_CONTAINER = "DescriptiveMetadata";
   public static final String STRANGE_DESC_METADATA_FILE = "strange.xml";
+  public static final String EMAIL_ARCHIVE_FULL_FILE = "emailarchive_full.xml";
+  public static final String EMAIL_ARCHIVE_MINIMAL_FILE = "emailarchive_minimal.xml";
+  public static final String EMAIL_ARCHIVE_NO_EMAILS_FILE = "emailarchive_no_emails.xml";
+  public static final String EMAIL_ARCHIVE_METADATA_TYPE = "emailarchive";
 
   public static final String TEXT_XML = "text/xml";
   public static final String REPRESENTATION_1_PREMIS_EVENT_ID = "urn:roda:premis:event:roda_398";
