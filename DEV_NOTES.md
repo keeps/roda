@@ -16,12 +16,22 @@ Install pre-requisites:
 
 Additional support for internal plugins:
 
-- ClamAV using docker image
+- ClamAV client on Linux (daemon runs from the dev compose):
 
  ```sh
  sudo apt install clamdscan
  echo "TCPSocket 3310
 TCPAddr localhost" | sudo tee /etc/clamav/clamd.conf
+ ```
+
+- ClamAV client on macOS (daemon runs from the dev compose):
+
+ ```sh
+ brew install clamav
+ echo "TCPSocket 3310
+TCPAddr 127.0.0.1" > /opt/homebrew/etc/clamav/clamd.conf
+ mkdir -p $HOME/.roda/config
+ echo "core.plugins.internal.virus_check.clamav.bin = /opt/homebrew/bin/clamdscan" >> $HOME/.roda/config/roda-core.properties
  ```
 
 ### Sign Github commits
