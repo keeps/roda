@@ -1,5 +1,47 @@
 # Changelog
 
+## v6.4.3 (22/10/2026)
+#### Security
+- Bumped tomcat to v11.0.27
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
+## v6.4.2 (15/10/2026)
+### :warning: Breaking Changes
+RODA 6.3.0 onwards will use Apache Solr 10 as indexing system. If you have an existing RODA implementation with Solr 9 you will need to [upgrade the Solr to version 10](https://solr.apache.org/guide/solr/latest/upgrade-notes/major-changes-in-solr-10.html) and then rebuild all indexes on RODA.
+
+> [!WARNING]
+> **Flyway migration scripts.** The scripts under `db/migration` changed (schema is now taken from the database connection instead of being hardcoded), so their checksums changed too. **Any installation that already ran a 6.2.x release needs a Flyway `repair` step before starting 6.4.0 onwards**, or it will refuse to start. Follow the [Database Schema Migration Guide](https://github.com/keeps/roda/blob/master/documentation/Database_Schema_Migration.md).
+
+#### Enhancements
+
+- Allow configuring the default UI language in roda-wui.properties (#3777)
+- i18n: Spanish translations and missing GWT plural forms (#3763)
+
+#### Bug fixes
+
+- Default risks and representation information are not copied to storage services other than FileStorageService (#3758)
+- File integrity check rolls back the whole transaction when it finds corrupted files (#3756)
+- Solr requests stall during reindex due to HTTP/2 flow control in the Solr client (#3778)
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
+## v5.8.2 (12/10/2026)
+#### Bug fixes
+- Fixed move bug where descendants were not reindexed (https://github.com/keeps/roda/commit/6e9c6036cc75e7595651a332c8ca823d9568c57a)
+- Fixed empty preservationLevelValue (https://github.com/keeps/roda/commit/02689f1765fcbc2cef59ddeb9b1603666b0808d7)
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v6.4.1 (07/10/2026)
 ### :warning: Breaking Changes
 RODA 6.3.0 onwards will use Apache Solr 10 as indexing system. If you have an existing RODA implementation with Solr 9 you will need to [upgrade the Solr to version 10](https://solr.apache.org/guide/solr/latest/upgrade-notes/major-changes-in-solr-10.html) and then rebuild all indexes on RODA.
@@ -418,40 +460,6 @@ To try out this version, check the [install instructions](https://github.com/kee
 
 #### Security
 - Several major dependency upgrades to fix security vulnerabilities
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
-## v5.7.1 (08/01/2025)
-#### Bug fixes
-
-- Fix built-in plugin "AIP ancestor hierarchy fix"
-- Deleting linked DIPs now longer increments objects processed (#3285)
-
-#### Security
-- Several dependency major upgrades to fix security vulnerabilities
-
----
-
-To try this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
-## v5.7.0 (05/09/2024)
-#### Security
-- Several dependency major upgrades to fix security vulnerabilities
-- Improve HTTP headers security
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
-## v5.7.0-beta1 (21/06/2024)
-#### New features 
-
-- Replace Akka with Apache Pekko
 
 ---
 
