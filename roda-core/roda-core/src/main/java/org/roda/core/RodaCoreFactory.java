@@ -1215,10 +1215,9 @@ public class RodaCoreFactory {
   private static void createCollection(CloudSolrClient cloudSolrClient, String collection, Path configPath) {
 
     try {
-      LOGGER.info("Creating SOLR collection {}", collection);
-
-      int numShards = getEnvInt("SOLR_NUM_SHARDS", 4);
+      int numShards = getNumShards(collection);
       int numReplicas = getEnvInt("SOLR_REPLICATION_FACTOR", 1);
+      LOGGER.info("Creating SOLR collection {} with {} shards and {} replicas", collection, numShards, numReplicas);
 
       SolrZkClient zkClient = ZkClientClusterStateProvider.from(cloudSolrClient).getZkStateReader().getZkClient();
       ZkController.uploadConfig(zkClient, collection, configPath);
@@ -1232,6 +1231,58 @@ public class RodaCoreFactory {
     } catch (SolrServerException | SolrException | IOException e) {
       LOGGER.error("Error creating collection {}", collection, e);
     }
+  }
+
+  /**
+   * The number of shards a collection is created with: its own
+   * ({@code core.solr.shards.collection.<Collection>}), else that of the group
+   * it is listed in ({@code core.solr.shards.large} for the collections in
+   * {@code core.solr.collections.large}, {@code core.solr.shards.small} for
+   * those in {@code core.solr.collections.small}), else {@code SOLR_NUM_SHARDS},
+   * for every collection, else 1. Most collections are small and need a single
+   * shard (#3784).
+   */
+  private static int getNumShards(String collection) {
+    Integer shards = getConfigurationPositiveInt(RodaConstants.CORE_SOLR_SHARDS_COLLECTION_PREFIX + collection);
+    if (shards == null) {
+      if (getConfigurationList(RodaConstants.CORE_SOLR_COLLECTIONS_LARGE).contains(collection)) {
+        shards = getConfigurationPositiveInt(RodaConstants.CORE_SOLR_SHARDS_LARGE);
+      } else if (getConfigurationList(RodaConstants.CORE_SOLR_COLLECTIONS_SMALL).contains(collection)) {
+        shards = getConfigurationPositiveInt(RodaConstants.CORE_SOLR_SHARDS_SMALL);
+      }
+    }
+    return shards != null ? shards : getEnvInt("SOLR_NUM_SHARDS", 1);
+  }
+
+  /**
+   * A list from the configuration: the RODA_ environment variable or system
+   * property of the key, comma separated, else the key repeated in the
+   * configuration files.
+   */
+  private static List<String> getConfigurationList(String key) {
+    String envKey = "RODA_" + key.toUpperCase().replace('.', '_');
+    String value = System.getenv(envKey) != null ? System.getenv(envKey) : System.getProperty(envKey);
+    if (value != null) {
+      return Arrays.stream(value.split(",")).map(String::trim).filter(StringUtils::isNotBlank).toList();
+    }
+    return configurationManager.getRodaConfigurationAsList(key);
+  }
+
+  private static Integer getConfigurationPositiveInt(String key) {
+    String value = configurationManager.getConfigurationString(key, "");
+    if (StringUtils.isBlank(value)) {
+      return null;
+    }
+    try {
+      int number = Integer.parseInt(value.trim());
+      if (number > 0) {
+        return number;
+      }
+    } catch (NumberFormatException e) {
+      // reported below
+    }
+    LOGGER.error("Invalid value for {}: {}, ignoring it", key, value);
+    return null;
   }
 
   private static Integer getEnvInt(String name, Integer defaultValue) {

@@ -48,6 +48,11 @@ public final class RodaConstants {
   public static final String CORE_SOLR_HTTP_URL = "core.solr.http.url";
   public static final String CORE_SOLR_CLOUD_URLS = "core.solr.cloud.urls";
   public static final String CORE_SOLR_STEMMING_LANGUAGE = "core.solr.stemming.language";
+  public static final String CORE_SOLR_COLLECTIONS_LARGE = "core.solr.collections.large";
+  public static final String CORE_SOLR_COLLECTIONS_SMALL = "core.solr.collections.small";
+  public static final String CORE_SOLR_SHARDS_LARGE = "core.solr.shards.large";
+  public static final String CORE_SOLR_SHARDS_SMALL = "core.solr.shards.small";
+  public static final String CORE_SOLR_SHARDS_COLLECTION_PREFIX = "core.solr.shards.collection.";
 
   public static final String CORE_INDEX_EMBEDDING_ENABLED = "core.index.embedding.enabled";
   public static final String CORE_INDEX_EMBEDDING_BASE_URL = "core.index.embedding.base_url";
