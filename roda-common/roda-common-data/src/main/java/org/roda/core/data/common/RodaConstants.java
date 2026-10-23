@@ -1709,6 +1709,8 @@ public final class RodaConstants {
 
   public static final String NOTIFICATION_HTTP_ENDPOINT = "ingest.http_notification.endpoint";
   public static final String NOTIFICATION_HTTP_TIMEOUT = "ingest.http_notification.timeout";
+  public static final String NOTIFICATION_HTTP_ENDPOINT_RESTRICTED = "ingest.http_notification.endpoint_restricted";
+  public static final String NOTIFICATION_WEBHOOK_ALLOWED_DESTINATIONS = "core.notification.webhook.allowed_destinations";
 
   /* DIPs */
   public static final String DIP_ID = "id";
