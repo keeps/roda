@@ -153,6 +153,7 @@ import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.events.EventsManager;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.schema.collections.LogEntryCollection;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.iterables.LogEntryFileSystemIterable;
 import org.roda.core.model.iterables.LogEntryStorageIterable;
@@ -2464,6 +2465,8 @@ public class DefaultModelService implements ModelService {
       }
 
       // write to log file
+      // the id the index needs to keep the entries of a request together
+      logEntry.setUUID(LogEntryCollection.idFor(logEntry));
       logEntry.setId(id + "-" + entryLogLineNumber);
       logEntry.setInstanceId(instanceId);
       logEntry.setLineNumber(entryLogLineNumber);
