@@ -1217,7 +1217,7 @@ public class RodaCoreFactory {
     try {
       LOGGER.info("Creating SOLR collection {}", collection);
 
-      int numShards = getEnvInt("SOLR_NUM_SHARDS", 1);
+      int numShards = getEnvInt("SOLR_NUM_SHARDS", 4);
       int numReplicas = getEnvInt("SOLR_REPLICATION_FACTOR", 1);
 
       SolrZkClient zkClient = ZkClientClusterStateProvider.from(cloudSolrClient).getZkStateReader().getZkClient();
@@ -1237,7 +1237,7 @@ public class RodaCoreFactory {
   private static Integer getEnvInt(String name, Integer defaultValue) {
     Integer envInt;
     try {
-      String envString = System.getenv(name);
+      String envString = System.getenv(name) != null ? System.getenv(name) : System.getProperty(name);
       envInt = envString != null ? Integer.valueOf(envString) : defaultValue;
     } catch (NumberFormatException e) {
       envInt = defaultValue;
