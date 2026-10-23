@@ -83,6 +83,7 @@ public final class RodaConstants {
   public static final String CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT = "core.ingest.processed.move_when_autoaccept";
   public static final String CORE_TRANSFERRED_RESOURCES_DELETE_WHEN_SUCCESSFULLY_INGESTED = "core.ingest.delete_transfer_resource_after_successfully_ingested";
   public static final String CORE_INGEST_SKIP_FIX_PARENTS = "core.ingest.skip.fix.parents";
+  public static final String CORE_INGEST_CONSOLIDATE_PRESERVATION_EVENTS = "core.ingest.consolidate_preservation_events";
 
   public static final String CORE_STORAGE_LEGACY_IMPLEMENTATION_ENABLED = "core.storage.legacy.implementation.enabled";
 
@@ -1400,6 +1401,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_NOTIFICATION_WHEN_FAILED = "parameter.notification_when_failed";
   public static final String PLUGIN_PARAMS_CREATES_PLUGIN_EVENT = "createsPluginEvent";
   public static final String PLUGIN_PARAMS_CREATE_SUBMISSION = "parameter.create_submission";
+  public static final String PLUGIN_PARAMS_CONSOLIDATE_INGEST_EVENTS = "parameter.consolidate_ingest_events";
   public static final String PLUGIN_PARAMS_USERNAME = "parameter.username";
   public static final String PLUGIN_PARAMS_IGNORE_OTHER_FILES = "parameter.ignore_other_files";
   public static final String PLUGIN_PARAMS_VERAPDF_VALIDATION = "parameter.ignore_verapdf_validation";

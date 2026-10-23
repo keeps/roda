@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -1284,11 +1285,23 @@ public final class PluginHelper {
       outcome, outcomeDetailExtension, notify, new Date(), cachedJob);
   }
 
+  /**
+   * Every plugin event ends here. When the plugin runs as a step of an ingest
+   * that writes a single preservation event per AIP, its AIP events are not
+   * written but captured to be part of that event (see
+   * {@link #isCapturingIngestEvent}); in any other case the event is written as
+   * always.
+   */
   private static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipId,
     String representationId, List<String> filePath, String fileId, ModelService model, IndexService index,
     List<LinkingIdentifier> sources, List<LinkingIdentifier> outcomes, PluginState outcome,
     String outcomeDetailExtension, boolean notify, Date startDate, Job cachedJob) throws RequestNotValidException,
     NotFoundException, GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
+
+    if (isCapturingIngestEvent(plugin, representationId, fileId)) {
+      return captureIngestStepEvent(plugin, aipId, model, index, sources, outcomes, outcome, outcomeDetailExtension,
+        notify, startDate, cachedJob);
+    }
 
     List<LinkingIdentifier> agentIds = new ArrayList<>();
     String agentId = IdUtils.getPluginAgentId(plugin.getClass().getName(), plugin.getVersion(),
@@ -1373,6 +1386,243 @@ public final class PluginHelper {
     pm.setFileId(fileId);
     pm.setType(PreservationMetadataType.EVENT);
     return pm;
+  }
+
+  /*************** Single ingest event related ***************/
+  /************************************************************/
+
+  /**
+   * Whether an event must be captured to be part of the single preservation
+   * event of an ingest instead of being written: the ingest workflow set the
+   * option on the plugin parameters and opened the job, it is an AIP event (not
+   * a representation or file one) and the plugin is not the ingest workflow
+   * itself (which writes the single event).
+   */
+  private static <T extends IsRODAObject> boolean isCapturingIngestEvent(Plugin<T> plugin, String representationId,
+    String fileId) {
+    Map<String, String> parameters = plugin.getParameterValues();
+    return parameters != null
+      && Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_CONSOLIDATE_INGEST_EVENTS))
+      && representationId == null && fileId == null
+      && !plugin.getClass().getName().equals(parameters.get(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS))
+      && ConsolidatedIngestEvents.isOpen(getJobId(plugin));
+  }
+
+  /**
+   * Captures the event as it would have been written (values resolved now, as
+   * the plugin may change its event type and messages afterwards).
+   *
+   * @return the event that would have been written (it is not stored)
+   */
+  private static <T extends IsRODAObject> PreservationMetadata captureIngestStepEvent(Plugin<T> plugin,
+    String aipId, ModelService model, IndexService index, List<LinkingIdentifier> sources,
+    List<LinkingIdentifier> outcomes, PluginState outcome, String outcomeDetailExtension, boolean notify,
+    Date eventDate, Job cachedJob) throws RequestNotValidException, NotFoundException, GenericException,
+    AuthorizationDeniedException, ValidationException, AlreadyExistsException {
+    List<LinkingIdentifier> agentIds = new ArrayList<>();
+    String pluginAgentId = resolveEventAgents(plugin, model, index, cachedJob, agentIds);
+    // plugin names are usually translation keys
+    String pluginName = getPreservationEventText(plugin.getName(), plugin.getName());
+    ConsolidatedIngestEvents.StepEvent event = new ConsolidatedIngestEvents.StepEvent(pluginName, plugin.getVersion(),
+      pluginAgentId, getPreservationEventType(plugin).toString(), plugin.getPreservationEventDescription(), eventDate,
+      outcome, getEventOutcomeDetailNote(plugin, outcome), outcomeDetailExtension,
+      sources == null ? Collections.emptyList() : new ArrayList<>(sources),
+      outcomes == null ? Collections.emptyList() : new ArrayList<>(outcomes), agentIds);
+
+    if (!ConsolidatedIngestEvents.add(getJobId(plugin), aipId, event)) {
+      // could not be captured (e.g. the job was closed in the meantime), so it
+      // is written as always
+      return createPluginEvent(plugin, aipId, null, null, null, model, index, sources, outcomes, outcome,
+        outcomeDetailExtension, notify, eventDate, cachedJob);
+    }
+
+    PreservationMetadata pm = new PreservationMetadata();
+    pm.setId(IdUtils.createPreservationMetadataId(PreservationMetadataType.EVENT,
+      RODAInstanceUtils.getLocalInstanceIdentifier()));
+    pm.setAipId(aipId);
+    pm.setType(PreservationMetadataType.EVENT);
+    return pm;
+  }
+
+  /**
+   * Writes the single preservation event of an ingest for an AIP: the outcome
+   * of the ingest followed by the outcome of each step event captured.
+   */
+  public static <T extends IsRODAObject> PreservationMetadata createSingleIngestEvent(Plugin<T> plugin, String aipId,
+    ModelService model, IndexService index, List<LinkingIdentifier> sources, List<LinkingIdentifier> outcomes,
+    PluginState outcome, List<ConsolidatedIngestEvents.StepEvent> stepEvents, Job cachedJob)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
+    ValidationException, AlreadyExistsException {
+    List<LinkingIdentifier> ingestAgentIds = new ArrayList<>();
+    String jobUsername = getEventJobUsername(plugin, index, cachedJob);
+    resolveEventAgents(plugin, model, index, cachedJob, ingestAgentIds);
+
+    List<String> details = new ArrayList<>();
+    details.add(plugin.getPreservationEventDescription());
+
+    List<PremisV3Utils.EventOutcome> eventOutcomes = new ArrayList<>();
+    eventOutcomes.add(new PremisV3Utils.EventOutcome(outcome.name(), getEventOutcomeDetailNote(plugin, outcome)));
+
+    Map<String, LinkingIdentifier> linkingObjects = new LinkedHashMap<>();
+    mergeLinkingIdentifiers(linkingObjects, sources, null);
+    mergeLinkingIdentifiers(linkingObjects, outcomes, null);
+
+    Map<String, LinkingIdentifier> agents = new LinkedHashMap<>();
+    mergeLinkingIdentifiers(agents, ingestAgentIds, null);
+
+    for (ConsolidatedIngestEvents.StepEvent stepEvent : stepEvents) {
+      details.add(stepEvent.eventType() + ": " + stepEvent.eventDescription());
+
+      StringBuilder note = new StringBuilder();
+      // the step outcome is also in eventOutcome, but only the notes are shown
+      note.append("[").append(stepEvent.outcome().name()).append("] ").append(stepEvent.eventType()).append(" (")
+        .append(stepEvent.pluginName()).append(" ")
+        .append(stepEvent.pluginVersion()).append(", agent ").append(stepEvent.pluginAgentId()).append(", ")
+        .append(stepEvent.eventDate().toInstant()).append("): ").append(stepEvent.outcomeDetailNote());
+      if (StringUtils.isNotBlank(stepEvent.outcomeDetailExtension())) {
+        note.append("\n").append(stepEvent.outcomeDetailExtension());
+      }
+      eventOutcomes.add(new PremisV3Utils.EventOutcome(stepEvent.outcome().name(), note.toString()));
+
+      mergeLinkingIdentifiers(linkingObjects, stepEvent.sources(), null);
+      mergeLinkingIdentifiers(linkingObjects, stepEvent.outcomes(), null);
+      for (LinkingIdentifier agent : stepEvent.agents()) {
+        // the agent of the step plugin gets the step event type as its role
+        String role = agent.getValue().equals(stepEvent.pluginAgentId()) ? stepEvent.eventType() : null;
+        mergeLinkingIdentifiers(agents, Collections.singletonList(agent), role);
+      }
+    }
+
+    String id = IdUtils.createPreservationMetadataId(PreservationMetadataType.EVENT,
+      RODAInstanceUtils.getLocalInstanceIdentifier());
+    ContentPayload premisEvent = PremisV3Utils.createPremisEventBinary(id, new Date(),
+      getPreservationEventType(plugin).toString(), details, new ArrayList<>(linkingObjects.values()),
+      new ArrayList<>(agents.values()), eventOutcomes);
+    model.createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, null, null, null, premisEvent,
+      jobUsername, true);
+
+    PreservationMetadata pm = new PreservationMetadata();
+    pm.setId(id);
+    pm.setAipId(aipId);
+    pm.setType(PreservationMetadataType.EVENT);
+    return pm;
+  }
+
+  /**
+   * Adds to agentIds the agents of an event (the plugin and the job users),
+   * creating their PREMIS agents when they do not exist yet, the same way
+   * {@link #createPluginEvent} does.
+   *
+   * @return the plugin agent id
+   */
+  private static <T extends IsRODAObject> String resolveEventAgents(Plugin<T> plugin, ModelService model,
+    IndexService index, Job cachedJob, List<LinkingIdentifier> agentIds)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
+    String agentId = IdUtils.getPluginAgentId(plugin.getClass().getName(), plugin.getVersion(),
+      RODAInstanceUtils.getLocalInstanceIdentifier());
+    Optional<LiteRODAObject> agentLite = LiteRODAObjectFactory.get(PreservationMetadata.class, agentId);
+    if (agentLite.isEmpty()) {
+      throw new RequestNotValidException("Could not get LITE for agent with ID: " + agentId);
+    }
+    LinkingIdentifier linkingIdentifierPlugin = new LinkingIdentifier();
+    linkingIdentifierPlugin.setValue(agentId);
+
+    try {
+      if (!model.existsInStorage(agentLite.get())) {
+        PremisV3Utils.createPremisAgentBinary(plugin, model, true);
+      }
+      agentIds.add(linkingIdentifierPlugin);
+    } catch (AlreadyExistsException e) {
+      agentIds.add(linkingIdentifierPlugin);
+    } catch (RODAException e) {
+      LOGGER.error("Error creating PREMIS agent", e);
+    }
+
+    List<JobUserDetails> jobUserDetails;
+    String jobUsername;
+    if (cachedJob == null) {
+      try {
+        IndexedJob indexedJob = getIndexedJob(plugin, index);
+        jobUserDetails = indexedJob.getJobUsersDetails();
+        jobUsername = indexedJob.getUsername();
+      } catch (NotFoundException e) {
+        jobUserDetails = null;
+        jobUsername = null;
+      }
+    } else {
+      jobUserDetails = cachedJob.getJobUsersDetails();
+      jobUsername = cachedJob.getUsername();
+    }
+
+    if (jobUserDetails != null && jobUsername != null) {
+      for (JobUserDetails jobUserDetail : jobUserDetails) {
+        String userId = IdUtils.getUserAgentId(jobUserDetail.getUsername(),
+          RODAInstanceUtils.getLocalInstanceIdentifier());
+        LinkingIdentifier linkingIdentifierAgent = new LinkingIdentifier();
+        linkingIdentifierAgent.setValue(userId);
+        List<String> roles = new ArrayList<>();
+        roles.add(jobUserDetail.getRole());
+        linkingIdentifierAgent.setRoles(roles);
+        addAgent(jobUserDetail.getUsername(), model, linkingIdentifierAgent, index, agentIds, jobUserDetails);
+      }
+    }
+
+    return agentId;
+  }
+
+  private static <T extends IsRODAObject> String getEventJobUsername(Plugin<T> plugin, IndexService index,
+    Job cachedJob) throws GenericException, RequestNotValidException {
+    if (cachedJob != null) {
+      return cachedJob.getUsername();
+    }
+    try {
+      return getIndexedJob(plugin, index).getUsername();
+    } catch (NotFoundException e) {
+      return null;
+    }
+  }
+
+  private static <T extends IsRODAObject> String getEventOutcomeDetailNote(Plugin<T> plugin, PluginState outcome) {
+    switch (outcome) {
+      case SKIPPED:
+        return plugin.getPreservationEventSkippedMessage();
+      case SUCCESS:
+        return plugin.getPreservationEventSuccessMessage();
+      default:
+        return plugin.getPreservationEventFailureMessage();
+    }
+  }
+
+  /**
+   * Adds copies of the identifiers to target (by type and value), merging the
+   * roles of the ones already there.
+   */
+  private static void mergeLinkingIdentifiers(Map<String, LinkingIdentifier> target,
+    List<LinkingIdentifier> identifiers, String extraRole) {
+    if (identifiers == null) {
+      return;
+    }
+    for (LinkingIdentifier identifier : identifiers) {
+      LinkingIdentifier merged = target.computeIfAbsent(identifier.getType() + " " + identifier.getValue(), k -> {
+        LinkingIdentifier copy = new LinkingIdentifier();
+        copy.setType(identifier.getType());
+        copy.setValue(identifier.getValue());
+        copy.setRoles(new ArrayList<>());
+        return copy;
+      });
+      List<String> roles = new ArrayList<>();
+      if (identifier.getRoles() != null) {
+        roles.addAll(identifier.getRoles());
+      }
+      if (extraRole != null) {
+        roles.add(extraRole);
+      }
+      for (String role : roles) {
+        if (!merged.getRoles().contains(role)) {
+          merged.getRoles().add(role);
+        }
+      }
+    }
   }
 
   public static void addAgent(String agentName, ModelService model, LinkingIdentifier linkingIdentifierAgent,

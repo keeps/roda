@@ -527,6 +527,63 @@ public final class PremisV3Utils {
     return MetadataUtils.saveToContentPayload(FACTORY.createEvent(ect), EventComplexType.class);
   }
 
+  /**
+   * Creates an event with several details and outcomes (e.g. the single event
+   * of an ingest, with one outcome per ingest step). The first detail and the
+   * first outcome are the ones that describe the event as a whole.
+   */
+  public static ContentPayload createPremisEventBinary(String eventID, Date date, String type, List<String> details,
+    List<LinkingIdentifier> linkingObjects, List<LinkingIdentifier> agentIds, List<EventOutcome> outcomes) {
+    EventComplexType ect = FACTORY.createEventComplexType();
+    ect.setEventDateTime(DateTime.parse(date.toInstant().toString()).toString());
+    ect.setEventType(getStringPlusAuthority(type));
+
+    EventIdentifierComplexType eict = FACTORY.createEventIdentifierComplexType();
+    eict.setEventIdentifierValue(eventID);
+    eict.setEventIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
+    ect.setEventIdentifier(eict);
+
+    for (String detail : details) {
+      EventDetailInformationComplexType edict = FACTORY.createEventDetailInformationComplexType();
+      edict.setEventDetail(detail);
+      ect.getEventDetailInformation().add(edict);
+    }
+
+    for (LinkingIdentifier identifier : linkingObjects) {
+      LinkingObjectIdentifierComplexType loict = FACTORY.createLinkingObjectIdentifierComplexType();
+      loict.setLinkingObjectIdentifierValue(identifier.getValue());
+      loict.setLinkingObjectIdentifierType(getStringPlusAuthority(identifier.getType()));
+      if (identifier.getRoles() != null) {
+        loict.getLinkingObjectRole().addAll(getStringPlusAuthorityArray(identifier.getRoles()));
+      }
+      ect.getLinkingObjectIdentifier().add(loict);
+    }
+
+    for (LinkingIdentifier identifier : agentIds) {
+      LinkingAgentIdentifierComplexType laict = FACTORY.createLinkingAgentIdentifierComplexType();
+      laict.setLinkingAgentIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
+      laict.setLinkingAgentIdentifierValue(identifier.getValue());
+      if (identifier.getRoles() != null) {
+        laict.getLinkingAgentRole().addAll(getStringPlusAuthorityArray(identifier.getRoles()));
+      }
+      ect.getLinkingAgentIdentifier().add(laict);
+    }
+
+    for (EventOutcome outcome : outcomes) {
+      EventOutcomeInformationComplexType eoict = FACTORY.createEventOutcomeInformationComplexType();
+      eoict.getEventOutcome().add(getStringPlusAuthority(outcome.outcome()));
+      EventOutcomeDetailComplexType eodct = FACTORY.createEventOutcomeDetailComplexType();
+      eodct.getEventOutcomeDetailNote().add(outcome.detailNote());
+      eoict.getEventOutcomeDetail().add(eodct);
+      ect.getEventOutcomeInformation().add(eoict);
+    }
+
+    return MetadataUtils.saveToContentPayload(FACTORY.createEvent(ect), EventComplexType.class);
+  }
+
+  public record EventOutcome(String outcome, String detailNote) {
+  }
+
   public static ContentPayload retrievePremisEventBinary(String eventID, Date date, String type, String details,
     List<LinkingIdentifier> sources, List<LinkingIdentifier> outcomes, String outcome, String detailNote,
     String detailExtension, List<LinkingIdentifier> agentIds) throws GenericException, ValidationException {

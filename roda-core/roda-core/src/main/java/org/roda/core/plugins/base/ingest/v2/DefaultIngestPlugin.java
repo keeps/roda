@@ -32,6 +32,7 @@ import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.SIPInformation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -44,6 +45,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.TransactionalModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
+import org.roda.core.plugins.ConsolidatedIngestEvents;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
@@ -75,6 +77,10 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   public static final String END_DESCRIPTION = "The ingest process has ended.";
   public static final PreservationEventType END_TYPE = PreservationEventType.INGEST_END;
 
+  public static final String SINGLE_EVENT_DESCRIPTION = "The ingest process has ended. This event includes the "
+    + "outcome of each ingest step that ran.";
+  public static final PreservationEventType SINGLE_EVENT_TYPE = PreservationEventType.INGESTION;
+
   protected static final int INITIAL_TOTAL_STEPS = 10;
   protected int totalSteps = INITIAL_TOTAL_STEPS;
 
@@ -103,6 +109,13 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       createSubmission = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_CREATE_SUBMISSION));
     }
     getParameterValues().put(RodaConstants.PLUGIN_PARAMS_CREATE_SUBMISSION, createSubmission.toString());
+    boolean singleEvent = RodaCoreFactory.getRodaConfiguration()
+      .getBoolean(RodaConstants.CORE_INGEST_CONSOLIDATE_PRESERVATION_EVENTS, false);
+    if (parameters.get(RodaConstants.PLUGIN_PARAMS_CONSOLIDATE_INGEST_EVENTS) != null) {
+      singleEvent = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_CONSOLIDATE_INGEST_EVENTS));
+    }
+    // the ingest steps get it through the parameters they are run with
+    getParameterValues().put(RodaConstants.PLUGIN_PARAMS_CONSOLIDATE_INGEST_EVENTS, Boolean.toString(singleEvent));
     getParameterValues().put(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS, getClass().getName());
   }
 
@@ -139,11 +152,17 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
   protected void processObjects(IndexService index, ModelService model, Report report, JobPluginInfo outerJobPluginInfo,
     Job cachedJob, List<TransferredResource> resources) {
+    final IngestJobPluginInfo jobPluginInfo = (IngestJobPluginInfo) outerJobPluginInfo;
+    final boolean singleEvent = isSingleEventIngest();
+    if (singleEvent) {
+      // from now on, the AIP events of the steps are captured instead of written
+      ConsolidatedIngestEvents.open(PluginHelper.getJobId(this));
+    }
+
     try {
       Date startDate = new Date();
       Report pluginReport;
 
-      final IngestJobPluginInfo jobPluginInfo = (IngestJobPluginInfo) outerJobPluginInfo;
       PluginHelper.updateJobInformationAsync(this, jobPluginInfo.setTotalSteps(getTotalSteps()));
 
       // PluginHelper.createJobReport(this, model, report, cachedJob, resources);
@@ -169,7 +188,9 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
       // this event can only be created after AIPs exist and that's why it is
       // performed here, after transformTransferredResourceIntoAnAIP
-      createIngestStartedEvent(model, index, jobPluginInfo, startDate, cachedJob);
+      if (!singleEvent) {
+        createIngestStartedEvent(model, index, jobPluginInfo, startDate, cachedJob);
+      }
 
       List<IngestStep> steps = getIngestSteps();
 
@@ -180,7 +201,11 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         step.execute(bundle);
       }
 
-      createIngestEndedEvent(model, index, jobPluginInfo, cachedJob);
+      if (singleEvent) {
+        createSingleIngestEvents(model, index, jobPluginInfo, cachedJob, resources, true);
+      } else {
+        createIngestEndedEvent(model, index, jobPluginInfo, cachedJob);
+      }
 
       getAfterExecute().ifPresent(e -> e.execute(jobPluginInfo, aips));
 
@@ -196,6 +221,14 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     } catch (JobException e) {
       // do nothing
     } finally {
+      if (singleEvent) {
+        // write what was captured for the AIPs whose ingest did not reach the end
+        try {
+          createSingleIngestEvents(model, index, jobPluginInfo, cachedJob, resources, false);
+        } catch (RuntimeException e) {
+          LOGGER.error("Error creating ingest events", e);
+        }
+      }
       if(model instanceof TransactionalModelService) {
         LOGGER.info("Delegating object lock release to RODATransactionManager");
       } else {
@@ -208,6 +241,8 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   @Override
   public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     LOGGER.debug("Doing stuff in afterAllExecute");
+
+    ConsolidatedIngestEvents.close(PluginHelper.getJobId(this));
 
     try {
       index.commitAIPs();
@@ -368,6 +403,66 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     setPreservationEventDescription(PluginHelper
       .getPreservationEventText("plugin.defaultIngestPlugin.event.endDescription", END_DESCRIPTION));
     createIngestEvent(model, index, jobPluginInfo, new Date(), cachedJob);
+  }
+
+  private boolean isSingleEventIngest() {
+    return Boolean.parseBoolean(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_CONSOLIDATE_INGEST_EVENTS));
+  }
+
+  /**
+   * Writes the single ingest event of each AIP of the given transferred
+   * resources, including the AIPs that stopped being processed because a
+   * mandatory step failed.
+   *
+   * @param includeAIPsWithoutCapturedEvents
+   *          false to only write the event of the AIPs that still have captured
+   *          step events
+   */
+  private void createSingleIngestEvents(ModelService model, IndexService index, IngestJobPluginInfo jobPluginInfo,
+    Job cachedJob, List<TransferredResource> resources, boolean includeAIPsWithoutCapturedEvents) {
+    String jobId = PluginHelper.getJobId(this);
+    setPreservationEventType(SINGLE_EVENT_TYPE);
+    setPreservationEventDescription(PluginHelper
+      .getPreservationEventText("plugin.defaultIngestPlugin.event.singleEventDescription", SINGLE_EVENT_DESCRIPTION));
+
+    for (TransferredResource resource : resources) {
+      Map<String, Report> aipReports = jobPluginInfo.getAllReports().get(resource.getUUID());
+      if (aipReports == null) {
+        continue;
+      }
+      for (Entry<String, Report> aipReport : aipReports.entrySet()) {
+        String aipId = aipReport.getKey();
+        if (Report.NO_OUTCOME_OBJECT_ID.equals(aipId)
+          || (!includeAIPsWithoutCapturedEvents && !ConsolidatedIngestEvents.hasEvents(jobId, aipId))) {
+          continue;
+        }
+        List<ConsolidatedIngestEvents.StepEvent> stepEvents = ConsolidatedIngestEvents.remove(jobId, aipId);
+        PluginState pluginState = aipReport.getValue().getPluginState();
+        if (pluginState == PluginState.FAILURE) {
+          setPreservationFailureMessage(
+            PluginHelper.getPreservationEventText("plugin.defaultIngestPlugin.event.endFailure", END_FAILURE));
+        } else {
+          // a PARTIAL_SUCCESS outcome uses the failure message
+          String message = calculatePreservationSuccessMessageFromPluginState(pluginState);
+          setPreservationSuccessMessage(message);
+          setPreservationFailureMessage(message);
+        }
+
+        try {
+          List<LinkingIdentifier> sources = Arrays
+            .asList(PluginHelper.getLinkingIdentifier(resource, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+          List<LinkingIdentifier> outcomes = Arrays
+            .asList(PluginHelper.getLinkingIdentifier(aipId, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+          PluginHelper.createSingleIngestEvent(this, aipId, model, index, sources, outcomes, pluginState, stepEvents,
+            cachedJob);
+        } catch (NotFoundException e) {
+          LOGGER.debug("AIP '{}' no longer exists, its ingest event was not written", aipId);
+        } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | ValidationException
+          | AlreadyExistsException e) {
+          LOGGER.warn("Error creating ingest event", e);
+        }
+      }
+    }
   }
 
   private void removeSIPAfterIngestEnded(ModelService model, List<TransferredResource> resources,
