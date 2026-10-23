@@ -10915,3 +10915,29 @@ wui-disposal-hold-data .form-textbox {
     flex: 1;               /* Fills the rest of the screen */
     min-width: 0;          /* Prevents large <pre> code blocks from breaking the flex container */
 }
+
+
+/******************************
+  SEARCH HIGHLIGHTS
+ ******************************/
+.highlighted-cell {
+    color: rgb(117, 69, 1);
+    background-color: rgb(255, 238, 215);
+    border-radius: 4px;
+}
+
+.cell-highlight-popup {
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px #00000088;
+    padding: 8px;
+    transition: opacity 0.075s ease-in-out;
+}
+
+.cell-highlight-popup-hidden {
+    opacity: 0;
+}
+
+.cell-highlight-popup-visible {
+    opacity: 1;
+}

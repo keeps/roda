@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-import com.google.gwt.dom.client.NativeEvent;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.FindRequest;
@@ -27,6 +26,7 @@ import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetParameter;
 import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.filter.EDismaxSimpleQueryFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -67,6 +67,7 @@ import org.roda.wui.common.client.widgets.wcag.AcessibleCheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.shared.GWT;
+import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
@@ -143,6 +144,9 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   private Facets facets;
   private boolean selectable;
   private List<String> fieldsToReturn;
+  private List<String> queryFields;
+  private boolean highlighting;
+  private List<String> highlightedFields;
   private Collapse collapse;
 
   private HandlerRegistration facetsValueChangedHandlerRegistration;
@@ -191,6 +195,10 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     this.redirectOnSingleResult = options.getRedirectOnSingleResult();
 
     this.fieldsToReturn = options.getFieldsToReturn();
+    this.queryFields = options.getQueryFields();
+
+    this.highlighting = options.isHighlighting();
+    this.highlightedFields = options.getHighlightFields();
 
     this.setVisible(!options.isStartHidden());
 
@@ -638,7 +646,8 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     Services services = new Services(reason, "get");
     FindRequest findRequest = FindRequest.getBuilder(getFilter(), getJustActive()).withSublist(sublist)
       .withFacets(getFacets()).withExportFacets(false).withSorter(sorter).withFieldsToReturn(fieldsToReturn)
-      .withCollapse(getCollapse()).build();
+      .withQueryFields(fieldsToReturn).withDefType(getDefType()).withCollapse(getCollapse())
+      .withHighlighting(highlighting).withHighlightedFields(highlightedFields).build();
     return services.rodaEntityRestService(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
       getClassToReturn());
   }
@@ -742,6 +751,12 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
   public Filter getFilter() {
     return filter;
+  }
+
+  public String getDefType() {
+    return getFilter().getParameters().stream().anyMatch(p -> p instanceof EDismaxSimpleQueryFilterParameter)
+      ? RodaConstants.SOLR_EDISMAX
+      : RodaConstants.SOLR_LUCENE;
   }
 
   public void setFilter(Filter filter) {

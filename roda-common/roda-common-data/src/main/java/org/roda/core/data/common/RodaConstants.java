@@ -201,6 +201,12 @@ public final class RodaConstants {
   public static final String UI_SERVICE_MONITORING_DEFAULT_URL = "https://www.roda-enterprise.com";
   public static final String UI_SERVICE_CAS_DEFAULT_URL = "https://www.roda-enterprise.com";
   public static final String UI_SERVICE_MARKETPLACE_DEFAULT_URL = "https://marketplace.roda-community.org";
+
+  public static final String UI_SEARCH_HIGHLIGHT_TAG_PRE = "ui.highlight.tag.pre";
+  public static final String UI_SEARCH_HIGHLIGHT_TAG_POST = "ui.highlight.tag.post";
+  public static final String UI_SEARCH_HIGHLIGHT_FRAGSIZE = "ui.highlight.fragsize";
+  public static final String UI_SEARCH_HIGHLIGHT_MAXANALYZEDCHARS = "ui.highlight.maxAnalyzedChars";
+
   /*
    * RODA objects
    */
@@ -923,6 +929,12 @@ public final class RodaConstants {
    * USER REGISTRATION SETTINGS
    */
   public static final String USER_REGISTRATION_DISABLED = "core.user_registration.disabled";
+
+  /*
+   * SOLR QUERY PARSERS
+   */
+  public static final String SOLR_LUCENE = "lucene";
+  public static final String SOLR_EDISMAX = "edismax";
 
   /*
    * INDEX NAMES
