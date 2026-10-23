@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
@@ -37,6 +38,31 @@ import org.slf4j.LoggerFactory;
 public class LogEntryCollection extends AbstractSolrCollection<LogEntry, LogEntry> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LogEntryCollection.class);
+  private static final Pattern UUID_PATTERN = Pattern
+    .compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}");
+  // Solr's compositeId router hashes the part of a document id before this separator to choose its shard
+  private static final String ROUTE_SEPARATOR = "!";
+
+  /**
+   * The id an audit log entry must have, set when the entry is written: its id
+   * prefixed by the id of the request it was made in
+   * ({@code <request>!<id>}), so that Solr's compositeId router puts every entry
+   * of a request on the same shard. The audit log list collapses entries per
+   * request, and {@code {!collapse}} only groups the documents of each shard, so
+   * without it a request shows up once per shard (#3784). The request id comes
+   * from a request header, so only one shaped like a UUID is used; entries
+   * without one, and entries that already have their id, keep it.
+   */
+  public static String idFor(LogEntry entry) {
+    String id = entry.getUUID();
+    AuditLogRequestHeaders headers = entry.getAuditLogRequestHeaders();
+    String requestId = headers != null ? headers.getUuid() : null;
+    if (id == null || id.contains(ROUTE_SEPARATOR) || requestId == null
+      || !UUID_PATTERN.matcher(requestId).matches()) {
+      return id;
+    }
+    return requestId + ROUTE_SEPARATOR + id;
+  }
 
   @Override
   public Class<LogEntry> getIndexClass() {

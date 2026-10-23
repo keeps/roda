@@ -8,13 +8,11 @@
 package org.roda.core.index.review;
 
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,9 +46,6 @@ import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Container.ExecResult;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.utility.DockerImageName;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -95,8 +90,8 @@ import org.testng.annotations.Test;
  * </pre>
  *
  * Parameters (system properties, defaults in brackets):
- * {@code solrreview.stall.image} [solr:10.0.0], {@code solrreview.stall.heap}
- * [2g], {@code solrreview.stall.shards} [4], {@code solrreview.stall.threads}
+ * {@code solrreview.image} [solr:10.0.0], {@code solrreview.heap} [2g],
+ * {@code solrreview.stall.shards} [4], {@code solrreview.stall.threads}
  * [16], {@code solrreview.stall.durationSeconds} [300],
  * {@code solrreview.stall.stallSeconds} [60],
  * {@code solrreview.stall.logEntriesPerCycle} [5], {@code solrreview.outputDir}
@@ -106,14 +101,7 @@ import org.testng.annotations.Test;
 public class Http2InterShardStallTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(Http2InterShardStallTest.class);
 
-  private static final String SOLR_CLOUD_URLS_PROPERTY = "RODA_CORE_SOLR_CLOUD_URLS";
-  private static final String SOLR_NUM_SHARDS_PROPERTY = "SOLR_NUM_SHARDS";
-  // Solr's embedded ZooKeeper listens on the Solr port + 1000
-  private static final int ZOOKEEPER_PORT_OFFSET = 1000;
-
-  private static GenericContainer<?> solr;
-  private static String previousSolrCloudUrls;
-  private static String previousNumShards;
+  private static ShardedSolr solr;
   private static Path basePath;
   private static ModelService model;
   private static IndexService index;
@@ -124,25 +112,8 @@ public class Http2InterShardStallTest {
   @BeforeClass
   public static void setUp() throws Exception {
     shards = Integer.getInteger("solrreview.stall.shards", 4);
-    int port = findFreePort();
-    int zookeeperPort = port + ZOOKEEPER_PORT_OFFSET;
-
-    // a Solr of its own, with Solr's defaults (HTTP/2 between shards) and the heap of the reference deploy
-    solr = new GenericContainer<>(
-      DockerImageName.parse(System.getProperty("solrreview.stall.image", "solr:10.0.0")))
-      .withExposedPorts(port, zookeeperPort).withEnv("SOLR_PORT_LISTEN", String.valueOf(port))
-      .withEnv("SOLR_HOST_ADVERTISE", "localhost")
-      .withEnv("SOLR_HEAP", System.getProperty("solrreview.stall.heap", "2g"))
-      .waitingFor(Wait.forHttp("/solr/admin/info/system").forPort(port).forStatusCode(200)
-        .withStartupTimeout(Duration.ofMinutes(3)));
-    solr.setPortBindings(List.of(port + ":" + port, zookeeperPort + ":" + zookeeperPort));
-    solr.start();
-
-    // point RODA at it, with every collection created on several shards
-    previousSolrCloudUrls = System.getProperty(SOLR_CLOUD_URLS_PROPERTY);
-    previousNumShards = System.getProperty(SOLR_NUM_SHARDS_PROPERTY);
-    System.setProperty(SOLR_CLOUD_URLS_PROPERTY, "localhost:" + zookeeperPort);
-    System.setProperty(SOLR_NUM_SHARDS_PROPERTY, String.valueOf(shards));
+    // a Solr of its own, with Solr's defaults (HTTP/2 between shards), with every RODA collection on several shards
+    solr = ShardedSolr.start(shards);
 
     basePath = TestsHelper.createBaseTempDir(Http2InterShardStallTest.class, true);
     ldapUtilityTestHelper = new LdapUtilityTestHelper();
@@ -172,10 +143,8 @@ public class Http2InterShardStallTest {
         FSUtils.deletePath(basePath);
       }
     } finally {
-      restore(SOLR_CLOUD_URLS_PROPERTY, previousSolrCloudUrls);
-      restore(SOLR_NUM_SHARDS_PROPERTY, previousNumShards);
       if (solr != null) {
-        solr.stop();
+        solr.close();
       }
     }
   }
@@ -299,10 +268,10 @@ public class Http2InterShardStallTest {
       Files.writeString(outputDir.resolve("summary.txt"), summary + "\n" + String.join("\n", errors) + "\n",
         StandardCharsets.UTF_8);
       // SIGQUIT makes the JVM print a thread dump to stdout (the container log); it does not stop Solr
-      solr.execInContainer("bash", "-c", "kill -3 $(pgrep -f start.jar)");
+      solr.container().execInContainer("bash", "-c", "kill -3 $(pgrep -f start.jar)");
       Thread.sleep(3000);
-      Files.writeString(outputDir.resolve("container.log"), solr.getLogs(), StandardCharsets.UTF_8);
-      ExecResult log = solr.execInContainer("bash", "-c", "cat /var/solr/logs/solr.log");
+      Files.writeString(outputDir.resolve("container.log"), solr.container().getLogs(), StandardCharsets.UTF_8);
+      ExecResult log = solr.container().execInContainer("bash", "-c", "cat /var/solr/logs/solr.log");
       Files.writeString(outputDir.resolve("solr.log"), log.getStdout(), StandardCharsets.UTF_8);
       LOGGER.error("Thread dump and Solr logs saved to {}", outputDir.toAbsolutePath());
     } catch (IOException | UnsupportedOperationException e) {
@@ -312,31 +281,7 @@ public class Http2InterShardStallTest {
     }
   }
 
-  private static void restore(String property, String value) {
-    if (value == null) {
-      System.clearProperty(property);
-    } else {
-      System.setProperty(property, value);
-    }
-  }
 
-  private static int findFreePort() throws IOException {
-    // the ZooKeeper port (port + 1000) must be free too
-    for (int attempt = 0; attempt < 20; attempt++) {
-      int port;
-      try (ServerSocket socket = new ServerSocket(0)) {
-        port = socket.getLocalPort();
-      }
-      if (port + ZOOKEEPER_PORT_OFFSET < 65536) {
-        try (ServerSocket zookeeper = new ServerSocket(port + ZOOKEEPER_PORT_OFFSET)) {
-          return port;
-        } catch (IOException e) {
-          // taken, try another
-        }
-      }
-    }
-    throw new IOException("No free pair of ports for Solr and its ZooKeeper");
-  }
 
   @FunctionalInterface
   private interface RodaCall {
