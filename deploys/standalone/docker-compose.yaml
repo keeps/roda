@@ -93,7 +93,8 @@ services:
       # Solr Cloud configuration
       - RODA_CORE_SOLR_TYPE=CLOUD
       - RODA_CORE_SOLR_CLOUD_URLS=zoo:2181
-      - SOLR_NUM_SHARDS=4
+      - RODA_CORE_SOLR_SHARDS_LARGE=4
+      - RODA_CORE_SOLR_SHARDS_SMALL=1
       - SOLR_REPLICATION_FACTOR=1
       # Base plugin services configuration
       - SIEGFRIED_SERVER_URL=http://siegfried:5138
