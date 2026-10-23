@@ -40,6 +40,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -181,6 +182,7 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
         if (job.getSourceObjects() instanceof SelectedItemsAll) {
           Class<? extends IsIndexed> selectedClass = (Class<? extends IsIndexed>) Class
             .forName(job.getSourceObjects().getSelectedClass());
+          JobsHelper.checkNoActiveJobsBeforeClearingIndexes(index);
           index.clearIndexes(SolrCollectionRegistry.getCommitIndexNames(selectedClass));
           if (selectedClass.equals(AIP.class) || selectedClass.equals(IndexedAIP.class)) {
             index.clearAIPEventIndex();

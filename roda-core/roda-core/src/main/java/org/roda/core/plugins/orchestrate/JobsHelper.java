@@ -35,6 +35,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -62,7 +63,9 @@ import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
+import org.roda.core.plugins.base.maintenance.reindex.ReindexRodaEntityPlugin;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.slf4j.Logger;
@@ -85,6 +88,55 @@ public final class JobsHelper {
 
   private JobsHelper() {
     // do nothing
+  }
+
+  /**
+   * The jobs that have not reached a final state. Read from the index, so it
+   * also sees the jobs of other instances that share it.
+   */
+  public static List<IndexedJob> findActiveJobs(IndexService index)
+    throws GenericException, RequestNotValidException, IOException {
+    Filter activeJobs = new Filter();
+    for (JOB_STATE state : JOB_STATE.values()) {
+      if (Job.isFinalState(state)) {
+        activeJobs.add(new NotSimpleFilterParameter(RodaConstants.JOB_STATE, state.toString()));
+      }
+    }
+
+    List<IndexedJob> jobs = new ArrayList<>();
+    try (IterableIndexResult<IndexedJob> result = index.findAll(IndexedJob.class, activeJobs,
+      Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.JOB_NAME, RodaConstants.JOB_PLUGIN))) {
+      result.forEach(jobs::add);
+    }
+    return jobs;
+  }
+
+  /**
+   * Fails if a job other than a reindex job is running. Clearing an index
+   * deletes it by query, which blocks every update of each core until it is
+   * applied (#3783), so it must not run while other jobs index. Reindex jobs do
+   * not block each other: "Rebuild all indexes" starts one reindex job per
+   * entity, each clearing its own index.
+   */
+  public static void checkNoActiveJobsBeforeClearingIndexes(IndexService index) throws PluginException {
+    List<IndexedJob> blocking;
+    try {
+      blocking = findActiveJobs(index).stream().filter(job -> !isReindexJob(job)).toList();
+    } catch (GenericException | RequestNotValidException | IOException e) {
+      throw new PluginException("Could not check the running jobs before clearing the index", e);
+    }
+
+    if (!blocking.isEmpty()) {
+      throw new PluginException("Cannot clear the index while other jobs are running, as clearing it blocks their "
+        + "indexing. Wait for these jobs to finish, or stop them, and run the reindex again: " + blocking.stream()
+          .map(job -> "'" + job.getName() + "' (" + job.getId() + ")").collect(Collectors.joining(", ")));
+    }
+  }
+
+  // all reindex plugins, "Rebuild all indexes" included, are in the package of ReindexRodaEntityPlugin
+  private static boolean isReindexJob(IndexedJob job) {
+    return job.getPlugin() != null
+      && job.getPlugin().startsWith(ReindexRodaEntityPlugin.class.getPackageName() + ".");
   }
 
   public static int getMaxNumberOfJobsInParallel() {
