@@ -20,7 +20,6 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
@@ -132,12 +131,7 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
-    LOGGER.debug("Optimizing indexes");
-    try {
-      index.optimizeIndex(RodaConstants.INDEX_ACTION_LOG);
-    } catch (GenericException | AuthorizationDeniedException e) {
-      throw new PluginException("Error optimizing index", e);
-    }
+    // no optimize: it rewrites the whole index and can hold up the delete before it (#3783)
     return null;
   }
 

@@ -1303,34 +1303,17 @@ public class IndexModelObserver implements ModelObserver {
 
   /**
    * Deletes, by id, the documents whose {@code parentField} is {@code parentId}
-   * and whose id is not in {@code keep}. Replaces a delete by query before a
-   * reindex: the listing only sees changes older than the soft commit interval,
-   * which is enough as removed objects are also deleted by id when they are
-   * removed.
+   * and whose id is not in {@code keep} (see
+   * {@link SolrUtils#deleteMatchingById}), both before a reindex and when the
+   * parent is deleted. Before a reindex, missing the changes of the last soft
+   * commit interval is enough, as removed objects are also deleted by id when
+   * they are removed; when the parent is deleted, children indexed within that
+   * interval stay in the index.
    */
   private <T extends IsIndexed> ReturnWithExceptions<Void, ModelObserver> deleteStaleDocuments(Class<T> indexClass,
     String parentField, String parentId, Set<String> keep) {
-    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    List<String> stale = new ArrayList<>();
-    try (IterableIndexResult<T> indexed = new IterableIndexResult<>(index, indexClass,
-      new Filter(new SimpleFilterParameter(parentField, parentId)), null, false,
-      Collections.singletonList(RodaConstants.INDEX_UUID))) {
-      for (T document : indexed) {
-        if (!keep.contains(document.getUUID())) {
-          stale.add(document.getUUID());
-        }
-      }
-    } catch (IOException | RuntimeException e) {
-      LOGGER.error("Cannot list {} documents of {} to remove stale ones", indexClass.getSimpleName(), parentId, e);
-      ret.add(e);
-      return ret;
-    }
-
-    if (!stale.isEmpty()) {
-      LOGGER.debug("Removing {} stale {} documents of {}", stale.size(), indexClass.getSimpleName(), parentId);
-      SolrUtils.delete(index, indexClass, stale, (ModelObserver) this).addTo(ret);
-    }
-    return ret;
+    return SolrUtils.deleteMatchingById(index, indexClass,
+      new Filter(new SimpleFilterParameter(parentField, parentId)), keep, (ModelObserver) this);
   }
 
   private <T extends IsIndexed> ReturnWithExceptions<Void, ModelObserver> deleteDocumentFromIndex(
@@ -1345,13 +1328,20 @@ public class IndexModelObserver implements ModelObserver {
 
   private <T extends IsIndexed> ReturnWithExceptions<Void, ModelObserver> deleteDocumentsFromIndex(
     Class<T> classToDelete, String fieldName, String fieldValue) {
-    return SolrUtils.delete(index, classToDelete, new Filter(new SimpleFilterParameter(fieldName, fieldValue)), this);
+    return deleteStaleDocuments(classToDelete, fieldName, fieldValue, Collections.emptySet());
   }
 
   private <T extends IsIndexed> ReturnWithExceptions<Void, ModelObserver> deleteDocumentsFromIndex(
     Class<T> classToDelete, String fieldName, String fieldValue, boolean commit) {
-    return SolrUtils.delete(index, classToDelete, new Filter(new SimpleFilterParameter(fieldName, fieldValue)), this,
-      commit);
+    ReturnWithExceptions<Void, ModelObserver> ret = deleteDocumentsFromIndex(classToDelete, fieldName, fieldValue);
+    if (commit && ret.isEmpty()) {
+      try {
+        SolrUtils.commit(index, classToDelete);
+      } catch (GenericException e) {
+        ret.add(e);
+      }
+    }
+    return ret;
   }
 
   @Override
@@ -1556,6 +1546,20 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> dipCreated(DIP dip, boolean commit) {
+    ReturnWithExceptions<Void, ModelObserver> ret = indexDIPAndFiles(dip, null);
+    if (commit) {
+      commitDIPs().addTo(ret);
+    }
+    return ret;
+  }
+
+  /**
+   * Indexes the DIP and its files.
+   *
+   * @param written
+   *          if not null, receives the ids of every DIP file document written
+   */
+  private ReturnWithExceptions<Void, ModelObserver> indexDIPAndFiles(DIP dip, Set<String> written) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
     SolrUtils.create2(index, model, (ModelObserver) this, IndexedDIP.class, dip).addTo(ret);
@@ -1566,19 +1570,10 @@ public class IndexModelObserver implements ModelObserver {
         for (OptionalWithCause<DIPFile> file : allFiles) {
           if (file.isPresent()) {
             indexDIPFile(dip, file.get(), false).addTo(ret);
+            addWritten(written, IdUtils.getDIPFileId(file.get()));
           } else {
             LOGGER.error("Cannot index DIP file", file.getCause());
             ret.add(file.getCause());
-          }
-        }
-
-        if (commit) {
-          try {
-            SolrUtils.commit(index, IndexedDIP.class);
-            SolrUtils.commit(index, DIPFile.class);
-          } catch (GenericException e) {
-            LOGGER.warn("Commit did not run as expected");
-            ret.add(e);
           }
         }
       } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
@@ -1591,10 +1586,30 @@ public class IndexModelObserver implements ModelObserver {
     return ret;
   }
 
+  private ReturnWithExceptions<Void, ModelObserver> commitDIPs() {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+    try {
+      SolrUtils.commit(index, IndexedDIP.class);
+      SolrUtils.commit(index, DIPFile.class);
+    } catch (GenericException e) {
+      LOGGER.warn("Commit did not run as expected");
+      ret.add(e);
+    }
+    return ret;
+  }
+
+  /**
+   * Reindexes the DIP in place, then deletes the documents of the DIP files that
+   * were not written again (see {@link #aipUpdated(AIP)}).
+   */
   @Override
   public ReturnWithExceptions<Void, ModelObserver> dipUpdated(DIP dip, boolean commit) {
-    ReturnWithExceptions<Void, ModelObserver> ret = dipDeleted(dip.getId(), commit);
-    dipCreated(dip, commit).addTo(ret);
+    Set<String> written = new HashSet<>();
+    ReturnWithExceptions<Void, ModelObserver> ret = indexDIPAndFiles(dip, written);
+    deleteStaleDocuments(DIPFile.class, RodaConstants.DIPFILE_DIP_ID, dip.getId(), written).addTo(ret);
+    if (commit) {
+      commitDIPs().addTo(ret);
+    }
     return ret;
   }
 

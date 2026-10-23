@@ -28,6 +28,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,6 +135,7 @@ public class ReindexPreservationAIPEventPlugin extends AbstractPlugin<AIP> {
     throws PluginException {
     if (clearIndexes) {
       LOGGER.debug("Clearing indexes");
+      JobsHelper.checkNoActiveJobsBeforeClearingIndexes(index);
       try {
         index.clearAIPEventIndex();
       } catch (GenericException | AuthorizationDeniedException e) {

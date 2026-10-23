@@ -32,6 +32,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobsHelper;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -207,6 +208,7 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
     throws PluginException {
     if (clearIndexes) {
       LOGGER.debug("Clearing indexes");
+      JobsHelper.checkNoActiveJobsBeforeClearingIndexes(index);
       try {
         index.clearIndex(RodaConstants.INDEX_ACTION_LOG);
       } catch (GenericException | AuthorizationDeniedException e) {

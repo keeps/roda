@@ -7,10 +7,11 @@
  */
 package org.roda.core.index;
 
+import java.io.IOException;
+
+import org.apache.solr.client.solrj.SolrServerException;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.index.schema.SolrCollectionRegistry;
 import org.roda.core.index.utils.SolrUtils;
 import org.slf4j.Logger;
@@ -26,9 +27,10 @@ public class IndexTestUtils {
   public static void resetIndex() {
     SolrCollectionRegistry.registry().forEach(r -> {
       try {
-        SolrUtils.deleteByQuery(RodaCoreFactory.getSolr(), r.getIndexName(), Filter.ALL);
+        // between test classes nothing else is indexing, and every document must be gone at once
+        RodaCoreFactory.getSolr().deleteByQuery(r.getIndexName(), "*:*");
         SolrUtils.commit(RodaCoreFactory.getSolr(), r.getIndexClass());
-      } catch (GenericException | RequestNotValidException e) {
+      } catch (GenericException | SolrServerException | IOException e) {
         LOGGER.error("Failed to reset index", e);
       }
     });

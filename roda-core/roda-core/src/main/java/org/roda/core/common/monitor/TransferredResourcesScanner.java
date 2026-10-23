@@ -42,7 +42,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.LiteRODAObjectFactory;
@@ -52,8 +52,12 @@ import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
+
 public class TransferredResourcesScanner {
   private static final Logger LOGGER = LoggerFactory.getLogger(TransferredResourcesScanner.class);
+  // each path is one clause of an OR query, which Solr caps at maxBooleanClauses (1024)
+  private static final int MAX_ANCESTORS_PER_DELETE = 500;
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH);
 
@@ -231,18 +235,25 @@ public class TransferredResourcesScanner {
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    for (String uuid : ids) {
-      TransferredResource tr = index.retrieve(TransferredResource.class, uuid, fieldsToReturn);
-      Path relative = Paths.get(FilenameUtils.normalize(tr.getRelativePath()));
-      Path fullPath = basePath.resolve(relative);
-      if (FSUtils.exists(fullPath)) {
-        FSUtils.deletePath(fullPath);
-
-        Filter filter = new Filter(
-          new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS, relative.toString()));
-        index.delete(TransferredResource.class, filter);
-      } else {
-        throw new NotFoundException("Path does not exist: " + fullPath);
+    List<String> deletedPaths = new ArrayList<>();
+    try {
+      for (String uuid : ids) {
+        TransferredResource tr = index.retrieve(TransferredResource.class, uuid, fieldsToReturn);
+        Path relative = Paths.get(FilenameUtils.normalize(tr.getRelativePath()));
+        Path fullPath = basePath.resolve(relative);
+        if (FSUtils.exists(fullPath)) {
+          FSUtils.deletePath(fullPath);
+          deletedPaths.add(relative.toString());
+        } else {
+          throw new NotFoundException("Path does not exist: " + fullPath);
+        }
+      }
+    } finally {
+      // the descendants of every deleted path in a few listings rather than one per path (#3783); also when a later
+      // path failed, as the ones before it are already gone from disk
+      for (List<String> paths : Lists.partition(deletedPaths, MAX_ANCESTORS_PER_DELETE)) {
+        index.delete(TransferredResource.class,
+          new Filter(new OneOfManyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS, paths)));
       }
     }
 

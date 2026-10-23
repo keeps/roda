@@ -160,6 +160,7 @@ public class SolrUtils {
   public static final String SCHEMA = "managed-schema.xml";
   private static final Logger LOGGER = LoggerFactory.getLogger(SolrUtils.class);
   private static final String DEFAULT_QUERY_PARSER_OPERATOR = "AND";
+  private static final int DELETE_BY_ID_BATCH_SIZE = 1000;
   // StAX factories are thread-safe once configured; looking one up is not cheap
   private static final XMLInputFactory XML_INPUT_FACTORY = XMLInputFactory.newInstance();
   private static final Set<String> NON_REPEATABLE_FIELDS = new HashSet<>(Arrays.asList(RodaConstants.AIP_TITLE,
@@ -1910,37 +1911,41 @@ public class SolrUtils {
     return ret;
   }
 
-  public static <T extends IsIndexed, S extends Object> ReturnWithExceptions<Void, S> delete(SolrClient index,
-    Class<T> classToDelete, Filter filter, S source) {
-    return delete(index, classToDelete, filter, source, false);
-  }
-
-  public static <T extends IsIndexed, S extends Object> ReturnWithExceptions<Void, S> delete(SolrClient index,
-    Class<T> classToDelete, Filter filter, S source, boolean commit) {
-    ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>();
-
-    Fallback<Object> fallback = Fallback.of(e -> {
-      ret.add(new SolrRetryException(e.getLastException()));
-    });
-
-    Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy())
-      .onFailure(e -> LOGGER.error("Error deleting documents from index")).run(() -> {
-        index.deleteByQuery(SolrCollectionRegistry.getIndexName(classToDelete), parseFilter(filter));
-        if (commit) {
-          commit(index, classToDelete);
+  /**
+   * Deletes, by id, the documents that match the filter and whose id is not in
+   * {@code keep}: lists their ids with a cursor and deletes them in batches. It
+   * replaces delete by query, which blocks every update of each core that
+   * applies it until it is applied and goes to every shard of the collection
+   * (#3783). The listing only sees the documents indexed up to the last soft
+   * commit.
+   */
+  public static <T extends IsIndexed, S extends Object> ReturnWithExceptions<Void, S> deleteMatchingById(
+    SolrClient index, Class<T> indexClass, Filter filter, Set<String> keep, S source) {
+    ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>(source);
+    List<String> ids = new ArrayList<>();
+    // the deletes are not visible to the listing until the next commit, and the cursor follows the sort values,
+    // so deleting while listing skips nothing
+    try (IterableIndexResult<T> indexed = new IterableIndexResult<>(index, indexClass, filter, null, false,
+      Collections.singletonList(RodaConstants.INDEX_UUID))) {
+      for (T document : indexed) {
+        if (!keep.contains(document.getUUID())) {
+          ids.add(document.getUUID());
         }
-      });
-
-    return ret;
-  }
-
-  public static <T extends IsIndexed> void deleteByQuery(SolrClient index, String classToDelete, Filter filter)
-    throws GenericException, RequestNotValidException {
-    try {
-      index.deleteByQuery(classToDelete, parseFilter(filter));
-    } catch (SolrServerException | SolrException | IOException e) {
-      throw new GenericException("Could not delete items", e);
+        if (ids.size() == DELETE_BY_ID_BATCH_SIZE) {
+          delete(index, indexClass, ids, source).addTo(ret);
+          ids = new ArrayList<>();
+        }
+      }
+    } catch (IOException | RuntimeException e) {
+      LOGGER.error("Cannot list the {} documents to delete", indexClass.getSimpleName(), e);
+      ret.add(e);
+      return ret;
     }
+
+    if (!ids.isEmpty()) {
+      delete(index, indexClass, ids, source).addTo(ret);
+    }
+    return ret;
   }
 
   public static Map<String, String> getRetentionPeriod(DisposalSchedule disposalSchedule, AIP aip)

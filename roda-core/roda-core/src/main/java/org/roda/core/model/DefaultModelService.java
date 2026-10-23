@@ -113,7 +113,6 @@ import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.disposal.schedule.DisposalScheduleState;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -121,8 +120,6 @@ import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
@@ -232,17 +229,6 @@ public class DefaultModelService implements ModelService {
     }
   }
 
-  private static void clearSpecificIndexes(IndexService index, Class<IsRODAObject> objectClass,
-    IsModelObject rodaObject) throws AuthorizationDeniedException {
-    if (AIP.class.equals(objectClass)) {
-      List<String> ids = Arrays.asList(rodaObject.getId());
-      index.delete(IndexedRepresentation.class,
-        new Filter(new OneOfManyFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, ids)));
-      index.delete(IndexedFile.class, new Filter(new OneOfManyFilterParameter(RodaConstants.FILE_AIP_ID, ids)));
-      index.delete(IndexedPreservationEvent.class,
-        new Filter(new OneOfManyFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, ids)));
-    }
-  }
 
   /**
    * Lazily retrieves the job database layer from the Spring context.
@@ -6222,7 +6208,7 @@ public class DefaultModelService implements ModelService {
           IndexedJob job = index.retrieve(IndexedJob.class, jobId, Arrays.asList());
           notifyJobReportCreatedOrUpdated((Report) rodaObject.get(), job);
         } else {
-          clearSpecificIndexes(index, objectClass, rodaObject.get());
+          // reindexes in place: overwrites the documents by id and deletes only the leftovers (#3783)
           index.reindex(rodaObject.get());
         }
       }
