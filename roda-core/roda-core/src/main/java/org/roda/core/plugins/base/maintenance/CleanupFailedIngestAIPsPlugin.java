@@ -22,7 +22,6 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -36,6 +35,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,17 +128,9 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
   }
 
   private List<String> findActiveJobs(IndexService index) {
-    Filter activeJobsViaStateFilter = new Filter();
-    for (Job.JOB_STATE jobState : Job.JOB_STATE.values()) {
-      if (Job.isFinalState(jobState)) {
-        activeJobsViaStateFilter.add(new NotSimpleFilterParameter(RodaConstants.JOB_STATE, jobState.toString()));
-      }
-    }
-
     List<String> activeJobsIds = new ArrayList<>();
-    try (IterableIndexResult<IndexedJob> result = index.findAll(IndexedJob.class, activeJobsViaStateFilter,
-      Arrays.asList(RodaConstants.INDEX_UUID))) {
-      result.forEach(e -> activeJobsIds.add(e.getId()));
+    try {
+      JobsHelper.findActiveJobs(index).forEach(e -> activeJobsIds.add(e.getId()));
     } catch (IOException | GenericException | RequestNotValidException e) {
       LOGGER.error("Error getting jobs when finding active ones", e);
     }

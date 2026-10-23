@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ReturnWithExceptionsWrapper;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.DateGranularity;
 import org.roda.core.data.common.RodaConstants.NodeType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -48,6 +50,7 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
@@ -280,7 +283,8 @@ public class IndexService {
   public ReturnWithExceptions<Void, ModelObserver> reindexAIP(AIP aip) {
     ReturnWithExceptions<Void, ModelObserver> ret = RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseReturn(nodeType);
     if (ret.isEmpty()) {
-      ret = observer.aipCreated(aip);
+      // in place: overwrites the documents by id and deletes only the leftovers (#3783)
+      ret = observer.aipUpdated(aip);
     }
     return ret;
   }
@@ -288,7 +292,8 @@ public class IndexService {
   public ReturnWithExceptions<Void, ModelObserver> reindexRepresentation(Representation rep) {
     ReturnWithExceptions<Void, ModelObserver> ret = RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseReturn(nodeType);
     if (ret.isEmpty()) {
-      ret = observer.representationCreated(rep);
+      // in place: overwrites the documents by id and deletes only the leftovers (#3783)
+      ret = observer.representationUpdated(rep);
     }
     return ret;
   }
@@ -304,7 +309,8 @@ public class IndexService {
   public ReturnWithExceptions<Void, ModelObserver> reindexDIP(DIP dip) {
     ReturnWithExceptions<Void, ModelObserver> ret = RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseReturn(nodeType);
     if (ret.isEmpty()) {
-      ret = observer.dipCreated(dip, false);
+      // in place: overwrites the documents by id and deletes only the leftovers (#3783)
+      ret = observer.dipUpdated(dip, false);
     }
     return ret;
   }
@@ -474,9 +480,13 @@ public class IndexService {
   public void deleteActionLog(Date until) throws SolrServerException, IOException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    String dateString = SolrUtils.formatDate(until);
-    String query = RodaConstants.LOG_DATETIME + ":[* TO " + dateString + "]";
-    getSolrClient().deleteByQuery(RodaConstants.INDEX_ACTION_LOG, query);
+    Filter olderEntries = new Filter(
+      new DateRangeFilterParameter(RodaConstants.LOG_DATETIME, null, until, DateGranularity.MILLISECOND));
+    ReturnWithExceptions<Void, IndexService> ret = SolrUtils.deleteMatchingById(getSolrClient(), LogEntry.class,
+      olderEntries, Collections.emptySet(), this);
+    if (!ret.isEmpty()) {
+      throw new IOException("Could not delete the action log until " + until, ret.getExceptions().get(0));
+    }
     getSolrClient().commit(RodaConstants.INDEX_ACTION_LOG);
   }
 
@@ -681,14 +691,7 @@ public class IndexService {
     throws AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    SolrUtils.delete(getSolrClient(), classToRetrieve, filter, this);
-  }
-
-  public <T extends IsIndexed> void deleteByQuery(String classToRetrieve, Filter filter)
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
-
-    SolrUtils.deleteByQuery(getSolrClient(), classToRetrieve, filter);
+    SolrUtils.deleteMatchingById(getSolrClient(), classToRetrieve, filter, Collections.emptySet(), this);
   }
 
   public <T extends IsIndexed, M extends IsModelObject> void create(Class<T> classToCreate, M instance)

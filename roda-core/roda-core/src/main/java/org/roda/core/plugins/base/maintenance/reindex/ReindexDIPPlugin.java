@@ -7,14 +7,10 @@
  */
 package org.roda.core.plugins.base.maintenance.reindex;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.ip.DIP;
-import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.index.IndexService;
 import org.roda.core.plugins.Plugin;
 
@@ -46,7 +42,7 @@ public class ReindexDIPPlugin extends ReindexRodaEntityPlugin<DIP> {
   @Override
   public void clearSpecificIndexes(IndexService index, List<String> ids)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-    index.delete(DIPFile.class, new Filter(new OneOfManyFilterParameter(RodaConstants.DIPFILE_DIP_ID, ids)));
+    // nothing to clear: the reindex overwrites the documents in place and deletes only the leftovers (#3783)
   }
 
 }
