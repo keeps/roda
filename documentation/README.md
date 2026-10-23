@@ -38,6 +38,7 @@ Among others articles, in this series of documentation you will find information
   - [General troubleshooting](Troubleshooting.md)
   - [Database: Schema migration](Database_Schema_Migration.md)
   - [Solr: Fulltext field fix](Solr_Fulltext_Field_Fix.md)
+  - [Solr: Shards per collection](Solr_Shards_Per_Collection.md)
   
 - [FAQ](FAQ.md)
 - [History](History.md)
