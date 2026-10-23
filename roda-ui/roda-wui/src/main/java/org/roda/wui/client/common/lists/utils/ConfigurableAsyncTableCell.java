@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.AIP;
@@ -34,8 +35,10 @@ import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.StringUtils;
 
+import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -44,6 +47,10 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.view.client.CellPreviewEvent;
 
 import config.i18n.client.ClientMessages;
 
@@ -306,9 +313,98 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
     return fieldsToReturn;
   }
 
+  private static <T extends IsIndexed> List<String> calculateQueryFields(AsyncTableCellOptions<T> options) {
+    List<String> queryFields = new ArrayList<>();
+
+    options.getColumnOptions().forEach(c -> {
+      if (c.getName().startsWith("default_")) {
+        List<String> list = DEFAULT_COLUMNS_FIELDS.get(c.getName());
+        if (list != null) {
+          queryFields.addAll(list);
+        }
+      } else if (StringUtils.isNotBlank(c.getField())) {
+        queryFields.add(c.getField());
+      }
+    });
+
+    // if index object has state, add state field
+    if (HAS_STATE.contains(options.getClassToReturn())) {
+      queryFields.add(RodaConstants.AIP_STATE);
+    }
+
+    // if index object has disposal hold status, add status field
+    if (HAS_DISPOSAL.contains(options.getClassToReturn())) {
+      queryFields.add(RodaConstants.AIP_DISPOSAL_HOLD_STATUS);
+      queryFields.add(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID);
+    }
+
+    // nested collections
+    if (IndexedRepresentation.class.equals(options.getClassToReturn())) {
+      queryFields.add(RodaConstants.REPRESENTATION_AIP_ID);
+    } else if (IndexedFile.class.equals(options.getClassToReturn())) {
+      queryFields.add(RodaConstants.FILE_AIP_ID);
+      queryFields.add(RodaConstants.FILE_REPRESENTATION_ID);
+      queryFields.add(RodaConstants.FILE_ISREFERENCE);
+      queryFields.add(RodaConstants.FILE_CREATED_ON);
+    }
+
+    return queryFields;
+  }
+
+  private static <T extends IsIndexed> List<String> calculateHighlightFields(AsyncTableCellOptions<T> options) {
+    List<String> highlightedFields = new ArrayList<>();
+
+    // add UUID
+    highlightedFields.add(RodaConstants.INDEX_UUID);
+    highlightedFields.add(RodaConstants.INDEX_ID);
+
+    options.getColumnOptions().forEach(c -> {
+      if (c.getName().startsWith("default_")) {
+        List<String> list = DEFAULT_COLUMNS_FIELDS.get(c.getName());
+        if (list != null) {
+          highlightedFields.addAll(list);
+        }
+      } else if (StringUtils.isNotBlank(c.getField())) {
+        highlightedFields.add(c.getField());
+      }
+    });
+
+    // if index object has permissions, add permissions fields
+    if (HAS_PERMISSIONS.contains(options.getClassToReturn())) {
+      highlightedFields.addAll(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+    }
+
+    // if index object has state, add state field
+    if (HAS_STATE.contains(options.getClassToReturn())) {
+      highlightedFields.add(RodaConstants.AIP_STATE);
+    }
+
+    // if index object has disposal hold status, add status field
+    if (HAS_DISPOSAL.contains(options.getClassToReturn())) {
+      highlightedFields.add(RodaConstants.AIP_DISPOSAL_HOLD_STATUS);
+      highlightedFields.add(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID);
+    }
+
+    // nested collections
+    if (IndexedRepresentation.class.equals(options.getClassToReturn())) {
+      highlightedFields.add(RodaConstants.REPRESENTATION_AIP_ID);
+    } else if (IndexedFile.class.equals(options.getClassToReturn())) {
+      highlightedFields.add(RodaConstants.FILE_AIP_ID);
+      highlightedFields.add(RodaConstants.FILE_REPRESENTATION_ID);
+      highlightedFields.add(RodaConstants.FILE_ISREFERENCE);
+      highlightedFields.add(RodaConstants.FILE_CREATED_ON);
+    }
+
+    return highlightedFields;
+  }
+
   @Override
   protected void adjustOptions(AsyncTableCellOptions<T> options) {
     options.withFieldsToReturn(calculateFieldsToReturn(options));
+    options.withQueryFields(calculateHighlightFields(options));
+    if (options.isHighlighting()) {
+      options.withHighlightFields(calculateHighlightFields(options));
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -381,6 +477,18 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
                 return value.toString();
             }
           }
+
+          @Override
+          public String getCellStyleNames(Cell.Context context, T row) {
+            List<String> styleNames = new ArrayList<>();
+            styleNames.add(super.getCellStyleNames(context, row));
+
+            if (!getCellHighlights(row, c.getField()).isEmpty()) {
+              styleNames.add("highlighted-cell");
+            }
+
+            return String.join(" ", styleNames);
+          }
         };
 
         htmlHeader = SafeHtmlUtils.fromString(header);
@@ -405,6 +513,85 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
     }
 
     addStyleName("my-collections-table");
+
+    configureCellHighlightPopups(display);
+  }
+
+  private void configureCellHighlightPopups(CellTable<T> display) {
+    final PopupPanel popupPanel = new PopupPanel(true);
+    popupPanel.setStyleName("cell-highlight-popup");
+    display.addCellPreviewHandler(new CellPreviewEvent.Handler<T>() {
+      private final Timer hideTimer = new Timer() {
+        @Override
+        public void run() {
+          currentMouseOverRow = null;
+          previousMouseOverColumnIndex = -1;
+          popupPanel.removeStyleName("cell-highlight-popup-visible");
+          popupPanel.addStyleName("cell-highlight-popup-hidden");
+          popupPanel.hide();
+        }
+      };
+      private T currentMouseOverRow;
+      private int previousMouseOverColumnIndex;
+
+      @Override
+      public void onCellPreview(CellPreviewEvent<T> event) {
+        T row = event.getValue();
+        // The event index starts at 1, so we shift it back once we're the ones handling
+        // it
+        int mouseOverColumnIndex = event.getContext().getColumn() - 1;
+        String mouseOverColumnField = getFieldFromIndex(mouseOverColumnIndex);
+
+        if (mouseOverColumnIndex > 0) {
+          if (event.getNativeEvent().getType().equals("mouseover")) {
+            if (row != currentMouseOverRow || mouseOverColumnIndex != previousMouseOverColumnIndex) {
+              List<String> snippets = getCellHighlights(row, mouseOverColumnField);
+              if (!snippets.isEmpty()) {
+                currentMouseOverRow = row;
+                previousMouseOverColumnIndex = mouseOverColumnIndex;
+                hideTimer.cancel();
+                String cellValue;
+                cellValue = row.getFields().get(mouseOverColumnField).toString();
+                popupPanel.setWidget(createHighlightPopupWidget(snippets, cellValue));
+                Element el = Element.as(event.getNativeEvent().getEventTarget());
+                popupPanel.setPopupPositionAndShow(new PopupPanel.PositionCallback() {
+                  @Override
+                  public void setPosition(int offsetWidth, int offsetHeight) {
+                    popupPanel.removeStyleName("cell-highlight-popup-hidden");
+                    popupPanel.addStyleName("cell-highlight-popup-visible");
+                    popupPanel.setPopupPosition(el.getAbsoluteLeft() - 15, el.getAbsoluteTop() - offsetHeight - 5);
+                  }
+                });
+              }
+            } else {
+              hideTimer.cancel();
+            }
+          } else if (event.getNativeEvent().getType().equals("mouseout")) {
+            if (row == currentMouseOverRow && mouseOverColumnIndex == previousMouseOverColumnIndex) {
+              hideTimer.schedule(200);
+            }
+          }
+        }
+      }
+    });
+  }
+
+  private String getFieldFromIndex(int index) {
+    return this.getOptions().getColumnOptions().get(index).getField();
+  }
+
+  private List<String> getCellHighlights(T row, String field) {
+    IndexResult<T> results = getResult();
+    if (results != null && results.getHighlightingInfo().containsKey(row.getUUID())
+      && results.getHighlightingInfo().get(row.getUUID()).containsKey(field)) {
+      return getResult().getHighlightingInfo().get(row.getUUID()).get(field);
+    }
+    return Collections.emptyList();
+  }
+
+  private HTML createHighlightPopupWidget(List<String> snippets, String cellValue) {
+    String snippetWithFullText = "<p>" + String.join("\n", snippets) + "</p><p><em>" + cellValue + "</em></p>";
+    return new HTML(SafeHtmlUtils.fromSafeConstant(snippetWithFullText));
   }
 
   @Override

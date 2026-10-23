@@ -36,6 +36,9 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
   private Facets facets;
   private String summary;
   private List<String> fieldsToReturn;
+  private List<String> queryFields;
+  private boolean highlighting;
+  private List<String> highlightFields;
   private int initialPageSize;
   private int pageSizeIncrement;
   private Actionable<T> actionable;
@@ -73,6 +76,9 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
     facets = FacetFactory.getFacets(listId);
     summary = AsyncTableCell.messages.searchResults();
     fieldsToReturn = Collections.emptyList();
+    queryFields = Collections.emptyList();
+    highlighting = false;
+    highlightFields = Collections.emptyList();
     initialPageSize = ConfigurationManager.getInt(AsyncTableCell.DEFAULT_INITIAL_PAGE_SIZE,
       RodaConstants.UI_LISTS_PROPERTY, listId, RodaConstants.UI_LISTS_PAGE_SIZE_INITIAL);
     pageSizeIncrement = ConfigurationManager.getInt(AsyncTableCell.DEFAULT_PAGE_SIZE_INCREMENT,
@@ -137,6 +143,21 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
 
   public AsyncTableCellOptions<T> withFieldsToReturn(List<String> fieldsToReturn) {
     this.fieldsToReturn = fieldsToReturn;
+    return this;
+  }
+
+  public AsyncTableCellOptions<T> withQueryFields(List<String> queryFields) {
+    this.queryFields = queryFields;
+    return this;
+  }
+
+  public AsyncTableCellOptions<T> withHighlighting(boolean highlighting) {
+    this.highlighting = highlighting;
+    return this;
+  }
+
+  public AsyncTableCellOptions<T> withHighlightFields(List<String> highlightFields) {
+    this.highlightFields = highlightFields;
     return this;
   }
 
@@ -224,6 +245,18 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
 
   public List<String> getFieldsToReturn() {
     return fieldsToReturn;
+  }
+
+  public List<String> getQueryFields() {
+    return queryFields;
+  }
+
+  public boolean isHighlighting() {
+    return highlighting;
+  }
+
+  public List<String> getHighlightFields() {
+    return highlightFields;
   }
 
   public int getInitialPageSize() {

@@ -124,8 +124,7 @@ public class BrowseTop extends Composite {
 
   private BrowseTop() {
     // AIP LIST, it has the same id as the AIP children list because facets
-    // should
-    // be the same
+    // should be the same
 
     ListBuilder<IndexedAIP> listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
       new AsyncTableCellOptions<>(IndexedAIP.class, "BrowseTop_aip")
@@ -133,7 +132,8 @@ public class BrowseTop extends Composite {
         .withSummary(messages.listOfAIPs()).bindOpener().withActionable(AipSearchWrapperActions.get())
         .withActionBlacklist(List.of(AipSearchWrapperActions.AipSearchWrapperAction.NEW_CHILD_AIP_BELOW,
           AipSearchWrapperActions.AipSearchWrapperAction.APPRAISAL_ACCEPT,
-          AipSearchWrapperActions.AipSearchWrapperAction.APPRAISAL_REJECT)));
+          AipSearchWrapperActions.AipSearchWrapperAction.APPRAISAL_REJECT))
+        .withHighlighting(true));
 
     search = new SearchWrapper(false).createListAndSearchPanel(listBuilder);
 

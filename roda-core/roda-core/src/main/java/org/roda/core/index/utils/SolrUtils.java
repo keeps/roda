@@ -32,6 +32,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -62,6 +63,7 @@ import org.apache.solr.common.params.SolrParams;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.MetadataFileUtils;
 import org.roda.core.common.RodaUtils;
+import org.roda.core.config.ConfigurationManager;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.DateGranularity;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -98,6 +100,7 @@ import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.ChildOfFilterParameter;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
+import org.roda.core.data.v2.index.filter.EDismaxSimpleQueryFilterParameter;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
@@ -378,6 +381,42 @@ public class SolrUtils {
 
     if (findRequest.getCollapse() != null) {
       query.addFilterQuery(parseCollapse(findRequest.getCollapse()));
+    }
+
+    if (findRequest.getDefType() != null) {
+      query.setParam("defType", findRequest.getDefType());
+
+      if (findRequest.getDefType().equals(RodaConstants.SOLR_EDISMAX) && findRequest.getQueryFields() != null) {
+        query.setParam("qf", String.join(" ", findRequest.getQueryFields()));
+      }
+    }
+
+    if (findRequest.highlighting) {
+      query.setParam("hl", true);
+
+      query.setParam("hl.fl",
+        (findRequest.highlightedFields != null) ? String.join(" ", findRequest.highlightedFields) : "");
+
+      String hlQ = buildHighlightQuery(findRequest.getFilter(), findRequest.highlightedFields);
+      if (StringUtils.isNotBlank(hlQ)) {
+        query.setParam("hl.q", hlQ);
+        query.setParam("hl.highlightMultiTerm", "true");
+        if (findRequest.equals(RodaConstants.SOLR_EDISMAX)) {
+          query.setParam("hl.requireFieldMatch", "false");
+        } else {
+          query.setParam("hl.requireFieldMatch", "true");
+        }
+      }
+
+      query.setParam("hl.tag.pre",
+        ConfigurationManager.getInstance().getConfigurationString(RodaConstants.UI_SEARCH_HIGHLIGHT_TAG_PRE, "<b>"));
+      query.setParam("hl.tag.post",
+        ConfigurationManager.getInstance().getConfigurationString(RodaConstants.UI_SEARCH_HIGHLIGHT_TAG_POST, "</b>"));
+      query.setParam("hl.encoder", "html");
+      query.setParam("hl.fragsize",
+        ConfigurationManager.getInstance().getConfigurationString(RodaConstants.UI_SEARCH_HIGHLIGHT_FRAGSIZE, "50"));
+      query.setParam("hl.maxAnalyzedChars", ConfigurationManager.getInstance()
+        .getConfigurationString(RodaConstants.UI_SEARCH_HIGHLIGHT_MAXANALYZEDCHARS, "51200"));
     }
 
     try {
@@ -822,12 +861,13 @@ public class SolrUtils {
     final long limit = docList.size();
     final long totalCount = docList.getNumFound();
     final List<T> docs = new ArrayList<>();
+    final Map<String, Map<String, List<String>>> highlightingInfo = response.getHighlighting();
 
     for (SolrDocument doc : docList) {
       docs.add(SolrCollectionRegistry.fromSolrDocument(responseClass, doc, liteFields));
     }
 
-    return new IndexResult<>(offset, limit, totalCount, docs, facetResults);
+    return new IndexResult<>(offset, limit, totalCount, docs, facetResults, highlightingInfo);
   }
 
   private static List<FacetFieldResult> processFacetFields(Facets facets, List<FacetField> facetFields) {
@@ -995,6 +1035,8 @@ public class SolrUtils {
     if (parameter instanceof SimpleFilterParameter simplePar) {
       requireField(parameter, "name", simplePar.getName());
       appendExactMatch(ret, simplePar.getName(), simplePar.getValue(), true, prefixWithANDOperatorIfBuilderNotEmpty);
+    } else if (parameter instanceof EDismaxSimpleQueryFilterParameter eDismaxSimplePar) {
+      appendEDismaxSearchTerm(ret, eDismaxSimplePar.getValue(), false, prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof OneOfManyFilterParameter param) {
       requireField(parameter, "name", param.getName());
       appendValuesUsingOROperator(ret, param.getName(), param.getValues(), prefixWithANDOperatorIfBuilderNotEmpty);
@@ -1004,7 +1046,7 @@ public class SolrUtils {
     } else if (parameter instanceof EmptyKeyFilterParameter param) {
       requireField(parameter, "name", param.getName());
       appendANDOperator(ret, true);
-      ret.append("(*:* NOT ").append(param.getName()).append(":*)");
+      ret.append("( *:* NOT ").append(param.getName()).append(":* )");
     } else if (parameter instanceof DateRangeFilterParameter param) {
       requireField(parameter, "name", param.getName());
       appendRange(ret, param.getName(), Date.class, param.getFromValue(), String.class,
@@ -1136,11 +1178,25 @@ public class SolrUtils {
   private static void appendExactMatch(StringBuilder ret, String key, String value, boolean appendDoubleQuotes,
     boolean prefixWithANDOperatorIfBuilderNotEmpty) {
     appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
-    ret.append("(").append(key).append(":");
+    ret.append("( ").append(key).append(":");
     if (appendDoubleQuotes) {
       ret.append("\"");
     }
     ret.append(value.replaceAll("(\")", "\\\\$1"));
+    if (appendDoubleQuotes) {
+      ret.append("\"");
+    }
+    ret.append(" )");
+  }
+
+  private static void appendEDismaxSearchTerm(StringBuilder ret, String value, boolean appendDoubleQuotes,
+    boolean prefixWithANDOperatorIfBuilderNotEmpty) {
+    appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
+    ret.append("(");
+    if (appendDoubleQuotes) {
+      ret.append("\"");
+    }
+    ret.append(value);
     if (appendDoubleQuotes) {
       ret.append("\"");
     }
@@ -1318,6 +1374,116 @@ public class SolrUtils {
   private static void appendNotExactMatch(StringBuilder ret, String key, String value, boolean appendDoubleQuotes,
     boolean prefixWithANDOperatorIfBuilderNotEmpty) {
     appendExactMatch(ret, "*:* -" + key, value, appendDoubleQuotes, prefixWithANDOperatorIfBuilderNotEmpty);
+  }
+
+  /*
+   * Highlighting support
+   * ____________________________________________________________________________________________________________________
+   */
+
+  /**
+   * Builds a Solr highlight query string based on the provided filter and fields.
+   */
+  private static String buildHighlightQuery(Filter filter, List<String> highlightedFields) {
+    if (filter == null || filter.getParameters() == null) {
+      return "";
+    }
+    List<String> hlQueries = new ArrayList<>();
+    for (FilterParameter param : filter.getParameters()) {
+      buildHighlightQueryRecursive(param, highlightedFields, hlQueries);
+    }
+    return String.join(" OR ", hlQueries).trim();
+  }
+
+  private static void buildHighlightQueryRecursive(FilterParameter parameter, List<String> highlightedFields,
+    List<String> hlQueries) {
+    if (parameter == null)
+      return;
+
+    if (parameter instanceof SimpleFilterParameter) {
+      handleSimpleFilter((SimpleFilterParameter) parameter, highlightedFields, hlQueries);
+    } else if (parameter instanceof BasicSearchFilterParameter) {
+      handleBasicSearchFilter((BasicSearchFilterParameter) parameter, highlightedFields, hlQueries);
+    } else if (parameter instanceof EDismaxSimpleQueryFilterParameter) {
+      handleEDismaxFilter((EDismaxSimpleQueryFilterParameter) parameter, highlightedFields, hlQueries);
+    } else if (parameter instanceof OrFiltersParameters) {
+      ((OrFiltersParameters) parameter).getValues()
+        .forEach(p -> buildHighlightQueryRecursive(p, highlightedFields, hlQueries));
+    } else if (parameter instanceof AndFiltersParameters) {
+      ((AndFiltersParameters) parameter).getValues()
+        .forEach(p -> buildHighlightQueryRecursive(p, highlightedFields, hlQueries));
+    }
+    // Range and Date filters are intentionally skipped as they do not support
+    // highlighting
+  }
+
+  private static void handleSimpleFilter(SimpleFilterParameter p, List<String> highlightedFields,
+    List<String> hlQueries) {
+    addSingleFieldQuery(p.getName(), p.getValue(), highlightedFields, hlQueries);
+  }
+
+  private static void handleBasicSearchFilter(BasicSearchFilterParameter p, List<String> highlightedFields,
+    List<String> hlQueries) {
+    if (RodaConstants.INDEX_SEARCH.equals(p.getName())) {
+      addMultiFieldQuery(p.getValue(), highlightedFields, field -> false, hlQueries);
+    } else {
+      addSingleFieldQuery(p.getName(), p.getValue(), highlightedFields, hlQueries);
+    }
+  }
+
+  private static void handleEDismaxFilter(EDismaxSimpleQueryFilterParameter p, List<String> highlightedFields,
+    List<String> hlQueries) {
+    // EDismax applies the highlighted term to all available fields
+    addMultiFieldQuery(p.getValue(), highlightedFields, field -> true, hlQueries);
+  }
+
+  private static void addSingleFieldQuery(String name, String value, List<String> highlightedFields,
+    List<String> hlQueries) {
+    String field = findHighlightField(name, highlightedFields);
+    hlQueries.add(field + ":(" + escapeSolrSpecialChars(value) + ")");
+  }
+
+  /**
+   * Filters the highlighted fields based on a given condition and appends the
+   * resulting queries.
+   */
+  private static void addMultiFieldQuery(String value, List<String> highlightedFields, Predicate<String> fieldCondition,
+    List<String> hlQueries) {
+    String val = escapeSolrSpecialChars(value);
+
+    if (highlightedFields == null || highlightedFields.isEmpty()) {
+      hlQueries.add("(" + val + ")");
+      return;
+    }
+
+    List<String> subQueries = highlightedFields.stream().filter(fieldCondition).map(field -> field + ":(" + val + ")")
+      .collect(Collectors.toList());
+
+    if (!subQueries.isEmpty()) {
+      hlQueries.add("(" + String.join(" OR ", subQueries) + ")");
+    } else {
+      hlQueries.add("(" + val + ")"); // Safety fallback
+    }
+  }
+
+  private static String findHighlightField(String filterField, List<String> highlightedFields) {
+    if (filterField == null || highlightedFields == null || highlightedFields.isEmpty()) {
+      return filterField;
+    }
+    if (highlightedFields.contains(filterField)) {
+      return filterField;
+    }
+
+    int lastUnderscore = filterField.lastIndexOf('_');
+    if (lastUnderscore > 0) {
+      String prefix = filterField.substring(0, lastUnderscore + 1);
+      for (String hlField : highlightedFields) {
+        if (hlField.startsWith(prefix)) {
+          return hlField;
+        }
+      }
+    }
+    return filterField;
   }
 
   /*

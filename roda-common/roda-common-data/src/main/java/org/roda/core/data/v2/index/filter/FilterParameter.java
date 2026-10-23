@@ -26,6 +26,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, visible = true, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({@JsonSubTypes.Type(value = BasicSearchFilterParameter.class, name = "BasicSearchFilterParameter"),
+  @JsonSubTypes.Type(value = EDismaxSimpleQueryFilterParameter.class, name = "EDismaxSimpleQueryFilterParameter"),
   @JsonSubTypes.Type(value = EmptyKeyFilterParameter.class, name = "EmptyKeyFilterParameter"),
   @JsonSubTypes.Type(value = LikeFilterParameter.class, name = "LikeFilterParameter"),
   @JsonSubTypes.Type(value = NotSimpleFilterParameter.class, name = "NotSimpleFilterParameter"),
@@ -48,6 +49,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
   AllFilterParameter.class, ParentWhichFilterParameter.class, ChildOfFilterParameter.class,
   TextToVectorFilterParameter.class}, discriminatorMapping = {
     @DiscriminatorMapping(value = "BasicSearchFilterParameter", schema = BasicSearchFilterParameter.class),
+    @DiscriminatorMapping(value = "EDismaxSimpleQueryFilterParameter", schema = EDismaxSimpleQueryFilterParameter.class),
     @DiscriminatorMapping(value = "LikeFilterParameter", schema = LikeFilterParameter.class),
     @DiscriminatorMapping(value = "NotSimpleFilterParameter", schema = NotSimpleFilterParameter.class),
     @DiscriminatorMapping(value = "OneOfManyFilterParameter", schema = OneOfManyFilterParameter.class),
