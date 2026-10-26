@@ -933,6 +933,13 @@ public class IndexModelObserver implements ModelObserver {
   public ReturnWithExceptions<Void, ModelObserver> aipDeleted(String aipId, boolean deleteIncidences) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
+    List<Class<? extends IsIndexed>> children = new ArrayList<>(
+      Arrays.asList(IndexedRepresentation.class, IndexedFile.class, IndexedPreservationEvent.class));
+    if (deleteIncidences) {
+      children.add(RiskIncidence.class);
+    }
+    makeChildrenVisible(children).addTo(ret);
+
     deleteDocumentFromIndex(IndexedAIP.class, aipId).addTo(ret);
     deleteDocumentsFromIndex(IndexedRepresentation.class, RodaConstants.REPRESENTATION_AIP_ID, aipId).addTo(ret);
     deleteDocumentsFromIndex(IndexedFile.class, RodaConstants.FILE_AIP_ID, aipId).addTo(ret);
@@ -1075,6 +1082,13 @@ public class IndexModelObserver implements ModelObserver {
     boolean deleteIncidences) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
+    List<Class<? extends IsIndexed>> children = new ArrayList<>(
+      Arrays.asList(IndexedFile.class, IndexedPreservationEvent.class));
+    if (deleteIncidences) {
+      children.add(RiskIncidence.class);
+    }
+    makeChildrenVisible(children).addTo(ret);
+
     String representationUUID = IdUtils.getRepresentationId(aipId, representationId);
     deleteDocumentFromIndex(IndexedRepresentation.class, representationUUID).addTo(ret);
     deleteDocumentsFromIndex(IndexedFile.class, RodaConstants.FILE_REPRESENTATION_UUID, representationUUID).addTo(ret);
@@ -1132,6 +1146,7 @@ public class IndexModelObserver implements ModelObserver {
     deleteDocumentFromIndex(IndexedFile.class, uuid).addTo(ret);
 
     if (deleteIncidences) {
+      makeChildrenVisible(Collections.singletonList(RiskIncidence.class)).addTo(ret);
       deleteDocumentsFromIndex(RiskIncidence.class, RodaConstants.RISK_INCIDENCE_FILE_ID, fileId).addTo(ret);
     }
 
@@ -1307,13 +1322,33 @@ public class IndexModelObserver implements ModelObserver {
    * {@link SolrUtils#deleteMatchingById}), both before a reindex and when the
    * parent is deleted. Before a reindex, missing the changes of the last soft
    * commit interval is enough, as removed objects are also deleted by id when
-   * they are removed; when the parent is deleted, children indexed within that
-   * interval stay in the index.
+   * they are removed; when the parent is deleted, the children collections are
+   * first made visible (see {@link #makeChildrenVisible}).
    */
   private <T extends IsIndexed> ReturnWithExceptions<Void, ModelObserver> deleteStaleDocuments(Class<T> indexClass,
     String parentField, String parentId, Set<String> keep) {
     return SolrUtils.deleteMatchingById(index, indexClass,
       new Filter(new SimpleFilterParameter(parentField, parentId)), keep, (ModelObserver) this);
+  }
+
+  /**
+   * Soft commits the collections of the children of a parent about to be
+   * deleted, once for all of them. The children are listed to be deleted by id,
+   * and a listing only sees the documents indexed up to the last soft commit, so
+   * without it the children indexed within the last soft commit interval (e.g.
+   * the PREMIS events of an object deleted right after it was created) would
+   * stay in the index (#3783).
+   */
+  private ReturnWithExceptions<Void, ModelObserver> makeChildrenVisible(
+    List<Class<? extends IsIndexed>> childrenClasses) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+    try {
+      SolrUtils.commit(index, childrenClasses);
+    } catch (GenericException e) {
+      LOGGER.error("Cannot make the children to delete visible", e);
+      ret.add(e);
+    }
+    return ret;
   }
 
   private <T extends IsIndexed> ReturnWithExceptions<Void, ModelObserver> deleteDocumentFromIndex(
@@ -1617,6 +1652,7 @@ public class IndexModelObserver implements ModelObserver {
   public ReturnWithExceptions<Void, ModelObserver> dipDeleted(String dipId, boolean commit) {
     ReturnWithExceptions<Void, ModelObserver> ret = deleteDocumentFromIndex(IndexedDIP.class, commit, dipId);
     if (ret.isEmpty()) {
+      makeChildrenVisible(Collections.singletonList(DIPFile.class)).addTo(ret);
       deleteDocumentsFromIndex(DIPFile.class, RodaConstants.DIPFILE_DIP_ID, dipId, commit).addTo(ret);
     }
     return ret;
