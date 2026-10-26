@@ -20,6 +20,7 @@ import org.roda.core.TestsHelper;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
@@ -27,6 +28,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -44,7 +46,8 @@ import org.testng.annotations.Test;
 
 /**
  * AIP and representation updates reindex in place and remove only the
- * documents of objects that no longer exist.
+ * documents of objects that no longer exist; deleting an AIP removes all its
+ * children, even those indexed right before.
  */
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
 public class IndexUpdateStaleDocumentsTest {
@@ -177,6 +180,35 @@ public class IndexUpdateStaleDocumentsTest {
       new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aip.getId()))), representationsBefore);
     IndexedAIP indexedAIP = index.retrieve(IndexedAIP.class, aip.getId(), Collections.emptyList());
     Assert.assertEquals(indexedAIP.getTitle(), "My example");
+  }
+
+  private long countChildren(Class<? extends IsIndexed> indexClass, String aipField, String aipId)
+    throws RODAException {
+    return index.count(indexClass, new Filter(new SimpleFilterParameter(aipField, aipId)));
+  }
+
+  @Test
+  public void testAIPDeletedRightAfterIndexingLeavesNoChildren() throws RODAException {
+    // the AIP of the corpora has representations, files and PREMIS events
+    AIP indexed = createAIP();
+    Assert.assertTrue(
+      countChildren(IndexedRepresentation.class, RodaConstants.REPRESENTATION_AIP_ID, indexed.getId()) > 0);
+    Assert.assertTrue(countChildren(IndexedFile.class, RodaConstants.FILE_AIP_ID, indexed.getId()) > 0);
+    Assert.assertTrue(
+      countChildren(IndexedPreservationEvent.class, RodaConstants.PRESERVATION_EVENT_AIP_ID, indexed.getId()) > 0);
+
+    // deleted within the soft commit interval: its children are not visible to a listing yet (#3783)
+    String aipId = IdUtils.createUUID();
+    model.createAIP(aipId, corporaService,
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+      RodaConstants.ADMIN);
+    model.deleteAIP(aipId);
+    index.commitAIPs();
+
+    Assert.assertEquals(countChildren(IndexedRepresentation.class, RodaConstants.REPRESENTATION_AIP_ID, aipId), 0);
+    Assert.assertEquals(countChildren(IndexedFile.class, RodaConstants.FILE_AIP_ID, aipId), 0);
+    Assert.assertEquals(
+      countChildren(IndexedPreservationEvent.class, RodaConstants.PRESERVATION_EVENT_AIP_ID, aipId), 0);
   }
 
   @Test
