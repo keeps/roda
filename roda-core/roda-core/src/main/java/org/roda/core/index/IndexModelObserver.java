@@ -33,6 +33,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.ReturnWithExceptions;
+import org.roda.core.data.exceptions.SolrRetryException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
@@ -40,10 +41,7 @@ import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
-import org.roda.core.data.v2.disposal.metadata.DisposalConfirmationAIPMetadata;
 import org.roda.core.data.v2.disposal.metadata.DisposalHoldAIPMetadata;
-import org.roda.core.data.v2.disposal.metadata.DisposalScheduleAIPMetadata;
-import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldAIPMetadata;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -189,9 +187,10 @@ public class IndexModelObserver implements ModelObserver {
         new AIPCollection.Info(ancestors, safemode, disposalSchedule, retentionPeriodCalculation, disposalHoldStatus))
       .addTo(ret);
 
-    // if there was an error indexing, try in safe mode
+    // if there was an error indexing, try in safe mode; not when Solr failed, as it
+    // would fail the same way
     if (!ret.isEmpty()) {
-      if (!safemode) {
+      if (!safemode && !solrFailed(ret)) {
         LOGGER.error("Error indexing AIP, trying safe mode", ret.getExceptions().getFirst());
         indexAIP(aip, ancestors, true).addTo(ret);
       } else {
@@ -224,6 +223,9 @@ public class IndexModelObserver implements ModelObserver {
           PreservationMetadata pm = opm.get();
           if (pm.getType().equals(PreservationMetadataType.EVENT)) {
             indexPreservationEvent(pm).addTo(ret);
+            if (solrFailed(ret)) {
+              break;
+            }
             addWritten(written, pm.getId());
           }
         } else {
@@ -263,6 +265,9 @@ public class IndexModelObserver implements ModelObserver {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
     for (Representation representation : aip.getRepresentations()) {
       indexRepresentation(aip, representation, ancestors, written).addTo(ret);
+      if (solrFailed(ret)) {
+        break;
+      }
     }
 
     return ret;
@@ -294,6 +299,9 @@ public class IndexModelObserver implements ModelObserver {
           }
 
           sizeInBytes += indexFile(aip, file.get(), ancestors, false, written).addTo(ret).getReturnedObject();
+          if (solrFailed(ret)) {
+            return ret;
+          }
 
           if (file.get().isDirectory()) {
             numberOfDataFolders++;
@@ -482,11 +490,14 @@ public class IndexModelObserver implements ModelObserver {
   public ReturnWithExceptions<Void, ModelObserver> aipUpdated(AIP aip) {
     Set<String> written = new HashSet<>();
     ReturnWithExceptions<Void, ModelObserver> ret = indexAIPAndChildren(aip, written);
-    deleteStaleDocuments(IndexedRepresentation.class, RodaConstants.REPRESENTATION_AIP_ID, aip.getId(), written)
-      .addTo(ret);
-    deleteStaleDocuments(IndexedFile.class, RodaConstants.FILE_AIP_ID, aip.getId(), written).addTo(ret);
-    deleteStaleDocuments(IndexedPreservationEvent.class, RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId(),
-      written).addTo(ret);
+    // after Solr failed, documents that still exist may not have been written again
+    if (!solrFailed(ret)) {
+      deleteStaleDocuments(IndexedRepresentation.class, RodaConstants.REPRESENTATION_AIP_ID, aip.getId(), written)
+        .addTo(ret);
+      deleteStaleDocuments(IndexedFile.class, RodaConstants.FILE_AIP_ID, aip.getId(), written).addTo(ret);
+      deleteStaleDocuments(IndexedPreservationEvent.class, RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId(),
+        written).addTo(ret);
+    }
     return ret;
   }
 
@@ -560,7 +571,9 @@ public class IndexModelObserver implements ModelObserver {
     if (ret.isEmpty()) {
       // change Representations, Files & Preservation events
       representationsStateUpdated(aip).addTo(ret);
-      preservationEventsStateUpdated(aip).addTo(ret);
+      if (!solrFailed(ret)) {
+        preservationEventsStateUpdated(aip).addTo(ret);
+      }
     }
 
     return ret;
@@ -605,6 +618,9 @@ public class IndexModelObserver implements ModelObserver {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
     for (DescriptiveMetadata metadata : aip.getDescriptiveMetadata()) {
       descriptiveMetadataUpdated(metadata).addTo(ret);
+      if (solrFailed(ret)) {
+        break;
+      }
     }
     return ret;
   }
@@ -613,6 +629,9 @@ public class IndexModelObserver implements ModelObserver {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
     for (Representation representation : aip.getRepresentations()) {
       representationStateUpdated(aip, representation).addTo(ret);
+      if (solrFailed(ret)) {
+        break;
+      }
     }
     return ret;
   }
@@ -633,6 +652,9 @@ public class IndexModelObserver implements ModelObserver {
             if (FSUtils.isManifestOfExternalFiles(file.get().getId())) {
               for (OptionalWithCause<File> fileShallow : model.listExternalFilesUnder(file.get())) {
                 fileStateUpdated(aip, fileShallow.get(), false).addTo(ret);
+                if (solrFailed(ret)) {
+                  break;
+                }
               }
             } else {
               fileStateUpdated(aip, file.get(), false).addTo(ret);
@@ -640,6 +662,9 @@ public class IndexModelObserver implements ModelObserver {
           } else {
             LOGGER.error("Cannot do a partial update on File", file.getCause());
             ret.add(file.getCause());
+          }
+          if (solrFailed(ret)) {
+            break;
           }
         }
       } else {
@@ -659,6 +684,9 @@ public class IndexModelObserver implements ModelObserver {
 
     for (Representation representation : aip.getRepresentations()) {
       representationInstanceIdUpdated(aip, representation).addTo(ret);
+      if (solrFailed(ret)) {
+        break;
+      }
     }
     return ret;
   }
@@ -680,6 +708,9 @@ public class IndexModelObserver implements ModelObserver {
             if (FSUtils.isManifestOfExternalFiles(file.get().getId())) {
               for (OptionalWithCause<File> fileShallow : model.listExternalFilesUnder(file.get())) {
                 fileInstanceIdUpdated(aip, fileShallow.get(), false).addTo(ret);
+                if (solrFailed(ret)) {
+                  break;
+                }
               }
             } else {
               fileInstanceIdUpdated(aip, file.get(), false).addTo(ret);
@@ -687,6 +718,9 @@ public class IndexModelObserver implements ModelObserver {
           } else {
             LOGGER.error("Cannot do a partial update on File", file.getCause());
             ret.add(file.getCause());
+          }
+          if (solrFailed(ret)) {
+            break;
           }
         }
       } else {
@@ -729,6 +763,9 @@ public class IndexModelObserver implements ModelObserver {
           for (OptionalWithCause<File> subfile : allFiles) {
             if (subfile.isPresent()) {
               fileStateUpdated(aip, subfile.get(), false).addTo(ret);
+              if (solrFailed(ret)) {
+                break;
+              }
             } else {
               LOGGER.error("Cannot index file sub-resources", subfile.getCause());
               ret.add(subfile.getCause());
@@ -761,6 +798,9 @@ public class IndexModelObserver implements ModelObserver {
           for (OptionalWithCause<File> subfile : allFiles) {
             if (subfile.isPresent()) {
               fileInstanceIdUpdated(aip, subfile.get(), false).addTo(ret);
+              if (solrFailed(ret)) {
+                break;
+              }
             } else {
               LOGGER.error("Cannot update instance id on the file sub-resources", subfile.getCause());
               ret.add(subfile.getCause());
@@ -789,6 +829,9 @@ public class IndexModelObserver implements ModelObserver {
           PreservationMetadata pm = opm.get();
           if (pm.getType().equals(PreservationMetadataType.EVENT)) {
             preservationEventInstanceIdUpdated(pm, aip.getInstanceId()).addTo(ret);
+            if (solrFailed(ret)) {
+              break;
+            }
           }
         } else {
           LOGGER.error("Cannot index premis event", opm.getCause());
@@ -823,6 +866,9 @@ public class IndexModelObserver implements ModelObserver {
           PreservationMetadata pm = opm.get();
           if (pm.getType().equals(PreservationMetadataType.EVENT)) {
             preservationEventStateUpdated(pm, aip.getState()).addTo(ret);
+            if (solrFailed(ret)) {
+              break;
+            }
           }
         } else {
           LOGGER.error("Cannot index premis event", opm.getCause());
@@ -875,6 +921,9 @@ public class IndexModelObserver implements ModelObserver {
         }
 
         for (IndexedAIP item : items) {
+          if (solrFailed(ret)) {
+            break;
+          }
           try {
             LOGGER.debug("Reindexing aip {} descendant {}", aip.getId(), item.getId());
             List<String> ancestors = SolrUtils.getAncestors(item.getParentID(), model);
@@ -916,6 +965,9 @@ public class IndexModelObserver implements ModelObserver {
               File file = oFile.get();
               SolrUtils.update(index, IndexedFile.class, IdUtils.getFileId(file),
                 Collections.singletonMap(RodaConstants.FILE_ANCESTORS, ancestors), (ModelObserver) this).addTo(ret);
+              if (solrFailed(ret)) {
+                break;
+              }
             }
           }
         } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | IOException
@@ -923,6 +975,9 @@ public class IndexModelObserver implements ModelObserver {
           LOGGER.error("Error updating file ancestors", e);
           ret.add(e);
         }
+      }
+      if (solrFailed(ret)) {
+        break;
       }
     }
 
@@ -1069,11 +1124,14 @@ public class IndexModelObserver implements ModelObserver {
   public ReturnWithExceptions<Void, ModelObserver> representationUpdated(Representation representation) {
     Set<String> written = new HashSet<>();
     ReturnWithExceptions<Void, ModelObserver> ret = indexRepresentationAndChildren(representation, written);
-    String representationUUID = IdUtils.getRepresentationId(representation);
-    deleteStaleDocuments(IndexedFile.class, RodaConstants.FILE_REPRESENTATION_UUID, representationUUID, written)
-      .addTo(ret);
-    deleteStaleDocuments(IndexedPreservationEvent.class, RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID,
-      representationUUID, written).addTo(ret);
+    // after Solr failed, documents that still exist may not have been written again
+    if (!solrFailed(ret)) {
+      String representationUUID = IdUtils.getRepresentationId(representation);
+      deleteStaleDocuments(IndexedFile.class, RodaConstants.FILE_REPRESENTATION_UUID, representationUUID, written)
+        .addTo(ret);
+      deleteStaleDocuments(IndexedPreservationEvent.class, RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID,
+        representationUUID, written).addTo(ret);
+    }
     return ret;
   }
 
@@ -1276,6 +1334,9 @@ public class IndexModelObserver implements ModelObserver {
             try (InputStream inputStream = reportBinary.getContent().createInputStream()) {
               Report objectFromJson = JsonUtils.getObjectFromJson(inputStream, Report.class);
               jobReportCreatedOrUpdated(objectFromJson, job).addTo(ret);
+              if (solrFailed(ret)) {
+                break;
+              }
             } catch (GenericException | IOException e) {
               LOGGER.error("Error getting report json from binary", e);
               ret.add(e);
@@ -1329,6 +1390,15 @@ public class IndexModelObserver implements ModelObserver {
     String parentField, String parentId, Set<String> keep) {
     return SolrUtils.deleteMatchingById(index, indexClass,
       new Filter(new SimpleFilterParameter(parentField, parentId)), keep, (ModelObserver) this);
+  }
+
+  /**
+   * Whether a Solr call failed, after its retries: the rest of the object is not
+   * indexed, as its next calls would most likely fail too, each one taking its
+   * own retries (#3785).
+   */
+  private static boolean solrFailed(ReturnWithExceptions<?, ?> ret) {
+    return ret.getExceptions().stream().anyMatch(SolrRetryException.class::isInstance);
   }
 
   /**
@@ -1407,7 +1477,9 @@ public class IndexModelObserver implements ModelObserver {
     if (ret.isEmpty()) {
       // change Representations, Files and Preservation events
       representationsPermissionsUpdated(aip).addTo(ret);
-      preservationEventsPermissionsUpdated(aip).addTo(ret);
+      if (!solrFailed(ret)) {
+        preservationEventsPermissionsUpdated(aip).addTo(ret);
+      }
     }
 
     return ret;
@@ -1426,6 +1498,9 @@ public class IndexModelObserver implements ModelObserver {
           if (dipFile.isPresent()) {
             SolrUtils.update(index, DIPFile.class, IdUtils.getDIPFileId(dipFile.get()),
               SolrUtils.getPermissionsAsPreCalculatedFields(dip.getPermissions()), (ModelObserver) this).addTo(ret);
+            if (solrFailed(ret)) {
+              break;
+            }
           } else {
             LOGGER.error("Cannot do a partial update on DIP file", dipFile.getCause());
             ret.add(dipFile.getCause());
@@ -1458,6 +1533,9 @@ public class IndexModelObserver implements ModelObserver {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
     for (Representation representation : aip.getRepresentations()) {
       representationPermissionsUpdated(aip, representation).addTo(ret);
+      if (solrFailed(ret)) {
+        break;
+      }
     }
     return ret;
   }
@@ -1477,6 +1555,9 @@ public class IndexModelObserver implements ModelObserver {
           if (file.isPresent()) {
             SolrUtils.update(index, IndexedFile.class, IdUtils.getFileId(file.get()),
               SolrUtils.getPermissionsAsPreCalculatedFields(aip.getPermissions()), (ModelObserver) this).addTo(ret);
+            if (solrFailed(ret)) {
+              break;
+            }
           } else {
             LOGGER.error("Cannot do a partial update on file", file.getCause());
             ret.add(file.getCause());
@@ -1503,6 +1584,9 @@ public class IndexModelObserver implements ModelObserver {
           PreservationMetadata pm = opm.get();
           if (PreservationMetadataType.EVENT.equals(pm.getType())) {
             preservationEventPermissionsUpdated(pm, aip.getPermissions(), aip.getState()).addTo(ret);
+            if (solrFailed(ret)) {
+              break;
+            }
           }
         } else {
           LOGGER.error("Cannot index premis event", opm.getCause());
@@ -1605,6 +1689,9 @@ public class IndexModelObserver implements ModelObserver {
         for (OptionalWithCause<DIPFile> file : allFiles) {
           if (file.isPresent()) {
             indexDIPFile(dip, file.get(), false).addTo(ret);
+            if (solrFailed(ret)) {
+              break;
+            }
             addWritten(written, IdUtils.getDIPFileId(file.get()));
           } else {
             LOGGER.error("Cannot index DIP file", file.getCause());
@@ -1641,7 +1728,10 @@ public class IndexModelObserver implements ModelObserver {
   public ReturnWithExceptions<Void, ModelObserver> dipUpdated(DIP dip, boolean commit) {
     Set<String> written = new HashSet<>();
     ReturnWithExceptions<Void, ModelObserver> ret = indexDIPAndFiles(dip, written);
-    deleteStaleDocuments(DIPFile.class, RodaConstants.DIPFILE_DIP_ID, dip.getId(), written).addTo(ret);
+    // after Solr failed, documents that still exist may not have been written again
+    if (!solrFailed(ret)) {
+      deleteStaleDocuments(DIPFile.class, RodaConstants.DIPFILE_DIP_ID, dip.getId(), written).addTo(ret);
+    }
     if (commit) {
       commitDIPs().addTo(ret);
     }
@@ -1669,6 +1759,9 @@ public class IndexModelObserver implements ModelObserver {
         for (OptionalWithCause<DIPFile> subfile : allFiles) {
           if (subfile.isPresent()) {
             indexDIPFile(dip, subfile.get(), false).addTo(ret);
+            if (solrFailed(ret)) {
+              break;
+            }
           } else {
             LOGGER.error("Cannot index DIP file", subfile.getCause());
             ret.add(subfile.getCause());

@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.common.SolrException;
 import org.apache.solr.common.params.CursorMarkParams;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -32,7 +33,7 @@ public class IndexResultIterator<T extends IsIndexed> implements Iterator<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(IndexResultIterator.class);
 
   public static final int DEFAULT_PAGE_SIZE = 1000;
-  public static final int DEFAULT_RETRIES = 100;
+  public static final int DEFAULT_RETRIES = 30;
   public static final int DEFAULT_SLEEP_BETWEEN_RETRIES = 10000;
 
   private int pageSize = DEFAULT_PAGE_SIZE;
@@ -79,6 +80,9 @@ public class IndexResultIterator<T extends IsIndexed> implements Iterator<T> {
       result = null;
       nextCursorMark = null;
       int availableRetries = retries;
+      // the retries of a page take at most this long, however long each attempt hangs
+      // (#3785)
+      long retryUntil = System.currentTimeMillis() + (long) retries * sleepBetweenRetries;
 
       do {
         try {
@@ -87,14 +91,19 @@ public class IndexResultIterator<T extends IsIndexed> implements Iterator<T> {
           result = page.getFirst();
           nextCursorMark = page.getSecond();
 
-        } catch (GenericException | RequestNotValidException e) {
-          if (availableRetries > 0) {
+        } catch (RequestNotValidException | GenericException e) {
+          if (e instanceof RequestNotValidException && !isServerError(e)) {
+            // the same request fails the same way every time (#3785)
+            LOGGER.error("Error getting next page from Solr, the request is not valid.", e);
+            throw new NoSuchElementException("Error getting next item in list: " + e.getMessage());
+          } else if (availableRetries > 0 && System.currentTimeMillis() < retryUntil) {
             availableRetries--;
             LOGGER.warn("Error getting next page from Solr, retrying in {}ms...", sleepBetweenRetries);
             try {
               Thread.sleep(sleepBetweenRetries);
             } catch (InterruptedException e1) {
-              // do nothing
+              Thread.currentThread().interrupt();
+              throw new NoSuchElementException("Interrupted while getting next item in list: " + e.getMessage());
             }
           } else {
             LOGGER.error("Error getting next page from Solr, no more retries.", e);
@@ -117,6 +126,19 @@ public class IndexResultIterator<T extends IsIndexed> implements Iterator<T> {
     }
 
     return current;
+  }
+
+  /**
+   * Whether Solr failed to answer (5xx), as while a shard has no leader, which
+   * passes; any other request that is not valid fails the same way every time.
+   */
+  private static boolean isServerError(Throwable failure) {
+    for (Throwable cause = failure; cause != null; cause = cause.getCause() == cause ? null : cause.getCause()) {
+      if (cause instanceof SolrException solrException) {
+        return solrException.code() >= 500;
+      }
+    }
+    return false;
   }
 
   @Override

@@ -922,7 +922,14 @@ public final class RodaConstants {
   public static final String SOLR_RETRY_MAX_DELAY = "core.solr.retry.maxDelay";
   public static final String SOLR_RETRY_DELAY_FACTOR = "core.solr.retry.delayFactor";
   public static final String SOLR_RETRY_MAX_RETRIES = "core.solr.retry.maxRetries";
+  public static final String SOLR_RETRY_SERVER_ERROR_MAX_RETRIES = "core.solr.retry.serverError.maxRetries";
   public static final String SOLR_RETRY_HANDLE_EXCEPTIONS = "core.solr.retry.handleExceptions[]";
+  public static final String SOLR_RETRY_MAX_DURATION = "core.solr.retry.maxDuration";
+  public static final String SOLR_CIRCUIT_BREAKER_FAILURES = "core.solr.circuit_breaker.failures";
+  public static final String SOLR_CIRCUIT_BREAKER_DELAY = "core.solr.circuit_breaker.delay";
+  public static final String SOLR_CLIENT_CONNECTION_TIMEOUT_MS = "core.solr.client.connection_timeout_ms";
+  public static final String SOLR_CLIENT_IDLE_TIMEOUT_MS = "core.solr.client.idle_timeout_ms";
+  public static final String SOLR_CLIENT_REQUEST_TIMEOUT_MS = "core.solr.client.request_timeout_ms";
 
   /*
    * USER REGISTRATION SETTINGS

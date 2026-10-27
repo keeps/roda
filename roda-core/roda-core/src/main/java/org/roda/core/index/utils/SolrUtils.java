@@ -144,7 +144,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-import dev.failsafe.Failsafe;
 import dev.failsafe.Fallback;
 
 /**
@@ -1458,7 +1457,7 @@ public class SolrUtils {
     });
 
     for (String collection : collections) {
-      Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy())
+      RetryPolicyBuilder.getInstance().executor(fallback)
         .onFailure(e -> LOGGER.error("Error committing into collection: {}", collection, e.getException()))
         .run(() -> index.commit(collection, waitFlush, waitSearcher, softCommit));
     }
@@ -1491,7 +1490,7 @@ public class SolrUtils {
     });
 
     if (instance != null) {
-      Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy()).onFailure(e -> {
+      RetryPolicyBuilder.getInstance().executor(fallback).onFailure(e -> {
         LOGGER.error("Error adding document to index", e.getException());
       }).run(() -> index.add(classToCreate, instance));
     }
@@ -1511,7 +1510,7 @@ public class SolrUtils {
       try {
         SolrInputDocument solrDocument = SolrCollectionRegistry.toSolrDocument(indexClass, model, object, utils);
         if (solrDocument != null) {
-          Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy())
+          RetryPolicyBuilder.getInstance().executor(fallback)
             .onFailure(e -> LOGGER.error("Error adding document to index", e.getException()))
             .run(() -> index.add(SolrCollectionRegistry.getIndexName(indexClass), solrDocument));
         }
@@ -1708,7 +1707,7 @@ public class SolrUtils {
         }
         String field = SolrCollectionRegistry.getIndexName(objectClass);
 
-        SolrDocument doc = Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy()).onFailure(e -> {
+        SolrDocument doc = RetryPolicyBuilder.getInstance().executor(fallback).onFailure(e -> {
           LOGGER.warn("Using the fallback strategy");
           e.getResult();
         }).get(() -> index.getById(field, id));
@@ -1900,7 +1899,7 @@ public class SolrUtils {
       ret.add(new SolrRetryException(e.getLastException()));
     });
 
-    Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy())
+    RetryPolicyBuilder.getInstance().executor(fallback)
       .onFailure(e -> LOGGER.error("Error deleting document from index")).run(() -> {
         index.deleteById(SolrCollectionRegistry.getIndexName(classToDelete), ids);
         if (commit) {
@@ -1933,6 +1932,10 @@ public class SolrUtils {
         }
         if (ids.size() == DELETE_BY_ID_BATCH_SIZE) {
           delete(index, indexClass, ids, source).addTo(ret);
+          if (!ret.isEmpty()) {
+            // Solr failed: the next batches would fail too, each one after its own retries (#3785)
+            return ret;
+          }
           ids = new ArrayList<>();
         }
       }

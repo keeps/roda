@@ -11,9 +11,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.times;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -37,13 +39,13 @@ import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationState;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.index.utils.RetryPolicyBuilder;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.util.IdUtils;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -55,6 +57,9 @@ import org.testng.annotations.Test;
 
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
 public class SolrRetryTest {
+  // a Solr that cannot be reached is retried until this deadline (s), however
+  // many attempts it takes
+  private static final int MAX_DURATION = 30;
 
   private static IndexService index;
   private static ModelService model;
@@ -77,12 +82,24 @@ public class SolrRetryTest {
 
     index = RodaCoreFactory.getIndexService();
     model = RodaCoreFactory.getModelService();
+
+    RodaCoreFactory.getRodaConfiguration().setProperty(RodaConstants.SOLR_RETRY_MAX_DURATION, MAX_DURATION);
+    resetRetryPolicy();
   }
 
   @AfterClass
   public static void tearDown() throws Exception {
+    RodaCoreFactory.getRodaConfiguration().clearProperty(RodaConstants.SOLR_RETRY_MAX_DURATION);
+    resetRetryPolicy();
     IndexTestUtils.resetIndex();
     RodaCoreFactory.shutdown();
+  }
+
+  /** The retry policy is built once, from the configuration at that time. */
+  private static void resetRetryPolicy() throws ReflectiveOperationException {
+    Field instance = RetryPolicyBuilder.class.getDeclaredField("instance");
+    instance.setAccessible(true);
+    instance.set(null, null);
   }
 
   @Test
@@ -95,7 +112,7 @@ public class SolrRetryTest {
 
     SolrUtils.commit(spy, IndexedAIP.class);
 
-    Mockito.verify(spy, times(11)).commit(anyString(), anyBoolean(), anyBoolean(), anyBoolean());
+    Mockito.verify(spy, atLeast(2)).commit(anyString(), anyBoolean(), anyBoolean(), anyBoolean());
   }
 
   @Test
@@ -200,7 +217,7 @@ public class SolrRetryTest {
 
     Assert.assertFalse(returnWithExceptions.getExceptions().isEmpty());
 
-    Mockito.verify(spy, times(11)).deleteById(anyString(), anyList());
+    Mockito.verify(spy, atLeast(2)).deleteById(anyString(), anyList());
   }
 
   @Test
@@ -225,7 +242,7 @@ public class SolrRetryTest {
 
     Assert.assertFalse(returnWithExceptions.getExceptions().isEmpty());
 
-    Mockito.verify(spy, times(11)).add(anyString(), any(SolrInputDocument.class));
+    Mockito.verify(spy, atLeast(2)).add(anyString(), any(SolrInputDocument.class));
 
   }
 }

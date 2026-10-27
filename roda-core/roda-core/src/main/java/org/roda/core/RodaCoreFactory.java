@@ -1065,8 +1065,16 @@ public class RodaCoreFactory {
     // Use HTTP/1.1: with HTTP/2 all requests share a single multiplexed connection, and under heavy
     // concurrent indexing (e.g. rebuilding all indexes) that connection can stall on flow control,
     // blocking every Solr request (including UI searches) until it times out.
+    // A request to a Solr that stopped answering is given up after the idle timeout, so that its retries end within
+    // their deadline (#3785); the request timeout is long, as an optimize or a clear of a large index takes minutes.
+    HttpJettySolrClient.Builder httpClientBuilder = new HttpJettySolrClient.Builder().useHttp1_1(true)
+      .withConnectionTimeout(getSolrClientTimeout(RodaConstants.SOLR_CLIENT_CONNECTION_TIMEOUT_MS, 10000),
+        TimeUnit.MILLISECONDS)
+      .withIdleTimeout(getSolrClientTimeout(RodaConstants.SOLR_CLIENT_IDLE_TIMEOUT_MS, 120000), TimeUnit.MILLISECONDS)
+      .withRequestTimeout(getSolrClientTimeout(RodaConstants.SOLR_CLIENT_REQUEST_TIMEOUT_MS, 300000),
+        TimeUnit.MILLISECONDS);
     CloudSolrClient cloudSolrClient = new CloudSolrClient.Builder(zkHosts, zkChroot)
-      .withHttpClientBuilder(new HttpJettySolrClient.Builder().useHttp1_1(true)).build();
+      .withHttpClientBuilder(httpClientBuilder).build();
 
     waitForSolrCluster(cloudSolrClient);
 
@@ -1266,6 +1274,11 @@ public class RodaCoreFactory {
       return Arrays.stream(value.split(",")).map(String::trim).filter(StringUtils::isNotBlank).toList();
     }
     return configurationManager.getRodaConfigurationAsList(key);
+  }
+
+  private static long getSolrClientTimeout(String key, long defaultMillis) {
+    Integer millis = getConfigurationPositiveInt(key);
+    return millis != null ? millis : defaultMillis;
   }
 
   private static Integer getConfigurationPositiveInt(String key) {
