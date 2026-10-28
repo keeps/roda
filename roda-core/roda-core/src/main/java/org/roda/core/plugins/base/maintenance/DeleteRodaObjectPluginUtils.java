@@ -519,7 +519,7 @@ public class DeleteRodaObjectPluginUtils {
     }
 
     try {
-      model.deleteRisk(risk.getId(), true);
+      model.deleteRisk(risk.getId(), false);
     } catch (GenericException | NotFoundException | AuthorizationDeniedException | RequestNotValidException e) {
       state = PluginState.FAILURE;
     }
@@ -537,7 +537,7 @@ public class DeleteRodaObjectPluginUtils {
     PluginState state = PluginState.SUCCESS;
 
     try {
-      model.deleteRepresentationInformation(ri.getId(), true);
+      model.deleteRepresentationInformation(ri.getId(), false);
     } catch (GenericException | NotFoundException | AuthorizationDeniedException | RequestNotValidException e) {
       state = PluginState.FAILURE;
     }
@@ -567,7 +567,7 @@ public class DeleteRodaObjectPluginUtils {
     PluginState state = PluginState.SUCCESS;
 
     try {
-      model.deleteRiskIncidence(incidence.getId(), true);
+      model.deleteRiskIncidence(incidence.getId(), false);
     } catch (GenericException | NotFoundException | AuthorizationDeniedException | RequestNotValidException e) {
       state = PluginState.FAILURE;
     }

@@ -140,13 +140,18 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
   @Override
   public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
     throws PluginException {
-    return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<File>() {
-      @Override
-      public void process(IndexService index, ModelService model, Report report, Job cachedJob,
-        JobPluginInfo jobPluginInfo, Plugin<File> plugin, List<File> objects) {
-        processFiles(index, model, report, jobPluginInfo, cachedJob, objects);
-      }
-    }, index, model, liteList);
+    try {
+      return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<File>() {
+        @Override
+        public void process(IndexService index, ModelService model, Report report, Job cachedJob,
+          JobPluginInfo jobPluginInfo, Plugin<File> plugin, List<File> objects) {
+          processFiles(index, model, report, jobPluginInfo, cachedJob, objects);
+        }
+      }, index, model, liteList);
+    } finally {
+      // the incidences mitigated in the block, committed once (#3786)
+      SiegfriedPluginUtils.commitRiskIncidences(index);
+    }
   }
 
   private void processFiles(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo,
@@ -239,7 +244,7 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
       if (clearIncidences) {
         for (RiskIncidence incidence : siegfriedRiskIncidences) {
           incidence.setStatus(IncidenceStatus.MITIGATED);
-          model.updateRiskIncidence(incidence, true);
+          model.updateRiskIncidence(incidence, false);
         }
       } else {
         for (String note : PremisV3Utils.getFormatNotes(model, aipId, representationId, filePath, fileId, username)) {

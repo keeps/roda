@@ -25,6 +25,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
@@ -124,6 +125,16 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
       this.overwriteManual = parameters.get(RodaConstants.PLUGIN_PARAMS_SIEGFRIED_OVERWRITE_MANUAL).equals("true");
     } else {
       this.overwriteManual = false;
+    }
+  }
+
+  @Override
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
+    throws PluginException {
+    try {
+      return super.execute(index, model, liteList);
+    } finally {
+      SiegfriedPluginUtils.commitRiskIncidences(index);
     }
   }
 

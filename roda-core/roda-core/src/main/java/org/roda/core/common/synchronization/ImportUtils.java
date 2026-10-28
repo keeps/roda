@@ -156,8 +156,10 @@ public class ImportUtils {
           rodaInstance.incrementEntityCounters(RodaConstants.SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_REMOVED,
             ModelUtils.giveRespectiveModelClass(indexedClass).getName());
         }
+        // the objects are deleted without a commit each (#3786)
+        index.commit(indexedClass);
         removed = listToRemove.size();
-      } catch (RequestNotValidException | NotFoundException | GenericException e) {
+      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         report.addPluginDetails(e.getMessage());
         report.setPluginState(PluginState.FAILURE);
