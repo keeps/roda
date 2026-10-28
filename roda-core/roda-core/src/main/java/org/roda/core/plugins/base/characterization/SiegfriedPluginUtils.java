@@ -250,6 +250,7 @@ public class SiegfriedPluginUtils {
               RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
             // Update PREMIS files
+            boolean incidenceWritten = false;
             for (JsonNode match : matches) {
               String format = null;
               String version = null;
@@ -268,7 +269,8 @@ public class SiegfriedPluginUtils {
               if (StringUtils.isNotBlank(warning.textValue())) {
                 notes.add(RodaConstants.PRESERVATION_FORMAT_NOTE_SIEGFRIED_WARNING + ": " + warning.textValue());
                 updateFileRiskIncidences(model, index, aipId, representationId, jsonFileId, jsonFilePath,
-                  warning.textValue());
+                  warning.textValue(), incidenceWritten);
+                incidenceWritten = true;
               }
               PremisV3Utils.updateFormatPreservationMetadata(model, aipId, representationId, jsonFilePath, jsonFileId,
                 format, version, pronom, mime, notes, username, true);
@@ -280,14 +282,25 @@ public class SiegfriedPluginUtils {
     return sources;
   }
 
+  /**
+   * Mitigates the previous incidences of the file and creates one for the
+   * warning. The incidences are not committed one by one, but once for the block
+   * (see {@link #commitRiskIncidences}); when an incidence was already written
+   * for the file, it is committed first, so that it is found to be mitigated
+   * (#3786).
+   */
   private static void updateFileRiskIncidences(ModelService model, IndexService index, String aipId,
-    String representationId, String fileId, List<String> filePath, String warning) throws RequestNotValidException,
-    GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
+    String representationId, String fileId, List<String> filePath, String warning, boolean incidenceWritten)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException,
+    NotFoundException {
+    if (incidenceWritten) {
+      index.commit(RiskIncidence.class);
+    }
     // Mitigate previous incidences
     for (RiskIncidence incidence : getPreviousSiegfriedIncidences(model, index, aipId, representationId, fileId,
       filePath)) {
       incidence.setStatus(IncidenceStatus.MITIGATED);
-      model.updateRiskIncidence(incidence, true);
+      model.updateRiskIncidence(incidence, false);
     }
     // Create a new incidence
     RiskIncidence riskIncidence = new RiskIncidence();
@@ -314,7 +327,19 @@ public class SiegfriedPluginUtils {
     riskIncidence.setDescription(warning);
     riskIncidence.setFileId(fileId);
     riskIncidence.setSeverity(SeverityLevel.LOW);
-    model.createRiskIncidence(riskIncidence, true);
+    model.createRiskIncidence(riskIncidence, false);
+  }
+
+  /**
+   * Makes the incidences written for a block visible, once for all of them, so
+   * that they are listed, and mitigated by the next run, as soon as it ends.
+   */
+  public static void commitRiskIncidences(IndexService index) {
+    try {
+      index.commit(RiskIncidence.class);
+    } catch (GenericException | AuthorizationDeniedException e) {
+      LOGGER.error("Could not commit the risk incidences", e);
+    }
   }
 
   public static List<RiskIncidence> getPreviousSiegfriedIncidences(ModelService model, IndexService index,

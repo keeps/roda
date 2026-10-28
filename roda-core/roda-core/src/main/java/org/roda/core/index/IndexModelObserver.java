@@ -993,7 +993,10 @@ public class IndexModelObserver implements ModelObserver {
     if (deleteIncidences) {
       children.add(RiskIncidence.class);
     }
-    makeChildrenVisible(children).addTo(ret);
+    // the ghosts an ingest deletes when it ends have no children (#3786)
+    if (!isGhost(aipId)) {
+      makeChildrenVisible(children).addTo(ret);
+    }
 
     deleteDocumentFromIndex(IndexedAIP.class, aipId).addTo(ret);
     deleteDocumentsFromIndex(IndexedRepresentation.class, RodaConstants.REPRESENTATION_AIP_ID, aipId).addTo(ret);
@@ -1399,6 +1402,20 @@ public class IndexModelObserver implements ModelObserver {
    */
   private static boolean solrFailed(ReturnWithExceptions<?, ?> ret) {
     return ret.getExceptions().stream().anyMatch(SolrRetryException.class::isInstance);
+  }
+
+  /**
+   * Whether the AIP is a ghost, a placeholder an ingest creates for a parent not
+   * yet ingested, from its document, got in real time as it may not have been
+   * committed yet; when it cannot be told, it is not taken as one.
+   */
+  private boolean isGhost(String aipId) {
+    try {
+      return Boolean.TRUE
+        .equals(SolrUtils.retrieve(index, IndexedAIP.class, aipId, Collections.emptyList()).getGhost());
+    } catch (NotFoundException | GenericException e) {
+      return false;
+    }
   }
 
   /**
