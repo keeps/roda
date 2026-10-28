@@ -1,5 +1,14 @@
 # Changelog
 
+## v6.4.4 (28/10/2026)
+#### Security
+- Several dependency upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+
+
 ## v6.4.3 (22/10/2026)
 #### Security
 - Bumped tomcat to v11.0.27
