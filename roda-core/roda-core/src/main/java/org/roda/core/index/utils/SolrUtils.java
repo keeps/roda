@@ -26,6 +26,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -51,6 +52,7 @@ import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrException;
@@ -160,6 +162,8 @@ public class SolrUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(SolrUtils.class);
   private static final String DEFAULT_QUERY_PARSER_OPERATOR = "AND";
   private static final int DELETE_BY_ID_BATCH_SIZE = 1000;
+  // the shortest single word searched as a prefix by suggest
+  private static final int SUGGEST_MIN_PREFIX = 2;
   // StAX factories are thread-safe once configured; looking one up is not cheap
   private static final XMLInputFactory XML_INPUT_FACTORY = XMLInputFactory.newInstance();
   private static final Set<String> NON_REPEATABLE_FIELDS = new HashSet<>(Arrays.asList(RodaConstants.AIP_TITLE,
@@ -1834,13 +1838,44 @@ public class SolrUtils {
     return index.query(collection, query);
   }
 
+  /**
+   * The values of a field of the documents that have, in its text copy, the
+   * words typed so far: the last one as a prefix. The text is searched as text,
+   * escaped, whatever it is written, and a single word shorter than
+   * {@link #SUGGEST_MIN_PREFIX} is only searched as a whole word, as it would
+   * match too many documents; after other words, which already narrow the
+   * search, it is still a prefix. Only the fields the collection defines are
+   * accepted (#3787).
+   */
   public static <T extends IsIndexed> List<String> suggest(SolrClient index, Class<T> classToRetrieve, String field,
-    String queryString, boolean justActive, User user, boolean allowPartial) throws GenericException {
+    String queryString, boolean justActive, User user, boolean allowPartial)
+    throws GenericException, RequestNotValidException {
+    SolrCollection<T, ?> collection = SolrCollectionRegistry.get(classToRetrieve);
+    if (collection == null || collection.getFields().stream().noneMatch(f -> f.getName().equals(field))) {
+      throw new RequestNotValidException("Cannot suggest values of field " + field);
+    }
+    List<String> words = queryString == null ? Collections.emptyList()
+      : Arrays.asList(StringUtils.split(queryString));
+    if (words.isEmpty()) {
+      return new ArrayList<>();
+    }
+
     StringBuilder queryBuilder = new StringBuilder();
-    appendKeyValue(queryBuilder, field + RodaConstants.INDEX_SEARCH_SUFFIX, queryString + "*");
+    for (int i = 0; i < words.size(); i++) {
+      // in lower case, as the text copy is, so that AND, OR and NOT are words, not operators
+      String word = words.get(i).toLowerCase(Locale.ROOT);
+      queryBuilder.append(i == 0 ? "" : " ").append(ClientUtils.escapeQueryChars(word));
+      if (i == words.size() - 1 && (i > 0 || word.length() >= SUGGEST_MIN_PREFIX)) {
+        queryBuilder.append("*");
+      }
+    }
+    StringBuilder fieldQuery = new StringBuilder();
+    appendKeyValue(fieldQuery, field + RodaConstants.INDEX_SEARCH_SUFFIX, queryBuilder.toString());
     SolrQuery query = new SolrQuery();
     query.setParam("q.op", DEFAULT_QUERY_PARSER_OPERATOR);
-    query.setQuery(queryBuilder.toString());
+    query.setQuery(fieldQuery.toString());
+    // only the facet is used
+    query.setRows(0);
     if (hasPermissionFilters(classToRetrieve)) {
       query.addFilterQuery(getFilterQueries(user, justActive, classToRetrieve));
     }
