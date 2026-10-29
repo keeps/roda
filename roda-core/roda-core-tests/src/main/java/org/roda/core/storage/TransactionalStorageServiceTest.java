@@ -57,6 +57,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -94,6 +95,15 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
       deployPluginManager, deployDefaultResources, false, ldapUtilityTestHelper.getLdapUtility());
 
     mainStorage = new FileStorageService(basePath);
+  }
+
+  @AfterClass(alwaysRun = true)
+  public void tearDown() throws Exception {
+    // otherwise the next test class keeps this RODA home, emptied after each
+    // test
+    ldapUtilityTestHelper.shutdown();
+    RodaCoreFactory.shutdown();
+    FSUtils.deletePath(basePath);
   }
 
   @AfterMethod
