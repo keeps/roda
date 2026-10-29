@@ -919,7 +919,7 @@ public interface ClientMessages extends Messages {
 
   String durationDHMSLongMinutes(int minutes, int seconds);
 
-  String durationDHMSLongSeconds(int seconds);
+  String durationDHMSLongSeconds(@PluralCount int seconds);
 
   String durationDHMSShortMillis(int millis);
 
