@@ -3,7 +3,7 @@
 
 	<p>Esta página apresenta diagramas sobre variados aspetos do repositório.
 		Os diagramas estão organizados em secções por tema, e.g. metainformação,
-		ingestão ou acções de preservação, eventos de preservação, gestão de riscos
+		ingestão ou ações de preservação, eventos de preservação, gestão de riscos
 		e notificações.</p>
 
 	<div class="collapsable-card-panel" id="panelStatistic">
@@ -108,7 +108,7 @@
 
 	<div class="row full_width">
 		<div class="col_4 stat_col_card">
-			<h4>Número de acções de preservação</h4>
+			<h4>Número de ações de preservação</h4>
 			<div class="textfill"><span class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.jobs.Job" data-view="text" data-source-filters="!pluginType=INGEST" data-view-field="totalCount"></span></div>
 		</div>
 		<div class="col_4 chart_col_card">
@@ -197,11 +197,11 @@
 			<div class="textfill"><span class="statistic" data-source="index" data-source-filters="any" data-source-class="org.roda.core.data.v2.ip.TransferredResource" data-view="text" data-view-field="totalCount"></span></div>
 		</div>
 		<div class="col_4 stat_col_card">
-			<h4>Ingestões bem sucedidas</h4>
+			<h4>Ingestões bem-sucedidas</h4>
 			<div class="textfill"><span class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.ip.TransferredResource" data-view="text" data-view-field="totalCount" data-source-filters="ancestors=PROCESSED/SUCCESSFULLY_INGESTED"></span></div>
 		</div>
 		<div class="col_4 stat_col_card">
-			<h4>Ingestões mal sucedidas</h4>
+			<h4>Ingestões malsucedidas</h4>
 			<div class="textfill"><span class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.ip.TransferredResource" data-view="text" data-view-field="totalCount" data-source-filters="ancestors=PROCESSED/UNSUCCESSFULLY_INGESTED"></span></div>
 		</div>
 	</div>
@@ -264,7 +264,7 @@
 			<div class="textfill"><span class="statistic" data-source="index" data-source-filters="any" data-source-class="org.roda.core.data.v2.notifications.Notification" data-view="text" data-view-field="totalCount"></span></div>
 		</div>
 		<div class="col_8 chart_col_card">
-			<h4>Notificações com recepção confirmada</h4>
+			<h4>Notificações com receção confirmada</h4>
 			<canvas id="notification-acknowledge" class="statistic" data-source="index" data-source-filters="any" data-source-class="org.roda.core.data.v2.notifications.Notification" data-source-facets="isAcknowledged" data-view="chart" data-view-field="facetResults" data-view-type="pie"></canvas><span class="statistic toolbarLink" data-ref="notification-acknowledge" data-view="download" data-view-filename="notification-acknowledge.csv"> <i class="fa fa-download" aria-hidden="true"></i>
 			</span>
 		</div>

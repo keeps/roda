@@ -1,6 +1,6 @@
 # Instruções de pré-ingestão
 
-O processo de pré-ingestão oferece a capacidade de criar Pacotes de Informação de Submissão (SIP), contendo da dos e metadados (numa estrutura bem definida), a fim de submetê-los ao repositório para serem ingeridos. Os SIPs criados devem cumprir co m as políticas estabelecidas (ou negociados com) o repositório. O processo de pré-ingestão geralmente compreende algumas ou todas das seguintes atividades:
+O processo de pré-ingestão oferece a capacidade de criar Pacotes de Informação de Submissão (SIP), contendo dados e metainformação (numa estrutura bem definida), a fim de submetê-los ao repositório para serem ingeridos. Os SIPs criados devem cumprir com as políticas estabelecidas (ou negociados com) o repositório. O processo de pré-ingestão geralmente compreende algumas ou todas as seguintes atividades:
 
 ## Acordo de aquisição
 
@@ -10,7 +10,7 @@ Esta atividade consiste na definição dos termos, pré-condições e requisitos
 
 Durante a assinatura do contrato de submissão, o produtor deve concordar com um esquema de classificação base (ou lista de coleções) no qual terá autorização explícita para depositar novas informações.
 
-O esquema de classificação básico é geralmente criado pelo Repositório e pode ser descarregado nesta seção num formato legível por máquina. O ficheiro descarregado pode ser carregado no [RODA-in](http://rodain.roda-community.org) para uma melhor organização e preparação dos SIPs, antes de transferi-los para o repositório a ser ingerido.
+O esquema de classificação básico é geralmente criado pelo Repositório e pode ser descarregado nesta secção num formato legível por máquina. O ficheiro descarregado pode ser carregado no [RODA-in](http://rodain.roda-community.org) para uma melhor organização e preparação dos SIPs, antes de transferi-los para o repositório a ser ingerido.
 
 [Descarregar o esquema de classificação](/api/v1/classification_plans) (nota: apenas é possível descarregar o esquema de classificãção a partir do RODA)
 
