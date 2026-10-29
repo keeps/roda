@@ -106,6 +106,7 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
   private Filter defaultFilter;
   private String allFilter;
   private boolean defaultFilterIncremental = false;
+  private List<String> queryFields = new ArrayList<>();
 
   private AdvancedSearchFieldsPanel advancedSearchFieldsPanel;
   private AsyncTableCell<T> list;
@@ -152,6 +153,9 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
       }
     });
 
+    // setup basic search query fields
+    setupBasicSearch();
+
     // setup advanced search panel and button
     setupAdvancedSearch(false);
 
@@ -180,6 +184,16 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
 
     if (!showSaveButton) {
       searchAdvancedSave.setVisible(false);
+    }
+  }
+
+  private void setupBasicSearch() {
+    List<String> basicSearchFields = ConfigurationManager.getStringList(RodaConstants.SEARCH_BASICSEARCH_FIELD_PREFIX,
+      list.getClassToReturn().getSimpleName());
+    for (String basicSearchField : basicSearchFields) {
+      queryFields.addAll(ConfigurationManager.getStringList(RodaConstants.SEARCH_BASICSEARCH_FIELD_PREFIX,
+        list.getClassToReturn().getSimpleName(), basicSearchField,
+        RodaConstants.SEARCH_BASICSEARCH_FIELD_QUERYFIELD_SUFFIX));
     }
   }
 
@@ -361,7 +375,7 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
     Map<String, FilterParameter> advancedSearchFilters = new HashMap<>();
 
     if (basicQuery != null && basicQuery.trim().length() > 0) {
-      parameters.add(new EDismaxSimpleQueryFilterParameter(basicQuery));
+      parameters.add(new EDismaxSimpleQueryFilterParameter(this.queryFields, basicQuery));
     }
 
     // transform advanced search fields into filter parameters

@@ -182,6 +182,7 @@ public final class RodaConstants {
   public static final String UI_LISTS_COLUMNS_RENDERINGHINT_PROPERTY = "renderingHint";
   public static final String UI_LISTS_COLUMNS_DEFAULTSORTLIST_COLUMNNAME = "defaultSortList.columnName";
   public static final String UI_LISTS_COLUMNS_DEFAULTSORTLIST_ASCENDING = "defaultSortList.ascending";
+  public static final String UI_LISTS_COLUMNS_HIGHLIGHTFIELD_PROPERTY = "highlightField";
 
   public static final String UI_LISTS_PAGE_SIZE_INITIAL = "pageSize.initial";
   public static final String UI_LISTS_PAGE_SIZE_INCREMENT = "pageSize.increment";
@@ -929,12 +930,6 @@ public final class RodaConstants {
    * USER REGISTRATION SETTINGS
    */
   public static final String USER_REGISTRATION_DISABLED = "core.user_registration.disabled";
-
-  /*
-   * SOLR QUERY PARSERS
-   */
-  public static final String SOLR_LUCENE = "lucene";
-  public static final String SOLR_EDISMAX = "edismax";
 
   /*
    * INDEX NAMES
@@ -1985,6 +1980,9 @@ public final class RodaConstants {
   public static final String SEARCH_ACTION_LOGS = "action_logs";
   public static final String SEARCH_NOTIFICATIONS = "notifications";
   public static final String SEARCH_TRANSFERRED_RESOURCES = "transferred_resources";
+
+  public static final String SEARCH_BASICSEARCH_FIELD_PREFIX = "ui.basicSearch.fields";
+  public static final String SEARCH_BASICSEARCH_FIELD_QUERYFIELD_SUFFIX = "queryFields";
 
   public static final String SEARCH_FIELD_PREFIX = "ui.search.fields";
 

@@ -132,8 +132,7 @@ public class BrowseTop extends Composite {
         .withSummary(messages.listOfAIPs()).bindOpener().withActionable(AipSearchWrapperActions.get())
         .withActionBlacklist(List.of(AipSearchWrapperActions.AipSearchWrapperAction.NEW_CHILD_AIP_BELOW,
           AipSearchWrapperActions.AipSearchWrapperAction.APPRAISAL_ACCEPT,
-          AipSearchWrapperActions.AipSearchWrapperAction.APPRAISAL_REJECT))
-        .withHighlighting(true));
+          AipSearchWrapperActions.AipSearchWrapperAction.APPRAISAL_REJECT)));
 
     search = new SearchWrapper(false).createListAndSearchPanel(listBuilder);
 

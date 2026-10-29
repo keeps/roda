@@ -383,14 +383,6 @@ public class SolrUtils {
       query.addFilterQuery(parseCollapse(findRequest.getCollapse()));
     }
 
-    if (findRequest.getDefType() != null) {
-      query.setParam("defType", findRequest.getDefType());
-
-      if (findRequest.getDefType().equals(RodaConstants.SOLR_EDISMAX) && findRequest.getQueryFields() != null) {
-        query.setParam("qf", String.join(" ", findRequest.getQueryFields()));
-      }
-    }
-
     if (findRequest.highlighting) {
       query.setParam("hl", true);
 
@@ -401,7 +393,7 @@ public class SolrUtils {
       if (StringUtils.isNotBlank(hlQ)) {
         query.setParam("hl.q", hlQ);
         query.setParam("hl.highlightMultiTerm", "true");
-        if (findRequest.equals(RodaConstants.SOLR_EDISMAX)) {
+        if (containsEDismaxParameter(findRequest.getFilter())) {
           query.setParam("hl.requireFieldMatch", "false");
         } else {
           query.setParam("hl.requireFieldMatch", "true");
@@ -1036,7 +1028,7 @@ public class SolrUtils {
       requireField(parameter, "name", simplePar.getName());
       appendExactMatch(ret, simplePar.getName(), simplePar.getValue(), true, prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof EDismaxSimpleQueryFilterParameter eDismaxSimplePar) {
-      appendEDismaxSearchTerm(ret, eDismaxSimplePar.getValue(), false, prefixWithANDOperatorIfBuilderNotEmpty);
+      appendEDismaxSubquery(ret, eDismaxSimplePar, prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof OneOfManyFilterParameter param) {
       requireField(parameter, "name", param.getName());
       appendValuesUsingOROperator(ret, param.getName(), param.getValues(), prefixWithANDOperatorIfBuilderNotEmpty);
@@ -1046,7 +1038,7 @@ public class SolrUtils {
     } else if (parameter instanceof EmptyKeyFilterParameter param) {
       requireField(parameter, "name", param.getName());
       appendANDOperator(ret, true);
-      ret.append("( *:* NOT ").append(param.getName()).append(":* )");
+      ret.append("(*:* NOT ").append(param.getName()).append(":*)");
     } else if (parameter instanceof DateRangeFilterParameter param) {
       requireField(parameter, "name", param.getName());
       appendRange(ret, param.getName(), Date.class, param.getFromValue(), String.class,
@@ -1178,7 +1170,7 @@ public class SolrUtils {
   private static void appendExactMatch(StringBuilder ret, String key, String value, boolean appendDoubleQuotes,
     boolean prefixWithANDOperatorIfBuilderNotEmpty) {
     appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
-    ret.append("( ").append(key).append(":");
+    ret.append("(").append(key).append(":");
     if (appendDoubleQuotes) {
       ret.append("\"");
     }
@@ -1186,21 +1178,56 @@ public class SolrUtils {
     if (appendDoubleQuotes) {
       ret.append("\"");
     }
-    ret.append(" )");
+    ret.append(")");
   }
 
-  private static void appendEDismaxSearchTerm(StringBuilder ret, String value, boolean appendDoubleQuotes,
+  /**
+   * Appends an {@link EDismaxSimpleQueryFilterParameter} as a nested EDismax
+   * subquery, e.g.
+   * <code>({!edismax qf='title^5 search' q.op=AND v='foo bar'})</code>.
+   */
+  private static void appendEDismaxSubquery(StringBuilder ret, EDismaxSimpleQueryFilterParameter parameter,
     boolean prefixWithANDOperatorIfBuilderNotEmpty) {
     appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
-    ret.append("(");
-    if (appendDoubleQuotes) {
-      ret.append("\"");
+    if (StringUtils.isBlank(parameter.getValue())) {
+      // same as an empty basic search: match everything
+      ret.append("(*:*)");
+    } else {
+      ret.append("(").append(buildEDismaxSubquery(parameter)).append(")");
     }
-    ret.append(value);
-    if (appendDoubleQuotes) {
-      ret.append("\"");
+  }
+
+  private static String buildEDismaxSubquery(EDismaxSimpleQueryFilterParameter parameter) {
+    return "{!edismax qf='" + escapeSolrLocalParamValue(String.join(" ", getEDismaxQueryFields(parameter))) + "' q.op="
+      + DEFAULT_QUERY_PARSER_OPERATOR + " v='" + escapeSolrLocalParamValue(parameter.getValue()) + "'}";
+  }
+
+  /**
+   * Returns the query fields (qf) of an
+   * {@link EDismaxSimpleQueryFilterParameter}. Falls back to the catch-all
+   * {@link RodaConstants#INDEX_SEARCH} field when none are given.
+   */
+  private static List<String> getEDismaxQueryFields(EDismaxSimpleQueryFilterParameter parameter) {
+    List<String> fields = parameter.getFields();
+    return fields == null || fields.isEmpty() ? Collections.singletonList(RodaConstants.INDEX_SEARCH) : fields;
+  }
+
+  private static boolean containsEDismaxParameter(Filter filter) {
+    return filter != null && filter.getParameters() != null
+      && filter.getParameters().stream().anyMatch(SolrUtils::isOrContainsEDismaxParameter);
+  }
+
+  private static boolean isOrContainsEDismaxParameter(FilterParameter parameter) {
+    if (parameter instanceof EDismaxSimpleQueryFilterParameter) {
+      return true;
+    } else if (parameter instanceof OrFiltersParameters orParameters) {
+      return orParameters.getValues() != null
+        && orParameters.getValues().stream().anyMatch(SolrUtils::isOrContainsEDismaxParameter);
+    } else if (parameter instanceof AndFiltersParameters andParameters) {
+      return andParameters.getValues() != null
+        && andParameters.getValues().stream().anyMatch(SolrUtils::isOrContainsEDismaxParameter);
     }
-    ret.append(")");
+    return false;
   }
 
   private static void appendValuesUsingOROperator(StringBuilder ret, String key, List<String> values,
@@ -1400,17 +1427,17 @@ public class SolrUtils {
     if (parameter == null)
       return;
 
-    if (parameter instanceof SimpleFilterParameter) {
-      handleSimpleFilter((SimpleFilterParameter) parameter, highlightedFields, hlQueries);
-    } else if (parameter instanceof BasicSearchFilterParameter) {
-      handleBasicSearchFilter((BasicSearchFilterParameter) parameter, highlightedFields, hlQueries);
-    } else if (parameter instanceof EDismaxSimpleQueryFilterParameter) {
-      handleEDismaxFilter((EDismaxSimpleQueryFilterParameter) parameter, highlightedFields, hlQueries);
-    } else if (parameter instanceof OrFiltersParameters) {
-      ((OrFiltersParameters) parameter).getValues()
+    if (parameter instanceof SimpleFilterParameter simpleFilterParameter) {
+      handleSimpleFilter(simpleFilterParameter, highlightedFields, hlQueries);
+    } else if (parameter instanceof BasicSearchFilterParameter basicSearchFilterParameter) {
+      handleBasicSearchFilter(basicSearchFilterParameter, highlightedFields, hlQueries);
+    } else if (parameter instanceof EDismaxSimpleQueryFilterParameter eDismaxSimpleQueryFilterParameter) {
+      handleEDismaxFilter(eDismaxSimpleQueryFilterParameter, highlightedFields, hlQueries);
+    } else if (parameter instanceof OrFiltersParameters orFiltersParameters) {
+      orFiltersParameters.getValues()
         .forEach(p -> buildHighlightQueryRecursive(p, highlightedFields, hlQueries));
-    } else if (parameter instanceof AndFiltersParameters) {
-      ((AndFiltersParameters) parameter).getValues()
+    } else if (parameter instanceof AndFiltersParameters andFiltersParameters) {
+      andFiltersParameters.getValues()
         .forEach(p -> buildHighlightQueryRecursive(p, highlightedFields, hlQueries));
     }
     // Range and Date filters are intentionally skipped as they do not support
@@ -1433,8 +1460,11 @@ public class SolrUtils {
 
   private static void handleEDismaxFilter(EDismaxSimpleQueryFilterParameter p, List<String> highlightedFields,
     List<String> hlQueries) {
-    // EDismax applies the highlighted term to all available fields
-    addMultiFieldQuery(p.getValue(), highlightedFields, field -> true, hlQueries);
+    // Highlight with the same subquery used to search, so the highlighted terms
+    // are exactly the ones that matched (hl.requireFieldMatch is false for EDismax)
+    if (StringUtils.isNotBlank(p.getValue())) {
+      hlQueries.add("(" + buildEDismaxSubquery(p) + ")");
+    }
   }
 
   private static void addSingleFieldQuery(String name, String value, List<String> highlightedFields,

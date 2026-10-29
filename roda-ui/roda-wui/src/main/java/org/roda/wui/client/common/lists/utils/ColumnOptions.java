@@ -23,6 +23,7 @@ public class ColumnOptions {
   private boolean sortable;
   private List<String> sortBy;
   private RenderingHint renderingHint;
+  private boolean highlightField;
 
   public enum RenderingHint {
     FILE_SIZE,
@@ -178,6 +179,18 @@ public class ColumnOptions {
    */
   public void setRenderingHint(RenderingHint renderingHint) {
     this.renderingHint = renderingHint;
+  }
+
+  public boolean isHighlightField() {
+    return highlightField;
+  }
+
+  /**
+   * @param highlightField
+   *          Whether to highlight this column
+   */
+  public void setHighlightField(boolean highlightField) {
+    this.highlightField = highlightField;
   }
 
 }
