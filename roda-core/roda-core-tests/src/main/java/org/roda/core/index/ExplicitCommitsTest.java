@@ -10,10 +10,14 @@ package org.roda.core.index;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -95,7 +99,11 @@ public class ExplicitCommitsTest {
 
   @BeforeClass
   public static void setUp() throws Exception {
-    basePath = TestsHelper.createBaseTempDir(ExplicitCommitsTest.class, true);
+    // readable by others, as Siegfried, in its own container, reads the files
+    basePath = TestsHelper.createBaseTempDir(ExplicitCommitsTest.class, true,
+      PosixFilePermissions
+        .asFileAttribute(new HashSet<>(Arrays.asList(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE,
+          PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OTHERS_READ, PosixFilePermission.OTHERS_EXECUTE))));
     ldapUtilityTestHelper = new LdapUtilityTestHelper();
 
     boolean deploySolr = true;
