@@ -24,6 +24,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.LinkingObjectUtils;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions;
@@ -47,6 +48,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Sets;
 
 import gov.loc.premis.v3.EventComplexType;
+import gov.loc.premis.v3.LinkingObjectIdentifierComplexType;
 
 public class PreservationEventCollection
   extends AbstractSolrCollection<IndexedPreservationEvent, PreservationMetadata> {
@@ -90,6 +92,8 @@ public class PreservationEventCollection
     fields.add(new Field(RodaConstants.PRESERVATION_EVENT_DETAIL, Field.TYPE_TEXT).setMultiValued(false));
     fields.add(new Field(RodaConstants.PRESERVATION_EVENT_TYPE, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.PRESERVATION_EVENT_OUTCOME, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER, Field.TYPE_STRING)
+      .setMultiValued(true));
 
     return fields;
   }
@@ -162,6 +166,19 @@ public class PreservationEventCollection
       if (!event.getEventOutcomeInformation().isEmpty()) {
         doc.addField(RodaConstants.PRESERVATION_EVENT_OUTCOME,
           event.getEventOutcomeInformation().get(0).getEventOutcome().get(0).getValue());
+      }
+
+      if (objectClass.equals(PreservationMetadataEventClass.REPOSITORY.toString())) {
+        for (LinkingObjectIdentifierComplexType loict : event.getLinkingObjectIdentifier()) {
+          boolean isSource = loict.getLinkingObjectRole().stream()
+            .anyMatch(role -> RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE.equals(role.getValue()));
+          String value = loict.getLinkingObjectIdentifierValue();
+          if (isSource && StringUtils.isNotBlank(value)) {
+            String uuid = LinkingObjectUtils.getLinkingObjectPath(value);
+            doc.addField(RodaConstants.PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER,
+              uuid != null ? uuid : value);
+          }
+        }
       }
     } catch (ValidationException e) {
       throw new GenericException(e);
