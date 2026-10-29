@@ -11,10 +11,8 @@ import java.io.Serial;
 import java.util.Collections;
 import java.util.List;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.collapse.Collapse;
 import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.filter.EDismaxSimpleQueryFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
@@ -54,15 +52,6 @@ public class FindRequest extends CountRequest {
   /** The index fields to return and use to construct the indexed object. */
   @JsonProperty("fieldsToReturn")
   private List<String> fieldsToReturn;
-  /** Query parser */
-  @JsonProperty("defType")
-  public String defType;
-  @JsonProperty("filterQuery")
-  /** Filter query */
-  public Filter filterQuery;
-  @JsonProperty("queryFields")
-  /** Query fields */
-  public List<String> queryFields;
   @JsonProperty("highlighting")
   /** Use highlighting */
   public boolean highlighting;
@@ -98,9 +87,6 @@ public class FindRequest extends CountRequest {
     this.exportFacets = builder.exportFacets;
     this.filename = builder.filename;
     this.fieldsToReturn = builder.fieldsToReturn;
-    this.defType = builder.defType;
-    this.filterQuery = builder.filterQuery;
-    this.queryFields = builder.queryFields;
     this.highlighting = builder.highlighting;
     this.highlightedFields = builder.highlightedFields;
     this.collapse = builder.collapse;
@@ -161,30 +147,6 @@ public class FindRequest extends CountRequest {
 
   public void setFieldsToReturn(List<String> fieldsToReturn) {
     this.fieldsToReturn = fieldsToReturn;
-  }
-
-  public String getDefType() {
-    return defType;
-  }
-
-  public void setDefType(String defType) {
-    this.defType = defType;
-  }
-
-  public Filter getFilterQuery() {
-    return filterQuery;
-  }
-
-  public void setFilterQuery(Filter filterQuery) {
-    this.filterQuery = filterQuery;
-  }
-
-  public List<String> getQueryFields() {
-    return queryFields;
-  }
-
-  public void setQueryFields(List<String> queryFields) {
-    this.queryFields = queryFields;
   }
 
   public boolean getHighlighting() {
@@ -253,9 +215,6 @@ public class FindRequest extends CountRequest {
     private boolean exportFacets;
     private String filename = null;
     private List<String> fieldsToReturn;
-    public String defType;
-    public Filter filterQuery;
-    public List<String> queryFields;
     public boolean highlighting;
     public List<String> highlightedFields;
     private Collapse collapse;
@@ -275,11 +234,6 @@ public class FindRequest extends CountRequest {
       this.facets = Facets.NONE;
       this.exportFacets = false;
       this.fieldsToReturn = Collections.emptyList();
-      this.defType = filter.getParameters().stream().anyMatch(p -> p instanceof EDismaxSimpleQueryFilterParameter)
-        ? RodaConstants.SOLR_EDISMAX
-        : RodaConstants.SOLR_LUCENE;
-      this.filterQuery = null;
-      this.queryFields = Collections.emptyList();
       this.highlighting = false;
       this.highlightedFields = Collections.emptyList();
       this.collapse = null;
@@ -317,21 +271,6 @@ public class FindRequest extends CountRequest {
 
     public FindRequestBuilder withFieldsToReturn(List<String> fieldsToReturn) {
       this.fieldsToReturn = fieldsToReturn;
-      return this;
-    }
-
-    public FindRequestBuilder withDefType(String defType) {
-      this.defType = defType;
-      return this;
-    }
-
-    public FindRequestBuilder withFilterQuery(Filter filterQuery) {
-      this.filterQuery = filterQuery;
-      return this;
-    }
-
-    public FindRequestBuilder withQueryFields(List<String> queryFields) {
-      this.queryFields = queryFields;
       return this;
     }
 

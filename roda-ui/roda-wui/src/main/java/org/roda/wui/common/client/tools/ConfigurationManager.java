@@ -463,6 +463,7 @@ public class ConfigurationManager {
           getStringListWithDefault(Arrays.asList(field), kh.key(RodaConstants.UI_LISTS_COLUMNS_SORTBY_PROPERTY)));
         col.setRenderingHint(
           getEnum(RenderingHint.class, null, kh.key(RodaConstants.UI_LISTS_COLUMNS_RENDERINGHINT_PROPERTY)));
+        col.setHighlightField(getBoolean(false, kh.key(RodaConstants.UI_LISTS_COLUMNS_HIGHLIGHTFIELD_PROPERTY)));
 
         ret.add(col);
       }

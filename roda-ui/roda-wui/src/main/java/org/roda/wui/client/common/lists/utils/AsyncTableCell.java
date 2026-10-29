@@ -26,7 +26,6 @@ import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetParameter;
 import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.filter.EDismaxSimpleQueryFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -144,8 +143,6 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   private Facets facets;
   private boolean selectable;
   private List<String> fieldsToReturn;
-  private List<String> queryFields;
-  private boolean highlighting;
   private List<String> highlightedFields;
   private Collapse collapse;
 
@@ -195,9 +192,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     this.redirectOnSingleResult = options.getRedirectOnSingleResult();
 
     this.fieldsToReturn = options.getFieldsToReturn();
-    this.queryFields = options.getQueryFields();
 
-    this.highlighting = options.isHighlighting();
     this.highlightedFields = options.getHighlightFields();
 
     this.setVisible(!options.isStartHidden());
@@ -646,8 +641,8 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     Services services = new Services(reason, "get");
     FindRequest findRequest = FindRequest.getBuilder(getFilter(), getJustActive()).withSublist(sublist)
       .withFacets(getFacets()).withExportFacets(false).withSorter(sorter).withFieldsToReturn(fieldsToReturn)
-      .withQueryFields(fieldsToReturn).withDefType(getDefType()).withCollapse(getCollapse())
-      .withHighlighting(highlighting).withHighlightedFields(highlightedFields).build();
+      .withCollapse(getCollapse()).withHighlighting(!highlightedFields.isEmpty())
+      .withHighlightedFields(highlightedFields).build();
     return services.rodaEntityRestService(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
       getClassToReturn());
   }
@@ -751,12 +746,6 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
   public Filter getFilter() {
     return filter;
-  }
-
-  public String getDefType() {
-    return getFilter().getParameters().stream().anyMatch(p -> p instanceof EDismaxSimpleQueryFilterParameter)
-      ? RodaConstants.SOLR_EDISMAX
-      : RodaConstants.SOLR_LUCENE;
   }
 
   public void setFilter(Filter filter) {
