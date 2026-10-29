@@ -69,8 +69,10 @@ import org.testng.annotations.Test;
 /**
  * #3786: a job does not commit Solr once per item it writes, which opens a new
  * searcher each time, but at most once per block; what it wrote is still
- * visible as soon as the job ends. Deleting the ghosts of an ingest does not
- * commit the collections of their children, as they have none.
+ * visible as soon as the job ends. Deleting AIPs commits the collections of
+ * their children only when children were written after the last such commit:
+ * once for AIPs written together, never for the ghosts of an ingest, which
+ * have none.
  *
  * The explicit commits are counted from the metrics of the Solr of the tests,
  * which count every commit and, apart, those Solr makes on its own.
@@ -328,6 +330,42 @@ public class ExplicitCommitsTest {
     }
     index.commit(IndexedAIP.class);
     Assert.assertEquals(index.count(IndexedAIP.class, Filter.ALL), 0L, "ghosts left");
+  }
+
+  @Test
+  public void deletingAIPsWrittenTogetherCommitsTheCollectionsOfChildrenOnce() throws Exception {
+    List<String> aipIds = new ArrayList<>();
+    for (int i = 0; i < OBJECTS; i++) {
+      AIP aip = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), RodaConstants.ADMIN, null);
+      String representationId = IdUtils.createUUID();
+      model.createRepresentation(aip.getId(), representationId, true, RodaConstants.REPRESENTATION_TYPE_MIXED, true,
+        RodaConstants.ADMIN);
+      model.createFile(aip.getId(), representationId, FOLDER, "file.json", new StringContentPayload("{}"),
+        RodaConstants.ADMIN);
+      aipIds.add(aip.getId());
+    }
+    TestsHelper.executeJob(PremisSkeletonPlugin.class, PluginType.AIP_TO_AIP,
+      SelectedItemsList.create(AIP.class, aipIds));
+    List<Class<? extends IsIndexed>> children = List.of(IndexedRepresentation.class, IndexedFile.class,
+      IndexedPreservationEvent.class, RiskIncidence.class);
+    Map<Class<? extends IsIndexed>, Long> before = new HashMap<>();
+    for (Class<? extends IsIndexed> child : children) {
+      before.put(child, explicitCommits(child));
+    }
+
+    TestsHelper.executeJob(DeleteRODAObjectPlugin.class, Collections.emptyMap(), PluginType.INTERNAL,
+      SelectedItemsList.create(AIP.class, aipIds));
+
+    for (Class<? extends IsIndexed> child : children) {
+      Assert.assertTrue(explicitCommits(child) - before.get(child) <= 1, "commits of " + child.getSimpleName()
+        + " deleting " + OBJECTS + " AIPs: " + (explicitCommits(child) - before.get(child)));
+    }
+    index.commit(IndexedRepresentation.class, IndexedFile.class, IndexedPreservationEvent.class);
+    Assert.assertEquals(index.count(IndexedRepresentation.class, Filter.ALL), 0L, "representations left");
+    Assert.assertEquals(index.count(IndexedFile.class, Filter.ALL), 0L, "files left");
+    Assert.assertEquals(index.count(IndexedPreservationEvent.class,
+      new Filter(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aipIds.get(0)))), 0L,
+      "events left");
   }
 
   private static <T extends IsRODAObject> void assertDeletedWithOneCommit(Class<? extends IsIndexed> indexClass,

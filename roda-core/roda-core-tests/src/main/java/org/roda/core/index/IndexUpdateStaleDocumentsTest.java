@@ -35,6 +35,7 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.security.LdapUtilityTestHelper;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.util.IdUtils;
@@ -209,6 +210,35 @@ public class IndexUpdateStaleDocumentsTest {
     Assert.assertEquals(countChildren(IndexedFile.class, RodaConstants.FILE_AIP_ID, aipId), 0);
     Assert.assertEquals(
       countChildren(IndexedPreservationEvent.class, RodaConstants.PRESERVATION_EVENT_AIP_ID, aipId), 0);
+  }
+
+  @Test
+  public void testAIPChangedAfterTheCommitOfAnotherDeletionLeavesNoChildren() throws RODAException {
+    // indexed together, so deleting the first makes the children of both visible
+    String firstId = IdUtils.createUUID();
+    String secondId = IdUtils.createUUID();
+    for (String aipId : List.of(firstId, secondId)) {
+      model.createAIP(aipId, corporaService,
+        DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+        RodaConstants.ADMIN);
+    }
+    model.deleteAIP(firstId);
+
+    // children written after that commit are not visible to a listing yet (#3786)
+    String representationId = IdUtils.createUUID();
+    model.createRepresentation(secondId, representationId, true, RodaConstants.REPRESENTATION_TYPE_MIXED, true,
+      RodaConstants.ADMIN);
+    model.createFile(secondId, representationId, Collections.emptyList(), "file.txt",
+      new StringContentPayload("file"), RodaConstants.ADMIN);
+    model.deleteAIP(secondId);
+    index.commitAIPs();
+
+    for (String aipId : List.of(firstId, secondId)) {
+      Assert.assertEquals(countChildren(IndexedRepresentation.class, RodaConstants.REPRESENTATION_AIP_ID, aipId), 0);
+      Assert.assertEquals(countChildren(IndexedFile.class, RodaConstants.FILE_AIP_ID, aipId), 0);
+      Assert.assertEquals(
+        countChildren(IndexedPreservationEvent.class, RodaConstants.PRESERVATION_EVENT_AIP_ID, aipId), 0);
+    }
   }
 
   @Test

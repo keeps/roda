@@ -17,6 +17,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.StreamSupport;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -104,6 +106,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
 /**
  *
  * @author Luis Faria <lfaria@keep.pt>
@@ -111,6 +116,15 @@ import org.xml.sax.SAXException;
  */
 public class IndexModelObserver implements ModelObserver {
   private static final Logger LOGGER = LoggerFactory.getLogger(IndexModelObserver.class);
+
+  // when a representation, file, preservation event or risk incidence of each
+  // AIP was last written (System.nanoTime), for all the observers of this RODA,
+  // as each transaction has its own; forgotten long after Solr makes it visible
+  // on its own, within the soft commit interval (#3786)
+  private static final Cache<String, Long> CHILDREN_WRITTEN = CacheBuilder.newBuilder()
+    .expireAfterWrite(1, TimeUnit.MINUTES).build();
+  // when the last commit of each collection of children started (System.nanoTime)
+  private static final Map<Class<? extends IsIndexed>, Long> CHILDREN_COMMITTED = new ConcurrentHashMap<>();
 
   private final SolrClient index;
   private final ModelService model;
@@ -256,6 +270,7 @@ public class IndexModelObserver implements ModelObserver {
 
     SolrUtils.create2(index, model, (ModelObserver) this, IndexedPreservationEvent.class, pm,
       new PreservationEventCollection.Info(aip)).addTo(ret);
+    childWritten(pm.getAipId());
 
     return ret;
   }
@@ -352,6 +367,7 @@ public class IndexModelObserver implements ModelObserver {
         numberOfDataFiles, numberOfDataFolders, safemode);
       SolrUtils.create2(index, model, (ModelObserver) this, IndexedRepresentation.class, representation, info)
         .addTo(ret);
+      childWritten(aip.getId());
     } catch (IOException | RequestNotValidException | GenericException | NotFoundException
       | AuthorizationDeniedException e) {
       LOGGER.error("Cannot index representation", e);
@@ -440,6 +456,7 @@ public class IndexModelObserver implements ModelObserver {
             shallowFile.get().setInstanceId(aip.getInstanceId());
             SolrUtils.create2(index, model, (ModelObserver) this, IndexedFile.class, shallowFile.get(), info)
               .addTo(ret);
+            childWritten(aip.getId());
             addWritten(written, IdUtils.getFileId(shallowFile.get()));
           }
         }
@@ -451,6 +468,7 @@ public class IndexModelObserver implements ModelObserver {
 
     } else {
       SolrUtils.create2(index, model, (ModelObserver) this, IndexedFile.class, file, info).addTo(ret);
+      childWritten(aip.getId());
       addWritten(written, IdUtils.getFileId(file));
       sizeInBytes = (Long) info.getAccumulators().get(RodaConstants.FILE_SIZE);
     }
@@ -993,10 +1011,7 @@ public class IndexModelObserver implements ModelObserver {
     if (deleteIncidences) {
       children.add(RiskIncidence.class);
     }
-    // the ghosts an ingest deletes when it ends have no children (#3786)
-    if (!isGhost(aipId)) {
-      makeChildrenVisible(children).addTo(ret);
-    }
+    makeChildrenVisible(aipId, children).addTo(ret);
 
     deleteDocumentFromIndex(IndexedAIP.class, aipId).addTo(ret);
     deleteDocumentsFromIndex(IndexedRepresentation.class, RodaConstants.REPRESENTATION_AIP_ID, aipId).addTo(ret);
@@ -1148,7 +1163,7 @@ public class IndexModelObserver implements ModelObserver {
     if (deleteIncidences) {
       children.add(RiskIncidence.class);
     }
-    makeChildrenVisible(children).addTo(ret);
+    makeChildrenVisible(aipId, children).addTo(ret);
 
     String representationUUID = IdUtils.getRepresentationId(aipId, representationId);
     deleteDocumentFromIndex(IndexedRepresentation.class, representationUUID).addTo(ret);
@@ -1207,7 +1222,7 @@ public class IndexModelObserver implements ModelObserver {
     deleteDocumentFromIndex(IndexedFile.class, uuid).addTo(ret);
 
     if (deleteIncidences) {
-      makeChildrenVisible(Collections.singletonList(RiskIncidence.class)).addTo(ret);
+      makeChildrenVisible(aipId, Collections.singletonList(RiskIncidence.class)).addTo(ret);
       deleteDocumentsFromIndex(RiskIncidence.class, RodaConstants.RISK_INCIDENCE_FILE_ID, fileId).addTo(ret);
     }
 
@@ -1303,6 +1318,7 @@ public class IndexModelObserver implements ModelObserver {
         SolrInputDocument solrFile = SolrUtils.addOtherPropertiesToIndexedFile("tika_", otherMetadataBinary, model,
           index);
         SolrUtils.create(index, RodaConstants.INDEX_FILE, solrFile, (ModelObserver) this).addTo(ret);
+        childWritten(otherMetadataBinary.getAipId());
       } catch (SolrServerException | RequestNotValidException | GenericException | NotFoundException
         | AuthorizationDeniedException | XPathExpressionException | ParserConfigurationException | SAXException
         | IOException e) {
@@ -1405,17 +1421,33 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   /**
-   * Whether the AIP is a ghost, a placeholder an ingest creates for a parent not
-   * yet ingested, from its document, got in real time as it may not have been
-   * committed yet; when it cannot be told, it is not taken as one.
+   * Records that a child of the AIP was just written to the index, after Solr
+   * took it, so that a commit started from now on makes it visible (#3786).
    */
-  private boolean isGhost(String aipId) {
-    try {
-      return Boolean.TRUE
-        .equals(SolrUtils.retrieve(index, IndexedAIP.class, aipId, Collections.emptyList()).getGhost());
-    } catch (NotFoundException | GenericException e) {
-      return false;
+  private static void childWritten(String aipId) {
+    if (aipId != null) {
+      CHILDREN_WRITTEN.put(aipId, System.nanoTime());
     }
+  }
+
+  /**
+   * Makes the children of an object of the AIP about to be deleted visible (see
+   * {@link #makeChildrenVisible(List)}), only when a child of the AIP was written
+   * after the last commit of one of the collections; otherwise they already are,
+   * e.g. when the AIP was not changed lately, or a commit for an AIP deleted
+   * before already made them visible (#3786). The children are written by this
+   * observer only, and only the primary RODA writes to the index.
+   */
+  private ReturnWithExceptions<Void, ModelObserver> makeChildrenVisible(String aipId,
+    List<Class<? extends IsIndexed>> childrenClasses) {
+    Long written = CHILDREN_WRITTEN.getIfPresent(aipId);
+    if (written != null && childrenClasses.stream().anyMatch(childrenClass -> {
+      Long committed = CHILDREN_COMMITTED.get(childrenClass);
+      return committed == null || written - committed >= 0;
+    })) {
+      return makeChildrenVisible(childrenClasses);
+    }
+    return new ReturnWithExceptions<>(this);
   }
 
   /**
@@ -1429,8 +1461,12 @@ public class IndexModelObserver implements ModelObserver {
   private ReturnWithExceptions<Void, ModelObserver> makeChildrenVisible(
     List<Class<? extends IsIndexed>> childrenClasses) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+    long started = System.nanoTime();
     try {
       SolrUtils.commit(index, childrenClasses);
+      for (Class<? extends IsIndexed> childrenClass : childrenClasses) {
+        CHILDREN_COMMITTED.merge(childrenClass, started, (last, now) -> now - last > 0 ? now : last);
+      }
     } catch (GenericException e) {
       LOGGER.error("Cannot make the children to delete visible", e);
       ret.add(e);
@@ -1644,7 +1680,10 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public ReturnWithExceptions<Void, ModelObserver> riskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence,
     boolean commit) {
-    return SolrUtils.create(index, model, RiskIncidence.class, riskIncidence, this, commit);
+    ReturnWithExceptions<Void, ModelObserver> ret = SolrUtils.create(index, model, RiskIncidence.class, riskIncidence,
+      this, commit);
+    childWritten(riskIncidence.getAipId());
+    return ret;
   }
 
   @Override
