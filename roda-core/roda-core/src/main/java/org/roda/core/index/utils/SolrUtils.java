@@ -1487,17 +1487,41 @@ public class SolrUtils {
 
   public static <T extends IsIndexed, S extends Object> ReturnWithExceptions<Void, S> create(SolrClient index,
     String classToCreate, SolrInputDocument instance, S source) {
+    if (instance == null) {
+      return new ReturnWithExceptions<>(source);
+    }
+    return create(index, classToCreate, Collections.singletonList(instance), source);
+  }
+
+  /**
+   * Adds the documents to the collection in a single request, retried as a whole
+   * (#3773). A request fails or succeeds as a whole, so when Solr rejects it
+   * (4xx), which one of its documents causes, they are sent one by one to isolate
+   * it: the others are still added, and only the rejected ones are reported.
+   */
+  public static <S extends Object> ReturnWithExceptions<Void, S> create(SolrClient index, String collection,
+    List<SolrInputDocument> documents, S source) {
+    ReturnWithExceptions<Void, S> ret = add(index, collection, documents, source);
+    if (documents.size() > 1 && ret.getExceptions().stream().anyMatch(RetryPolicyBuilder.getInstance()::isRejected)) {
+      ret = new ReturnWithExceptions<>(source);
+      for (SolrInputDocument document : documents) {
+        add(index, collection, Collections.singletonList(document), source).addTo(ret);
+      }
+    }
+    return ret;
+  }
+
+  private static <S extends Object> ReturnWithExceptions<Void, S> add(SolrClient index, String collection,
+    List<SolrInputDocument> documents, S source) {
     ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>(source);
 
     Fallback<Object> fallback = Fallback.of(e -> {
       ret.add(new SolrRetryException(e.getLastException()));
     });
 
-    if (instance != null) {
-      RetryPolicyBuilder.getInstance().executor(fallback).onFailure(e -> {
-        LOGGER.error("Error adding document to index", e.getException());
-      }).run(() -> index.add(classToCreate, instance));
-    }
+    RetryPolicyBuilder.getInstance().executor(fallback).onFailure(e -> {
+      LOGGER.error("Error adding documents to index", e.getException());
+    }).run(() -> index.add(collection, documents));
 
     return ret;
   }
@@ -1506,17 +1530,34 @@ public class SolrUtils {
     SolrClient index, ModelService model, S source, Class<I> indexClass, M object, IndexingAdditionalInfo utils) {
     ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>(source);
 
-    Fallback<Object> fallback = Fallback.of(e -> {
-      ret.add(new SolrRetryException(e.getLastException()));
-    });
+    if (object != null) {
+      try {
+        SolrInputDocument solrDocument = SolrCollectionRegistry.toSolrDocument(indexClass, model, object, utils);
+        create(index, SolrCollectionRegistry.getIndexName(indexClass), solrDocument, source).addTo(ret);
+      } catch (GenericException | NotSupportedException | RequestNotValidException | NotFoundException
+        | AuthorizationDeniedException e) {
+        LOGGER.error("Error adding document to index", e);
+        ret.add(e);
+      }
+    }
+
+    return ret;
+  }
+
+  /**
+   * Builds the document of the object, which fills the accumulators of the info,
+   * and adds it to the buffer, which sends the documents of its collection in a
+   * single request when there are enough of them (#3773).
+   */
+  public static <I extends IsIndexed, M extends IsModelObject, S extends Object> ReturnWithExceptions<Void, S> create2(
+    SolrDocumentBuffer<S> buffer, ModelService model, Class<I> indexClass, M object, IndexingAdditionalInfo utils) {
+    ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>();
 
     if (object != null) {
       try {
         SolrInputDocument solrDocument = SolrCollectionRegistry.toSolrDocument(indexClass, model, object, utils);
         if (solrDocument != null) {
-          RetryPolicyBuilder.getInstance().executor(fallback)
-            .onFailure(e -> LOGGER.error("Error adding document to index", e.getException()))
-            .run(() -> index.add(SolrCollectionRegistry.getIndexName(indexClass), solrDocument));
+          buffer.add(SolrCollectionRegistry.getIndexName(indexClass), solrDocument).addTo(ret);
         }
       } catch (GenericException | NotSupportedException | RequestNotValidException | NotFoundException
         | AuthorizationDeniedException e) {
@@ -1562,16 +1603,38 @@ public class SolrUtils {
   public static <T extends IsIndexed, S extends Object> ReturnWithExceptions<Void, S> update(SolrClient index,
     Class<T> classToCreate, String uuid, Map<String, Object> fields, S source) {
     ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>();
-    SolrInputDocument doc = new SolrInputDocument();
-    doc.addField(RodaConstants.INDEX_UUID, uuid);
-    fields.forEach((key, value) -> doc.addField(key, set(value)));
     try {
-      create(index, SolrCollectionRegistry.getIndexName(classToCreate), doc, source).addTo(ret);
+      create(index, SolrCollectionRegistry.getIndexName(classToCreate), updateDocument(uuid, fields), source)
+        .addTo(ret);
     } catch (NotSupportedException e) {
       LOGGER.error("Error adding document to index", e);
       ret.add(e);
     }
     return ret;
+  }
+
+  /**
+   * Adds the atomic update of the fields of the document to the buffer, which
+   * sends the documents of its collection in a single request when there are
+   * enough of them (#3773).
+   */
+  public static <T extends IsIndexed, S extends Object> ReturnWithExceptions<Void, S> update(
+    SolrDocumentBuffer<S> buffer, Class<T> classToUpdate, String uuid, Map<String, Object> fields) {
+    ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>();
+    try {
+      buffer.add(SolrCollectionRegistry.getIndexName(classToUpdate), updateDocument(uuid, fields)).addTo(ret);
+    } catch (NotSupportedException e) {
+      LOGGER.error("Error adding document to index", e);
+      ret.add(e);
+    }
+    return ret;
+  }
+
+  private static SolrInputDocument updateDocument(String uuid, Map<String, Object> fields) {
+    SolrInputDocument doc = new SolrInputDocument();
+    doc.addField(RodaConstants.INDEX_UUID, uuid);
+    fields.forEach((key, value) -> doc.addField(key, set(value)));
+    return doc;
   }
 
   private static Map<String, Object> set(Object value) {

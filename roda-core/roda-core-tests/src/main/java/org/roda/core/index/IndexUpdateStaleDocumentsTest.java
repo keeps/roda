@@ -48,10 +48,15 @@ import org.testng.annotations.Test;
 /**
  * AIP and representation updates reindex in place and remove only the
  * documents of objects that no longer exist; deleting an AIP removes all its
- * children, even those indexed right before.
+ * children, even those indexed right before. The same holds for AIPs of more
+ * files and events than are sent to Solr at once (#3773).
  */
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
 public class IndexUpdateStaleDocumentsTest {
+  // more files and events than are sent to Solr at once, and not a multiple of it
+  private static final int MANY_FILES = 1250;
+  private static final int MANY_EVENTS = 250;
+
   private static Path basePath;
   private static ModelService model;
   private static IndexService index;
@@ -186,6 +191,64 @@ public class IndexUpdateStaleDocumentsTest {
   private long countChildren(Class<? extends IsIndexed> indexClass, String aipField, String aipId)
     throws RODAException {
     return index.count(indexClass, new Filter(new SimpleFilterParameter(aipField, aipId)));
+  }
+
+  @Test
+  public void testAIPWithManyFilesAndEventsIsIndexedWhole() throws RODAException {
+    AIP aip = IndexTestUtils.createAIP(model, MANY_FILES, MANY_EVENTS);
+    String repId = aip.getRepresentations().getFirst().getId();
+
+    model.notifyAipCreated(aip.getId());
+    index.commitAIPs();
+
+    Assert.assertEquals(countFiles(aip.getId()), MANY_FILES);
+    Assert.assertEquals(
+      countChildren(IndexedPreservationEvent.class, RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId()),
+      MANY_EVENTS);
+    // counted from every file indexed
+    IndexedRepresentation representation = index.retrieve(IndexedRepresentation.class,
+      IdUtils.getRepresentationId(aip.getId(), repId), Collections.emptyList());
+    Assert.assertEquals(representation.getNumberOfDataFiles(), MANY_FILES);
+  }
+
+  @Test
+  public void testAIPWithManyFilesUpdateRemovesOnlyStaleFiles() throws RODAException {
+    AIP aip = IndexTestUtils.createAIP(model, MANY_FILES, MANY_EVENTS);
+    String repId = aip.getRepresentations().getFirst().getId();
+    model.notifyAipCreated(aip.getId());
+    index.commitAIPs();
+    // the first, one in the middle and the last
+    List<Integer> removed = List.of(0, MANY_FILES / 2, MANY_FILES - 1);
+    for (int i : removed) {
+      removeFileFromStorage(aip.getId(), repId, Collections.emptyList(), IndexTestUtils.fileId(i));
+    }
+
+    model.notifyAipUpdated(aip.getId());
+    index.commitAIPs();
+
+    Assert.assertEquals(countFiles(aip.getId()), MANY_FILES - removed.size());
+    for (int i : removed) {
+      Assert.assertFalse(fileIsIndexed(aip.getId(), repId, Collections.emptyList(), IndexTestUtils.fileId(i)),
+        IndexTestUtils.fileId(i));
+    }
+    Assert.assertEquals(
+      countChildren(IndexedPreservationEvent.class, RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId()),
+      MANY_EVENTS);
+  }
+
+  @Test
+  public void testAIPWithManyFilesDeletedRightAfterIndexingLeavesNoChildren() throws RODAException {
+    AIP aip = IndexTestUtils.createAIP(model, MANY_FILES, MANY_EVENTS);
+
+    model.notifyAipCreated(aip.getId());
+    model.deleteAIP(aip.getId());
+    index.commitAIPs();
+
+    Assert.assertEquals(
+      countChildren(IndexedRepresentation.class, RodaConstants.REPRESENTATION_AIP_ID, aip.getId()), 0);
+    Assert.assertEquals(countChildren(IndexedFile.class, RodaConstants.FILE_AIP_ID, aip.getId()), 0);
+    Assert.assertEquals(
+      countChildren(IndexedPreservationEvent.class, RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId()), 0);
   }
 
   @Test

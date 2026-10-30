@@ -930,6 +930,8 @@ public final class RodaConstants {
   public static final String SOLR_CLIENT_CONNECTION_TIMEOUT_MS = "core.solr.client.connection_timeout_ms";
   public static final String SOLR_CLIENT_IDLE_TIMEOUT_MS = "core.solr.client.idle_timeout_ms";
   public static final String SOLR_CLIENT_REQUEST_TIMEOUT_MS = "core.solr.client.request_timeout_ms";
+  public static final String SOLR_INDEX_BATCH_SIZE = "core.solr.index.batch.size";
+  public static final String SOLR_INDEX_BATCH_MAX_BYTES = "core.solr.index.batch.maxBytes";
 
   /*
    * USER REGISTRATION SETTINGS

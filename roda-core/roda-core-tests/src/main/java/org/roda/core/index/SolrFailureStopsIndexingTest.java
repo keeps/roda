@@ -15,8 +15,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiPredicate;
@@ -43,9 +46,11 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPDisposalScheduleAssociationType;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryState;
@@ -78,9 +83,19 @@ import org.testng.annotations.Test;
  * with a Solr internal error, and lets the others through to the Solr of the
  * tests. Internal errors are not retried and the circuit breaker is disabled,
  * so the failed requests counted are the calls made.
+ *
+ * With AIPs of more files than are sent to Solr at once (#3773), the request
+ * failed is the one with a given file: nothing is written after it and the
+ * documents of files that exist are not taken as stale; when Solr rejects that
+ * file, the other files sent are still indexed. The same goes for the atomic
+ * updates of the files of an AIP.
  */
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
 public class SolrFailureStopsIndexingTest {
+  // more files than are sent to Solr at once, and not a multiple of it, and the
+  // one failed in the middle
+  private static final int MANY_FILES = 1250;
+  private static final int FAILED_FILE = 700;
   private static final Map<String, Object> RETRY_SETTINGS = Map.of(RodaConstants.SOLR_RETRY_SERVER_ERROR_MAX_RETRIES, 0,
     RodaConstants.SOLR_CIRCUIT_BREAKER_FAILURES, 0);
 
@@ -171,6 +186,29 @@ public class SolrFailureStopsIndexingTest {
     return index.count(indexClass, new Filter(new SimpleFilterParameter(aipField, aipId)));
   }
 
+  private static String fileUUID(AIP aip, int file) {
+    return IdUtils.getFileId(aip.getId(), aip.getRepresentations().getFirst().getId(), Collections.emptyList(),
+      IndexTestUtils.fileId(file));
+  }
+
+  /** The files of the AIP indexed, whatever their state, that match the parameters. */
+  private Set<String> indexedFiles(AIP aip, SimpleFilterParameter... more) throws RODAException {
+    Set<String> uuids = new HashSet<>();
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_AIP_ID, aip.getId()));
+    for (SimpleFilterParameter parameter : more) {
+      filter.add(parameter);
+    }
+    try (IterableIndexResult<IndexedFile> result = index.findAll(IndexedFile.class, filter, false,
+      Collections.singletonList(RodaConstants.INDEX_UUID))) {
+      for (IndexedFile file : result) {
+        uuids.add(file.getUUID());
+      }
+    } catch (IOException e) {
+      throw new RODAException(e);
+    }
+    return uuids;
+  }
+
   private static String collection(Class<? extends IsIndexed> indexClass) {
     try {
       return SolrCollectionRegistry.getIndexName(indexClass);
@@ -180,17 +218,35 @@ public class SolrFailureStopsIndexingTest {
   }
 
   /**
-   * Fails, as an unreachable Solr, the requests the predicate selects, and counts
-   * them by collection; lets the others through to the Solr of the tests.
+   * Fails, with a Solr error, the requests the predicate selects, and counts them
+   * by collection; lets the others through to the Solr of the tests. Records the
+   * documents sent to be added, and the writes sent after the first failure.
    */
   private static class FailingSolrClient extends SolrClient {
     private final transient SolrClient solr;
     private final transient BiPredicate<SolrRequest<?>, String> fails;
+    private final SolrException.ErrorCode errorCode;
     private final transient Map<String, AtomicInteger> failed = new ConcurrentHashMap<>();
+    // by collection, the documents sent to be added, in the order first sent
+    private final transient Map<String, Set<String>> sent = new ConcurrentHashMap<>();
+    private final AtomicInteger writesAfterFailure = new AtomicInteger();
 
     FailingSolrClient(BiPredicate<SolrRequest<?>, String> fails) {
+      this(fails, SolrException.ErrorCode.SERVER_ERROR);
+    }
+
+    FailingSolrClient(BiPredicate<SolrRequest<?>, String> fails, SolrException.ErrorCode errorCode) {
       this.solr = index.getSolrClient();
       this.fails = fails;
+      this.errorCode = errorCode;
+    }
+
+    /** Fails the writes that add the document with the given uuid. */
+    static FailingSolrClient failingWritesOf(String uuid, SolrException.ErrorCode errorCode) {
+      return new FailingSolrClient((request, collection) -> request instanceof UpdateRequest update
+        && update.getDocuments() != null
+        && update.getDocuments().stream().anyMatch(doc -> uuid.equals(doc.getFieldValue(RodaConstants.INDEX_UUID))),
+        errorCode);
     }
 
     /** Fails the writes to the collections of the given classes. */
@@ -207,9 +263,19 @@ public class SolrFailureStopsIndexingTest {
     @Override
     public NamedList<Object> request(SolrRequest<?> request, String collection)
       throws SolrServerException, IOException {
+      if (request instanceof UpdateRequest update) {
+        if (!failed.isEmpty()) {
+          writesAfterFailure.incrementAndGet();
+        }
+        if (update.getDocuments() != null) {
+          Set<String> documents = sent.computeIfAbsent(collection,
+            c -> Collections.synchronizedSet(new LinkedHashSet<>()));
+          update.getDocuments().forEach(doc -> documents.add((String) doc.getFieldValue(RodaConstants.INDEX_UUID)));
+        }
+      }
       if (fails.test(request, collection)) {
         failed.computeIfAbsent(collection, c -> new AtomicInteger()).incrementAndGet();
-        throw new SolrException(SolrException.ErrorCode.SERVER_ERROR, "Solr failed");
+        throw new SolrException(errorCode, "Solr failed");
       }
       return solr.request(request, collection);
     }
@@ -217,6 +283,22 @@ public class SolrFailureStopsIndexingTest {
     int failed(Class<? extends IsIndexed> indexClass) {
       AtomicInteger count = failed.get(collection(indexClass));
       return count == null ? 0 : count.get();
+    }
+
+    /** The documents sent to be added to the collection. */
+    Set<String> sent(Class<? extends IsIndexed> indexClass) {
+      Set<String> documents = sent.get(collection(indexClass));
+      if (documents == null) {
+        return Collections.emptySet();
+      }
+      synchronized (documents) {
+        return new HashSet<>(documents);
+      }
+    }
+
+    /** The writes (adds, updates or deletes) sent after the first failure. */
+    int writesAfterFailure() {
+      return writesAfterFailure.get();
     }
 
     @Override
@@ -342,6 +424,74 @@ public class SolrFailureStopsIndexingTest {
         CorporaConstants.REPRESENTATION_1_FILE_2_PATH, CorporaConstants.REPRESENTATION_1_FILE_2_ID)))),
       0L);
     Assert.assertEquals(countChildren(IndexedFile.class, RodaConstants.FILE_AIP_ID, aip.getId()), 3L);
+  }
+
+  @Test
+  public void testAIPUpdateStopsAtSolrFailureWithoutRemovingDocuments() throws RODAException {
+    AIP aip = IndexTestUtils.createAIP(model, MANY_FILES, 0);
+    model.notifyAipCreated(aip.getId());
+    index.commitAIPs();
+    FailingSolrClient solr = FailingSolrClient.failingWritesOf(fileUUID(aip, FAILED_FILE),
+      SolrException.ErrorCode.SERVER_ERROR);
+
+    ReturnWithExceptions<Void, ModelObserver> ret = new IndexModelObserver(solr, model).aipUpdated(aip);
+    index.commitAIPs();
+
+    Assert.assertFalse(ret.isEmpty());
+    Assert.assertEquals(solr.writesAfterFailure(), 0, "nothing is written or deleted after Solr fails");
+    // the files not written again exist: their documents are not stale
+    Assert.assertEquals(countChildren(IndexedFile.class, RodaConstants.FILE_AIP_ID, aip.getId()), MANY_FILES);
+  }
+
+  @Test
+  public void testFileRejectedBySolrIsTheOnlyFileSentNotIndexed() throws RODAException {
+    AIP aip = IndexTestUtils.createAIP(model, MANY_FILES, 0);
+    String rejected = fileUUID(aip, FAILED_FILE);
+    FailingSolrClient solr = FailingSolrClient.failingWritesOf(rejected, SolrException.ErrorCode.BAD_REQUEST);
+
+    ReturnWithExceptions<Void, ModelObserver> ret = new IndexModelObserver(solr, model).aipCreated(aip);
+    index.commitAIPs();
+
+    Assert.assertFalse(ret.isEmpty(), "the rejection is reported");
+    Set<String> expected = solr.sent(IndexedFile.class);
+    Assert.assertTrue(expected.remove(rejected), "the rejected file is sent");
+    Assert.assertEquals(indexedFiles(aip), expected, "every file sent but the rejected one is indexed");
+  }
+
+  @Test
+  public void testAIPPermissionsUpdateStopsAtSolrFailureOfAFile() throws RODAException {
+    AIP aip = IndexTestUtils.createAIP(model, MANY_FILES, 0);
+    model.notifyAipCreated(aip.getId());
+    index.commitAIPs();
+    aip.getPermissions().setGroupPermissions("readers", Collections.singleton(PermissionType.READ));
+    FailingSolrClient solr = FailingSolrClient.failingWritesOf(fileUUID(aip, FAILED_FILE),
+      SolrException.ErrorCode.SERVER_ERROR);
+
+    ReturnWithExceptions<Void, ModelObserver> ret = new IndexModelObserver(solr, model).aipPermissionsUpdated(aip);
+
+    Assert.assertFalse(ret.isEmpty());
+    Assert.assertEquals(solr.writesAfterFailure(), 0, "nothing is written after Solr fails");
+  }
+
+  @Test
+  public void testFileUpdateRejectedBySolrIsTheOnlyFileSentNotUpdated() throws RODAException {
+    AIP aip = IndexTestUtils.createAIP(model, MANY_FILES, 0);
+    model.notifyAipCreated(aip.getId());
+    index.commitAIPs();
+    aip.setState(AIPState.UNDER_APPRAISAL);
+    String rejected = fileUUID(aip, FAILED_FILE);
+    FailingSolrClient solr = FailingSolrClient.failingWritesOf(rejected, SolrException.ErrorCode.BAD_REQUEST);
+
+    ReturnWithExceptions<Void, ModelObserver> ret = new IndexModelObserver(solr, model).aipStateUpdated(aip);
+    index.commitAIPs();
+
+    Assert.assertFalse(ret.isEmpty(), "the rejection is reported");
+    Set<String> expected = solr.sent(IndexedFile.class);
+    Assert.assertTrue(expected.remove(rejected), "the rejected file is sent");
+    Assert.assertEquals(
+      indexedFiles(aip,
+        new SimpleFilterParameter(RodaConstants.INDEX_STATE, SolrUtils.formatEnum(AIPState.UNDER_APPRAISAL))),
+      expected, "every file sent but the rejected one is updated");
   }
 
   @Test

@@ -7,8 +7,8 @@
  */
 package org.roda.core.index;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeast;
@@ -23,7 +23,6 @@ import java.util.Collections;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.common.SolrInputDocument;
 import org.mockito.Mockito;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
@@ -152,7 +151,7 @@ public class SolrRetryTest {
     SolrClient spy = Mockito.spy(solrClient);
 
     Mockito.doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doCallRealMethod()
-      .when(spy).add(anyString(), any(SolrInputDocument.class));
+      .when(spy).add(anyString(), anyCollection());
 
     DisposalConfirmation confirmation = new DisposalConfirmation();
     confirmation.setTitle("Confirmation");
@@ -164,7 +163,7 @@ public class SolrRetryTest {
 
     SolrUtils.create2(spy, model, this, DisposalConfirmation.class, disposalConfirmation);
 
-    Mockito.verify(spy, times(3)).add(anyString(), any(SolrInputDocument.class));
+    Mockito.verify(spy, times(3)).add(anyString(), anyCollection());
 
     DisposalConfirmation retrieve = index.retrieve(DisposalConfirmation.class, disposalConfirmation.getId(),
       new ArrayList<>());
@@ -227,7 +226,7 @@ public class SolrRetryTest {
     SolrClient solrClient = index.getSolrClient();
     SolrClient spy = Mockito.spy(solrClient);
 
-    Mockito.doThrow(new SolrServerException("test")).when(spy).add(anyString(), any(SolrInputDocument.class));
+    Mockito.doThrow(new SolrServerException("test")).when(spy).add(anyString(), anyCollection());
 
     DisposalConfirmation confirmation = new DisposalConfirmation();
     confirmation.setTitle("Confirmation");
@@ -242,7 +241,7 @@ public class SolrRetryTest {
 
     Assert.assertFalse(returnWithExceptions.getExceptions().isEmpty());
 
-    Mockito.verify(spy, atLeast(2)).add(anyString(), any(SolrInputDocument.class));
+    Mockito.verify(spy, atLeast(2)).add(anyString(), anyCollection());
 
   }
 }

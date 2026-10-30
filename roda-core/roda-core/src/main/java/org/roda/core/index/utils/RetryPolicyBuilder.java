@@ -72,6 +72,7 @@ public class RetryPolicyBuilder {
   }
 
   private static RetryPolicyBuilder instance;
+  private final List<Class<? extends Throwable>> handledExceptions;
   private final RetryPolicy<Object> unavailablePolicy;
   private final RetryPolicy<Object> serverErrorPolicy;
   // null when disabled
@@ -92,7 +93,7 @@ public class RetryPolicyBuilder {
       DEFAULT_CIRCUIT_BREAKER_FAILURES);
     int circuitBreakerDelay = configuration.getInt(RodaConstants.SOLR_CIRCUIT_BREAKER_DELAY,
       DEFAULT_CIRCUIT_BREAKER_DELAY_SECONDS);
-    List<Class<? extends Throwable>> handledExceptions = getHandleExceptionsFromConfiguration();
+    handledExceptions = getHandleExceptionsFromConfiguration();
 
     this.retriesHisto = RodaCoreFactory.getMetrics()
       .histogram(MetricRegistry.name(RetryPolicyBuilder.class.getSimpleName(), "retriesHisto"));
@@ -152,6 +153,14 @@ public class RetryPolicyBuilder {
     return circuitBreaker != null
       ? Failsafe.with(fallback, unavailablePolicy, serverErrorPolicy, circuitBreaker)
       : Failsafe.with(fallback, unavailablePolicy, serverErrorPolicy);
+  }
+
+  /**
+   * Whether Solr rejected the request (4xx), which fails the same way every time:
+   * in a request of several documents, because of one of them.
+   */
+  boolean isRejected(Throwable failure) {
+    return classify(failure, handledExceptions) == Failure.REQUEST_ERROR;
   }
 
   private void countRetry() {
