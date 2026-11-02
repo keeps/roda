@@ -102,7 +102,7 @@ public class UserLoginHelper {
         user = retrievedUserByEmail;
       } else {
         // If no user was found with username or e-mail, a new one is created.
-        user = RodaCoreFactory.getModelService().createUser(newUser, true);
+        user = UserManagement.createUser(newUser, request.getRemoteAddr());
       }
     }
 

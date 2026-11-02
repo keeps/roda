@@ -151,6 +151,30 @@ public class UserManagement extends RodaWuiController {
     }
   }
 
+  /**
+   * Creates a user authenticated by an external provider (e.g. CAS) on its first
+   * login. No role check is done since the user is not yet registered in RODA.
+   */
+  public static User createUser(User newUser, String ipAddress) throws GenericException,
+    EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException, NotFoundException,
+    AuthorizationDeniedException {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    LogEntryState state = LogEntryState.SUCCESS;
+    newUser.setIpAddress(ipAddress);
+
+    try {
+      // delegate
+      return RodaCoreFactory.getModelService().createUser(newUser, true);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(newUser, state, RodaConstants.CONTROLLER_USER_PARAM, newUser);
+    }
+  }
+
   public static User updateMyUser(User user, User modifiedUser, SecureString password, UserExtraBundle extra)
     throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException,
     IllegalOperationException, ValidationException, RequestNotValidException {
