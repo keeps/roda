@@ -203,7 +203,18 @@ public class MembersService {
     newUser.setDirectRoles(oldUser.getDirectRoles());
     newUser.setAllRoles(oldUser.getAllRoles());
     newUser.setGroups(oldUser.getGroups());
+    keepTokens(newUser, oldUser);
     return newUser;
+  }
+
+  private static void keepTokens(User newUser, User oldUser) {
+    if (oldUser == null) {
+      return;
+    }
+    newUser.setResetPasswordToken(oldUser.getResetPasswordToken());
+    newUser.setResetPasswordTokenExpirationDate(oldUser.getResetPasswordTokenExpirationDate());
+    newUser.setEmailConfirmationToken(oldUser.getEmailConfirmationToken());
+    newUser.setEmailConfirmationTokenExpirationDate(oldUser.getEmailConfirmationTokenExpirationDate());
   }
 
   public User retrieveUser(String username) throws GenericException {
@@ -403,6 +414,7 @@ public class MembersService {
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
     request.getUser().setExtra(request.getValues());
+    keepTokens(request.getUser(), model.retrieveUser(request.getUser().getName()));
     User modifiedUser = RodaCoreFactory.getModelService().updateUser(request.getUser(), request.getPassword(), true);
     PremisV3Utils.createOrUpdatePremisUserAgentBinary(request.getUser().getName(), model, index, false);
     RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
