@@ -1782,6 +1782,7 @@ public final class RodaConstants {
   public static final String PRESERVATION_EVENT_OUTCOME = "eventOutcome";
   public static final String PRESERVATION_EVENT_OUTCOME_DETAIL_EXTENSION = "eventOutcomeDetailExtension";
   public static final String PRESERVATION_EVENT_OUTCOME_DETAIL_NOTE = "eventOutcomeDetailNote";
+  public static final String PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER = "linkingSourceObjectIdentifier";
 
   /* Disposal Rule */
   public static final String DISPOSAL_RULE_ID = "id";
