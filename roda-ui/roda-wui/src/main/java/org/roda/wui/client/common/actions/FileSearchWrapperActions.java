@@ -561,7 +561,7 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
     MOVE(RodaConstants.PERMISSION_METHOD_MOVE_FILES), REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_FILE),
     UPLOAD_FILES(RodaConstants.PERMISSION_METHOD_CREATE_FILE),
     CREATE_FOLDER(RodaConstants.PERMISSION_METHOD_CREATE_FOLDER),
-    NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
+    NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB_ON_AIPS),
     IDENTIFY_FORMATS(RodaConstants.PERMISSION_METHOD_CREATE_JOB);
 
     private final List<String> methods;

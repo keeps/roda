@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -35,12 +36,22 @@ import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.FilterParameter;
+import org.roda.core.data.v2.index.filter.OrFiltersParameters;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsFilter;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.jobs.CreateJobRequest;
 import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.IndexedReport;
@@ -58,6 +69,7 @@ import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v2.utils.ApiUtils;
@@ -70,6 +82,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class JobService {
   private static final Logger LOGGER = LoggerFactory.getLogger(JobService.class);
+  private static final Map<String, Class<? extends IsIndexed>> JOB_ON_AIPS_SOURCE_CLASSES = Map.of(
+    IndexedAIP.class.getName(), IndexedAIP.class, IndexedRepresentation.class.getName(), IndexedRepresentation.class,
+    IndexedFile.class.getName(), IndexedFile.class);
+  private static final Set<PluginType> JOB_ON_AIPS_FORBIDDEN_PLUGIN_TYPES = Set.of(PluginType.INGEST,
+    PluginType.SIP_TO_AIP, PluginType.INTERNAL);
 
   @Autowired
   TranslationService translationService;
@@ -148,6 +165,112 @@ public class JobService {
     jobUserDetails.setFullname(user.getFullName());
     jobUserDetails.setRole(RodaConstants.PreservationAgentRole.IMPLEMENTER.toString());
     job.getJobUsersDetails().add(jobUserDetails);
+  }
+
+  public boolean canOnlyCreateJobsOnAIPs(User user) {
+    return !hasAnyConfiguredRole(user, RodaConstants.PERMISSION_METHOD_CREATE_JOB)
+      && hasAnyConfiguredRole(user, RodaConstants.PERMISSION_METHOD_CREATE_JOB_ON_AIPS);
+  }
+
+  private boolean hasAnyConfiguredRole(User user, String method) {
+    return user.hasRoles(RodaCoreFactory.getRodaConfigurationAsList("core.roles." + method));
+  }
+
+  public void checkJobOnAIPsPermissions(User user, Job job)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+    if (JOB_ON_AIPS_FORBIDDEN_PLUGIN_TYPES.contains(job.getPluginType())) {
+      throw new AuthorizationDeniedException("The user '" + user.getId()
+        + "' cannot create ingest or internal jobs (plugin type " + job.getPluginType() + ")");
+    }
+
+    SelectedItems<?> sourceObjects = job.getSourceObjects();
+
+    if (!(sourceObjects instanceof SelectedItemsList || sourceObjects instanceof SelectedItemsFilter)
+      || !JOB_ON_AIPS_SOURCE_CLASSES.containsKey(sourceObjects.getSelectedClass())) {
+      throw new AuthorizationDeniedException(
+        "The user '" + user.getId() + "' can only create jobs over a selection of AIPs, representations or files");
+    }
+
+    PermissionType permissionType = getJobOnAIPsPermissionType();
+    if (sourceObjects instanceof SelectedItemsFilter<?> selectedItemsFilter) {
+      checkJobOnAIPsFilterPermissions(user, selectedItemsFilter, permissionType);
+    } else if (sourceObjects instanceof SelectedItemsList<?> selectedItemsList) {
+      SelectedItemsList<IsIndexed> indexedItems = SelectedItemsList.create(selectedItemsList.getSelectedClass(),
+        selectedItemsList.getIds());
+      UserUtility.checkObjectPermissions(user, indexedItems, permissionType);
+    }
+
+    checkJobOnAIPsParametersPermissions(user, job, permissionType);
+  }
+
+  private void checkJobOnAIPsFilterPermissions(User user, SelectedItemsFilter<?> selectedItemsFilter,
+    PermissionType permissionType) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+    if (UserUtility.isAdministrator(user)) {
+      return;
+    }
+
+    Class<? extends IsIndexed> classToCount = JOB_ON_AIPS_SOURCE_CLASSES.get(selectedItemsFilter.getSelectedClass());
+    boolean justActive = Boolean.TRUE.equals(selectedItemsFilter.justActive());
+    Filter filter = selectedItemsFilter.getFilter() != null ? new Filter(selectedItemsFilter.getFilter())
+      : new Filter();
+    Filter filterWithPermission = new Filter(filter).add(buildPermissionFilterParameter(user, permissionType));
+
+    IndexService index = RodaCoreFactory.getIndexService();
+    long visibleCount = index.count(classToCount, filter, user, justActive);
+    long withPermissionCount = index.count(classToCount, filterWithPermission, user, justActive);
+    if (visibleCount != withPermissionCount) {
+      throw new AuthorizationDeniedException("The user '" + user.getId() + "' does not have permissions to "
+        + permissionType + " " + (visibleCount - withPermissionCount) + " of the selected objects");
+    }
+
+    selectedItemsFilter.setFilter(filterWithPermission);
+  }
+
+  private void checkJobOnAIPsParametersPermissions(User user, Job job, PermissionType permissionType)
+    throws AuthorizationDeniedException, GenericException {
+    Plugin<? extends IsRODAObject> plugin = RodaCoreFactory.getPluginManager().getPlugin(job.getPlugin());
+    if (plugin == null || job.getPluginParameters() == null) {
+      return;
+    }
+
+    IndexService index = RodaCoreFactory.getIndexService();
+    for (PluginParameter parameter : plugin.getParameters()) {
+      String aipId = job.getPluginParameters().get(parameter.getId());
+      if (PluginParameter.PluginParameterType.AIP_ID.equals(parameter.getType()) && StringUtils.isNotBlank(aipId)) {
+        try {
+          IndexedAIP aip = index.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+          UserUtility.checkAIPPermissions(user, aip, permissionType);
+        } catch (NotFoundException e) {
+          throw new AuthorizationDeniedException(
+            "Could not verify permissions of AIP " + aipId + " given in parameter " + parameter.getId(), e);
+        }
+      }
+    }
+  }
+
+  private PermissionType getJobOnAIPsPermissionType() throws AuthorizationDeniedException {
+    String configKey = "core.permissions." + RodaConstants.PERMISSION_METHOD_CREATE_JOB_ON_AIPS;
+    String configValue = RodaCoreFactory.getRodaConfigurationAsString(configKey);
+    if (configValue == null) {
+      return PermissionType.UPDATE;
+    }
+
+    try {
+      return PermissionType.valueOf(configValue.trim());
+    } catch (IllegalArgumentException e) {
+      throw new AuthorizationDeniedException("Unable to determine which permissions the user needs because the config"
+        + " value '" + configValue + "' of key '" + configKey + "' is not a permission type");
+    }
+  }
+
+  private FilterParameter buildPermissionFilterParameter(User user, PermissionType permissionType) {
+    List<FilterParameter> parameters = new ArrayList<>();
+    parameters
+      .add(new SimpleFilterParameter(RodaConstants.INDEX_PERMISSION_USERS_PREFIX + permissionType, user.getId()));
+    for (String group : user.getGroups()) {
+      parameters.add(new SimpleFilterParameter(RodaConstants.INDEX_PERMISSION_GROUPS_PREFIX + permissionType, group));
+    }
+    return new OrFiltersParameters(parameters);
   }
 
   public Job stopJob(String jobId)
