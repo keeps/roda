@@ -11,10 +11,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
@@ -26,6 +31,7 @@ import org.roda.core.data.v2.common.Pair;
 public final class HTTPUtility {
   public static final String METHOD_DELETE = "DELETE";
   public static final String METHOD_GET = "GET";
+  public static final String METHOD_POST = "POST";
 
   /** Private empty constructor */
   private HTTPUtility() {
@@ -81,6 +87,43 @@ public final class HTTPUtility {
 
   public static String doDeleteBearer(String url, Optional<String> token) throws GenericException {
     return doMethodBearer(url, METHOD_DELETE, token);
+  }
+
+  /**
+   * Uploads a file as a multipart/form-data POST (RFC 7578) and returns the
+   * response body. The file is streamed, not loaded into memory.
+   *
+   * @param url
+   *          the endpoint.
+   * @param fieldName
+   *          the form field that carries the file.
+   * @param file
+   *          the file to upload.
+   * @return the response body.
+   * @throws GenericException
+   *           if the server cannot be reached or does not answer with HTTP 200.
+   */
+  public static String doPostFile(String url, String fieldName, Path file) throws GenericException {
+    String boundary = "----roda-" + UUID.randomUUID();
+    String fileName = String.valueOf(file.getFileName()).replace("\"", "%22").replace("\r", "").replace("\n", "");
+    byte[] head = ("--" + boundary + "\r\nContent-Disposition: form-data; name=\"" + fieldName + "\"; filename=\""
+      + fileName + "\"\r\nContent-Type: application/octet-stream\r\n\r\n").getBytes(StandardCharsets.UTF_8);
+    byte[] tail = ("\r\n--" + boundary + "--\r\n").getBytes(StandardCharsets.UTF_8);
+    try {
+      HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
+      con.setRequestMethod(METHOD_POST);
+      con.setDoOutput(true);
+      con.setChunkedStreamingMode(0);
+      con.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+      try (OutputStream out = con.getOutputStream()) {
+        out.write(head);
+        Files.copy(file, out);
+        out.write(tail);
+      }
+      return executeRequest(con);
+    } catch (IOException e) {
+      throw new GenericException("Unable to connect to server", e);
+    }
   }
 
   private static void addBasicAuthToConnection(HttpURLConnection connection,
