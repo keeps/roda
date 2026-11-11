@@ -133,10 +133,11 @@ public class TestContainersManager {
 
     LOGGER.info("ClamAV started at {}:{}", clamav.getHost(), clamav.getMappedPort(3310));
 
-    // Siegfried
+    // Siegfried: files are uploaded to it (see RODA_CORE_TOOLS_SIEGFRIED_SERVER_UPLOAD below), so it needs no
+    // access to the test files. A bind mount only works when the Docker daemon sees the same paths as the tests,
+    // which is not the case when the tests run in a container (e.g. a GitLab CI job using the host's Docker).
     siegfried = new GenericContainer<>(DockerImageName.parse("keeps/siegfried:v1.11.0"))
       .withEnv("SIEGFRIED_HOST", "0.0.0.0").withEnv("SIEGFRIED_PORT", "5138").withExposedPorts(5138)
-      .withFileSystemBind(tmpDir, tmpDir, BindMode.READ_ONLY)
       .waitingFor(Wait.forListeningPort().withStartupTimeout(Duration.ofSeconds(60)));
     siegfried.start();
     LOGGER.info("Siegfried started at {}:{}", siegfried.getHost(), siegfried.getMappedPort(5138));
@@ -188,6 +189,7 @@ public class TestContainersManager {
     String siegfriedUrl = "http://" + siegfried.getHost() + ":" + siegfried.getMappedPort(5138);
     System.setProperty("RODA_CORE_TOOLS_SIEGFRIED_MODE", "server");
     System.setProperty("RODA_CORE_TOOLS_SIEGFRIED_SERVER", siegfriedUrl);
+    System.setProperty("RODA_CORE_TOOLS_SIEGFRIED_SERVER_UPLOAD", "true");
   }
 
   private void stopAll() {
