@@ -8,8 +8,10 @@
 package org.roda.core.plugins.base.characterization;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -64,6 +67,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public class SiegfriedPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPluginUtils.class);
@@ -94,6 +100,10 @@ public class SiegfriedPluginUtils {
       String siegfriedMode = RodaCoreFactory.getConfigurationManager()
         .getConfigurationString("core.tools.siegfried.mode", "server");
       if ("server".equalsIgnoreCase(siegfriedMode)) {
+        if (isServerUpload()) {
+          LOGGER.debug("Running Siegfried on server mode, uploading the files");
+          return runSiegfriedServerUpload(sourceDirectory);
+        }
         LOGGER.debug("Running Siegfried on server mode");
         String endpoint = getSiegfriedServerEndpoint(sourceDirectory);
         return HTTPUtility.doGet(endpoint);
@@ -105,6 +115,70 @@ public class SiegfriedPluginUtils {
     } catch (CommandException | GenericException e) {
       throw new PluginException("Error while executing Siegfried: " + e.getMessage());
     }
+  }
+
+  /**
+   * Whether files are uploaded to the Siegfried server
+   * ({@code core.tools.siegfried.server.upload}) instead of passed by path. By
+   * path (the default), the server must see RODA's files at the same paths, e.g.
+   * through a shared volume; uploading needs no shared file system.
+   */
+  private static boolean isServerUpload() {
+    return Boolean.parseBoolean(
+      RodaCoreFactory.getConfigurationManager().getConfigurationString("core.tools.siegfried.server.upload", "false"));
+  }
+
+  /**
+   * Identifies a file, or every file under a directory, by uploading it to the
+   * Siegfried server ({@code POST /identify}), and returns the same JSON as the
+   * by-path request: the results of all files under {@code files}, each with its
+   * local path, size and modification time.
+   */
+  private static String runSiegfriedServerUpload(Path source) throws GenericException {
+    String siegfriedServer = RodaCoreFactory.getConfigurationManager()
+      .getConfigurationString("core.tools.siegfried.server", "http://localhost:5138");
+    String endpoint = siegfriedServer + "/identify?format=json";
+
+    List<Path> paths;
+    try (Stream<Path> walk = Files.walk(source)) {
+      paths = walk.filter(Files::isRegularFile).sorted().toList();
+    } catch (IOException e) {
+      throw new GenericException("Could not list the files to identify under " + source, e);
+    }
+
+    ObjectNode result = null;
+    ArrayNode results = null;
+    for (Path path : paths) {
+      JsonNode response = JsonUtils.parseJson(HTTPUtility.doPostFile(endpoint, "file", path));
+      if (result == null) {
+        result = (ObjectNode) response.deepCopy();
+        results = result.putArray("files");
+      }
+      JsonNode files = response.get("files");
+      if (files != null) {
+        for (JsonNode file : files) {
+          ObjectNode identified = (ObjectNode) file.deepCopy();
+          // the upload reports the uploaded name and the request size: use the
+          // local file's path, size and modification time, as when by path
+          identified.put("filename", path.toString());
+          try {
+            identified.put("filesize", Files.size(path));
+            identified.put("modified",
+              Files.getLastModifiedTime(path).toInstant().truncatedTo(ChronoUnit.SECONDS).toString());
+          } catch (IOException e) {
+            LOGGER.warn("Could not read the size or modification time of {}", path, e);
+          }
+          results.add(identified);
+        }
+      }
+    }
+
+    if (result == null) {
+      // nothing to identify (e.g. an empty representation)
+      result = JsonNodeFactory.instance.objectNode();
+      result.putArray("files");
+    }
+    return result.toString();
   }
 
   public static String getVersion() {
