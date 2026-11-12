@@ -13,6 +13,7 @@ Among others articles, in this series of documentation you will find information
     - [Quick start](Quickstart.md)
     - [Advanced search](Advanced_Search.md)
     - [Pre-ingest](Pre_Ingest.md)
+    - [Ingest via REST API](Ingest_API.md)
     - [Descriptive metadata types](Descriptive_Metadata_Types.md)
     - [Edit descriptive metadata](EditDescriptiveMetadata.md)
     - [Risk assessment](Risk_Assessment.md)
