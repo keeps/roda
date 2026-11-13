@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified"
+           targetNamespace="https://roda-community.org/schemas/emailarchive/v1"
+           xmlns:ea="https://roda-community.org/schemas/emailarchive/v1">
+
+  <xs:element name="emailArchive">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="custodian"       type="xs:string"  minOccurs="1" maxOccurs="1"/>
+        <xs:element name="emailAddress"    type="xs:string"  minOccurs="1" maxOccurs="1"/>
+        <xs:element name="dateStart"       type="xs:date"    minOccurs="0" maxOccurs="1"/>
+        <xs:element name="dateEnd"         type="xs:date"    minOccurs="0" maxOccurs="1"/>
+        <xs:element name="totalMessages"   type="xs:integer" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="originalFormat"  type="xs:string"  minOccurs="0" maxOccurs="1"/>
+        <xs:element name="archivingMotive" type="xs:string"  minOccurs="0" maxOccurs="1"/>
+        <xs:element name="email"           type="ea:emailType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="emailType">
+    <xs:sequence>
+      <xs:element name="messageId"      type="xs:string"   minOccurs="1" maxOccurs="1"/>
+      <xs:element name="subject"        type="xs:string"   minOccurs="0" maxOccurs="1"/>
+      <xs:element name="sender"         type="xs:string"   minOccurs="0" maxOccurs="1"/>
+      <xs:element name="recipients"     type="xs:string"   minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="sentDate"       type="xs:dateTime" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="folderPath"     type="xs:string"   minOccurs="0" maxOccurs="1"/>
+      <xs:element name="hasAttachments" type="xs:boolean"  minOccurs="0" maxOccurs="1"/>
+      <xs:element name="filePath"       type="xs:string"   minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>
