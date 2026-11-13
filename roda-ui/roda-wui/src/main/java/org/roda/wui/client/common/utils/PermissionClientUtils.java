@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.user.User;
@@ -43,28 +44,39 @@ public class PermissionClientUtils {
       User user = authenticatedUser.get();
 
       for (String method : methods) {
-        canAct &= user.hasRole(ConfigurationManager.getString("core.roles." + method));
-
-        String permissionKey = ConfigurationManager.getString("core.permissions." + method);
-        if (canAct && permissions != null && permissionKey != null) {
-          try {
-            PermissionType permissionType = PermissionType.valueOf(permissionKey);
-
-            if (!permissions.getUserPermissions(user.getName()).contains(permissionType)) {
-              boolean containGroup = false;
-              for (String group : user.getGroups()) {
-                if (permissions.getGroupPermissions(group).contains(permissionType)) {
-                  containGroup = true;
-                  break;
-                }
-              }
-
-              canAct = containGroup;
-            }
-          } catch (IllegalArgumentException e) {
-            // do nothing
-          }
+        if (RodaConstants.PERMISSION_METHOD_CREATE_JOB_ON_AIPS.equals(method)) {
+          canAct &= hasPermission(user, RodaConstants.PERMISSION_METHOD_CREATE_JOB, null)
+            || hasPermission(user, method, permissions);
+        } else {
+          canAct &= hasPermission(user, method, permissions);
         }
+      }
+    }
+
+    return canAct;
+  }
+
+  private static boolean hasPermission(User user, String method, Permissions permissions) {
+    boolean canAct = user.hasRole(ConfigurationManager.getString("core.roles." + method));
+
+    String permissionKey = ConfigurationManager.getString("core.permissions." + method);
+    if (canAct && permissions != null && permissionKey != null) {
+      try {
+        PermissionType permissionType = PermissionType.valueOf(permissionKey);
+
+        if (!permissions.getUserPermissions(user.getName()).contains(permissionType)) {
+          boolean containGroup = false;
+          for (String group : user.getGroups()) {
+            if (permissions.getGroupPermissions(group).contains(permissionType)) {
+              containGroup = true;
+              break;
+            }
+          }
+
+          canAct = containGroup;
+        }
+      } catch (IllegalArgumentException e) {
+        // do nothing
       }
     }
 

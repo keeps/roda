@@ -7,10 +7,13 @@
  */
 package org.roda.wui.api.v2.filters;
 
-import tools.jackson.core.JsonGenerator;
-import tools.jackson.databind.SerializationContext;
-import tools.jackson.databind.ser.PropertyWriter;
-import tools.jackson.databind.ser.std.SimpleBeanPropertyFilter;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.disposal.metadata.DisposalAIPMetadata;
 import org.roda.core.data.v2.disposal.metadata.DisposalConfirmationAIPMetadata;
@@ -23,12 +26,10 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.utils.UserUtility;
 
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.PropertyWriter;
+import tools.jackson.databind.ser.std.SimpleBeanPropertyFilter;
 
 public class AipPermissionPropertyFilter extends SimpleBeanPropertyFilter {
 
@@ -207,20 +208,24 @@ public class AipPermissionPropertyFilter extends SimpleBeanPropertyFilter {
     if (original == null)
       return null;
     Permissions copy = new Permissions();
-    copy.setGroups(Map.of());
+    copy.setUsers(filterMembers(original.getUsers(), Set.of(user.getId())));
+    copy.setGroups(filterMembers(original.getGroups(), user.getGroups()));
+    return copy;
+  }
 
-    Map<Permissions.PermissionType, Set<String>> filteredUsers = new EnumMap<>(Permissions.PermissionType.class);
-    if (original.getUsers() != null) {
-      original.getUsers().forEach((key, userIds) -> {
-        if (userIds != null) {
-          Set<String> safeUserIds = userIds.stream().filter(id -> id.equals(user.getId())).collect(Collectors.toSet());
-          if (!safeUserIds.isEmpty()) {
-            filteredUsers.put(key, safeUserIds);
+  private Map<Permissions.PermissionType, Set<String>> filterMembers(
+    Map<Permissions.PermissionType, Set<String>> original, Set<String> allowedMembers) {
+    Map<Permissions.PermissionType, Set<String>> filtered = new EnumMap<>(Permissions.PermissionType.class);
+    if (original != null && allowedMembers != null) {
+      original.forEach((key, members) -> {
+        if (members != null) {
+          Set<String> safeMembers = members.stream().filter(allowedMembers::contains).collect(Collectors.toSet());
+          if (!safeMembers.isEmpty()) {
+            filtered.put(key, safeMembers);
           }
         }
       });
     }
-    copy.setUsers(filteredUsers);
-    return copy;
+    return filtered;
   }
 }
