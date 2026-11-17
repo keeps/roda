@@ -118,6 +118,7 @@
         <java_version>21</java_version>
         <gwt.version>2.13.1</gwt.version>
         <cas.client.version>4.1.1</cas.client.version>
+        <bouncycastle.version>1.87</bouncycastle.version>
         <swagger.version>2.2.52</swagger.version>
         <spring.version>7.0.10</spring.version>
         <solr.version>10.0.0</solr.version>
@@ -946,10 +947,32 @@
             </dependency>
             <!-- lfaria: 2022-12-07 -->
             <!-- Forcing transitive dependencies upgrade due to vulnerabilities -->
+            <!-- The whole BouncyCastle family must share one version: plugins load parent-first, so a split family
+                 (e.g. bcprov 1.85 + bcpkix 1.84) breaks the BC modules plugins bring themselves -->
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk18on</artifactId>
-                <version>1.85</version>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcutil-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcmail-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcjmail-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
             </dependency>
             <!-- mguimaraes: 2022-12-15 -->
             <!-- Forcing transitive dependencies upgrade due to vulnerabilities -->
