@@ -7,11 +7,9 @@
  */
 package org.roda.wui.client.common.actions;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import config.i18n.client.ClientMessages;
-import org.roda.core.common.pekko.messages.events.EventUserUpdated;
+import java.util.HashSet;
+import java.util.List;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.SecureString;
 import org.roda.core.data.utils.SelectedItemsUtils;
@@ -31,6 +29,7 @@ import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.dialogs.AccessKeyDialogs;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.RODAMembersDialogs;
+import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.management.members.CreateGroup;
 import org.roda.wui.client.management.members.CreateUser;
@@ -42,8 +41,11 @@ import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
-import java.util.HashSet;
-import java.util.List;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -295,27 +297,51 @@ public class RODAMemberActions {
     RODAMembersDialogs.setUserPassword(messages.userDataChangePassword(), new ActionAsyncCallback<String>(callback) {
       @Override
       public void onSuccess(String result) {
+        SecureString password = new SecureString(result.toCharArray());
+        if (PermissionClientUtils.isCurrentUser(object.getId())
+          && !PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_UPDATE_USER)) {
+          changeOwnPassword(object, password, callback);
+          return;
+        }
+
         UpdateUserRequest request = new UpdateUserRequest();
         request.setUser((User) object);
-        request.setPassword(new SecureString(result.toCharArray()));
+        request.setPassword(password);
         request.setValues(((User) object).getExtra());
 
         Services services = new Services("Update user password", "update");
-        services.membersResource(s -> s.updateUser(request)).whenComplete((res, error) -> {
-          if (error != null) {
-            callback.onSuccess(Actionable.ActionImpact.NONE);
-          } else {
-            callback.onSuccess(Actionable.ActionImpact.NONE);
-            Toast.showError(messages.editUserFailure(object.getFullName(), error.getMessage()));
-          }
-        });
+        services.membersResource(s -> s.updateUser(request))
+          .whenComplete((res, error) -> handlePasswordChanged(object, error, callback));
       }
 
-        @Override
-        public void onFailure(Throwable caught) {
-            callback.onSuccess(Actionable.ActionImpact.NONE);
-        }
+      @Override
+      public void onFailure(Throwable caught) {
+        callback.onSuccess(Actionable.ActionImpact.NONE);
+      }
     });
+  }
+
+  private static void changeOwnPassword(RODAMember object, SecureString password,
+    AsyncCallback<Actionable.ActionImpact> callback) {
+    Services services = new Services("Update my password", "update");
+    services.membersResource(s -> s.getMember(object.getUUID())).thenCompose(member -> {
+      User user = (User) member;
+      UpdateUserRequest request = new UpdateUserRequest();
+      request.setUser(user);
+      request.setPassword(password);
+      request.setValues(user.getExtra());
+      return services.membersResource(s -> s.updateMyUser(request));
+    }).whenComplete((res, error) -> handlePasswordChanged(object, error, callback));
+  }
+
+  private static void handlePasswordChanged(RODAMember object, Throwable error,
+    AsyncCallback<Actionable.ActionImpact> callback) {
+    callback.onSuccess(Actionable.ActionImpact.NONE);
+    if (error != null) {
+      Toast.showError(messages.editUserFailure(object.getFullName(), error.getMessage()));
+    } else {
+      Toast.showInfo(messages.userDataChangePassword(), messages.changePasswordSuccess());
+    }
   }
 
   public static void editPermissions(RODAMember object, AsyncCallback<Actionable.ActionImpact> callback) {
