@@ -10,6 +10,7 @@ package org.roda.wui.client.common.lists.utils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
@@ -54,6 +55,8 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
   private String searchPlaceholder;
   private boolean forceSelectable;
   private boolean redirectOnSingleResult;
+  private boolean includeNestedDocuments;
+  private Consumer<T> customOpener;
 
   private List<ColumnOptions> columnOptions;
   private String defaultSortListColumnName;
@@ -88,6 +91,9 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
     searchPlaceholder = null;
     forceSelectable = false;
     redirectOnSingleResult = false;
+    customOpener = null;
+    includeNestedDocuments = ConfigurationManager.getBoolean(false, RodaConstants.UI_LISTS_PROPERTY, listId,
+      RodaConstants.UI_LISTS_INCLUDE_NESTED_DOCUMENTS);
 
     columnOptions = ColumnOptionsFactory.getColumnOptions(listId);
     defaultSortListColumnName = ConfigurationManager.getStringWithDefault("", RodaConstants.UI_LISTS_PROPERTY, listId,
@@ -316,6 +322,24 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
 
   public boolean getRedirectOnSingleResult() {
     return redirectOnSingleResult;
+  }
+
+  public boolean isIncludeNestedDocuments() {
+    return includeNestedDocuments;
+  }
+
+  public AsyncTableCellOptions<T> withIncludeNestedDocuments(boolean includeNestedDocuments) {
+    this.includeNestedDocuments = includeNestedDocuments;
+    return this;
+  }
+
+  public Consumer<T> getCustomOpener() {
+    return customOpener;
+  }
+
+  public AsyncTableCellOptions<T> withCustomOpener(Consumer<T> customOpener) {
+    this.customOpener = customOpener;
+    return this;
   }
 
   /**
