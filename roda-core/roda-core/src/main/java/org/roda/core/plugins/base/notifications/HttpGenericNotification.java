@@ -14,6 +14,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.notifications.HTTPNotificationProcessor;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotificationException;
@@ -56,7 +57,9 @@ public class HttpGenericNotification extends AbstractJobNotification implements 
         notification.setRecipientUsers(Collections.singletonList(this.getTo()));
         Map<String, Object> scope = new HashMap<>();
         scope.put(HTTPNotificationProcessor.JOB_KEY, job);
-        model.createNotification(notification, new HTTPNotificationProcessor(this.getTo(), scope));
+        boolean restricted = Boolean.parseBoolean(
+          job.getPluginParameters().get(RodaConstants.NOTIFICATION_HTTP_ENDPOINT_RESTRICTED));
+        model.createNotification(notification, new HTTPNotificationProcessor(this.getTo(), scope, restricted));
       }
     } catch (GenericException | AuthorizationDeniedException e) {
       throw new NotificationException(e);
