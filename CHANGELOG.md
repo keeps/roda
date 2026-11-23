@@ -1,5 +1,27 @@
 # Changelog
 
+## v5.8.4 (23/11/2026)
+#### Security
+This is a security maintenance release for RODA 5. All RODA 5 installations should upgrade.
+
+**Docker image rebuilt on an updated base image**
+- Fixes CVE-2026-114938. RODA's code did not change for this; the fix comes from rebuilding the image on the current `tomcat:10-jre21` base image. Users of the official Docker image only need to pull `keeps/roda:v5.8.4` (or `v5.8` / `v5`).
+
+**Dependency upgrades** (patch-level only; Spring Boot stays on 3.4.x)
+- Netty 4.1.127 → 4.1.141. Fixes CVE-2026-75595 (critical): SNI routing bypass through a fragmented TLS ClientHello.
+- Apache MINA 2.2.3 → 2.2.10, used by the embedded LDAP server (ApacheDS). Fixes CVE-2024-52046, CVE-2026-41409, CVE-2026-41635, CVE-2026-42778, CVE-2026-42779 and CVE-2026-47065 (unsafe deserialization that can lead to remote code execution).
+- Spring Framework 6.2.11 → 6.2.19.
+- Tomcat embed 10.1.46 → 10.1.62, for the WAR/embedded run. The Docker image's Tomcat comes from the base image.
+- ZooKeeper client 3.9.3 → 3.9.5.
+
+**Scanner findings that do not affect RODA**
+- CVE-2026-47884 and CVE-2026-47890 (spring-webmvc) are only fixed upstream in Spring Framework 7. RODA does not use the affected features (`XsltView`, and Server-Sent Events rendered with views), so these findings do not apply.
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/roda-5/deploys/standalone/README.md).
+---
+
 ## v5.8.3 (02/11/2026)
 #### Bug fixes
 - Fixed missing audit log entry when a user is automatically created on first login through an external authentication provider
@@ -44,44 +66,6 @@ To try out this version, check the [install instructions](https://github.com/kee
 To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
 ---
 
-## v6.2.0 (04/05/2026)
-#### New features
-
-- Add parent location column to AIP selection and search lists #3656
-
-#### Security
-- Several dependency major upgrades to fix security vulnerabilities
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
-## v6.1.0 (20/04/2026)
-#### New features
-- Added a TIFF viewer
-- Added a email viewer (for EML and MSG formats)
-- Use database to temporarily store information about job and job reports #3640
-- Make list page size configurable via roda-wui.properties #3649
-
-#### Enhancements
-- Improve PDF viewer
-- The representation information viewer could respect breaklines of the original text #1521
-- Bad default config for default ingest plugin -- Virus check optional #3510
-
-#### Bug fixes
-- Update disposal workflows to support the transactional model #3620
-- Wrong behaviour when a dissemination is associated with a representation #3606
-- Fix streaming of files and generalizing for other storage providers. #3616
-
-#### Security
-- Several dependency major upgrades to fix security vulnerabilities
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
 ## v5.7.15 (08/04/2026)
 #### Security
 - Several dependency major upgrades to fix security vulnerabilities
@@ -104,37 +88,6 @@ To try out this version, check the [install instructions](https://github.com/kee
 ---
 
 To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
-## v6.0.2 (23/01/2026)
-#### Enhancements 
-
-- Add configuration to setup an HTTP header when using the HTTPNotificationProcessor 58791d11da136d1d05d3bbfa1338434d80dc090d
-- Enhance support for representation status other than Original when ingesting a E-ARK SIP package be884ca54d358c7be71d7cd52c49b899c8925abd
-- Rename filesystem StorageService copy to export and mark as READ operation #3555
-- Update HTTPUtility with Bearer access token authentication GET and DELETE methods #3563
-- Skip Rollback on Validation Failure #3572
-- Refactor DIP/File actions #3576
-- Improve audit logs #3576
-- Add pagination to side bar card lists (Representation and Dissemination) #3577
-- Fix PT-PT translation bugs and update breadcrumb styling #3578 - Hide home button in header when user is not authenticated #3579
-
-#### Bug fixes
-- Fix techMD ingest validation, repeated representation techMD types, and align UI technical metadata visibility #3581
--  Tests and fixes AIP delete permission checks on relatives, resolves incorrect nested iteration on transactional reports #3580
-- Fix technical metadata URN, File collision and Solr indexing inconsistencies #3561
-- Add UTF-8 encoding when downloading files with non-ASCII characteres 144c4c21d2f39458f2d73c10817dba8a4a45e04c
-- Storing the reason for created events https://github.com/keeps/roda/commit/aa4781eb89fec469ead45b67a9a9cfbdf762d205
-- Fixed incorrect HTTP error code when using REST-API and Bearer authentication 572bf3e65292ed92bc644f4c878ffdcc12b061bc
-- Fixed truncated iframe in BitstreamPreview #3524
-
-#### Security
-- Several dependency major upgrades to fix security vulnerabilities
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
-
 ---
 
 ## v5.7.13 (19/01/2026)
@@ -207,56 +160,6 @@ To try out this version, check the [install instructions](https://github.com/kee
 #### Bug fixes
 - Storing the reason for created events aa4781eb89fec469ead45b67a9a9cfbdf762d205
 - Resolved #3505: added support for both String and List values in conditionTypeMetadataValue
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
-## v6.0.1 (22/09/2025)
-#### Enhancements 
-- Change RODA packaging from WAR to JAR in order to use Spring [PropertiesLauncher](https://docs.spring.io/spring-boot/specification/executable-jar/property-launcher.html).
-
-
-#### Bug fixes
-- Add option for ChildFilter when using ChildDocTransform
-
-#### Security
-- Several dependency major upgrades to fix security vulnerabilities
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
-## v6.0.0 (29/07/2025)
-### :warning: Breaking Changes
-
-- Due to various dependency changes in this release, it is strongly recommended to back up all data and configurations before performing the upgrade. After upgrading, a complete reindexing of all data is required to maintain system integrity and performance.
-- The embedded ApacheDS has been replaced by an external LDAP server running in an OpenLDAP container. Due to this change, starting RODA will cause previously stored user data to be lost. We recommend backing up all user information before upgrading. A migration process to transfer existing user data will be provided as soon as possible.
-- The legacy REST API (v1) has been fully removed. All external integrations must now use the new REST API (v2)
-
-#### New features:
-- Major Web UI redesign: The RODA interface has been completely reimagined to deliver a cleaner, more intuitive, and user-friendly experience. This overhaul touches nearly every aspect of the UI, streamlining workflows, improving accessibility, and aligning with modern design standards. [3330](https://github.com/keeps/roda/issues/3330)
-- Introduced a transactional storage mechanism that stages most write operations before committing them to the main storage, enabling rollback in case of errors and improving data integrity and reliability. [102](https://github.com/keeps/roda/issues/102)[1224](https://github.com/keeps/roda/issues/1224)
-- The user database service has been upgraded from embedded ApacheDS to an external LDAP server with Spring LDAP integration, enhancing security, performance, and maintainability. [3115](https://github.com/keeps/roda/issues/3115)
-- Added support for manual override of file format identification via the Web UI, allowing users to correct misidentified formats when automatic detection fails. [3256](https://github.com/keeps/roda/issues/3256)
-- File format identification warnings now generate risk incidents, visible in the file information panel, allowing users to assess and accept potential issues like format mismatches or multiple matches.  [3259](https://github.com/keeps/roda/issues/3259)
-- Improved audit log presentation by grouping related REST-API calls under single user actions and allowing inspection of detailed calls, enhancing clarity and reducing noise in the Web UI. [3383](https://github.com/keeps/roda/issues/3383)
-- Added support for advanced search over nested items using Solr block join queries, enabling more precise queries across hierarchical metadata structures via new filter parameters: ParentWhichFilterParameter and ChildOfFilterParameter [3322](https://github.com/keeps/roda/issues/3322)
-- Added support for external user group mapping by allowing administrators to define mappings between CAS attributes and RODA groups through configuration. User group membership is now resolved dynamically at login based on the external attribute (e.g. memberOf) and assigned to corresponding RODA groups [3499](https://github.com/keeps/roda/pull/3499)
-
-#### Changes:
-- Migrated all GWT-RPC interface methods to REST API, reducing dependency on GWT and aligning with modern web architecture practices. [2060](https://github.com/keeps/roda/issues/2060)
-- Removed the sourceObjects field from the JobCollections index to prevent Solr overload caused by large identifier lists, improving system scalability and stability. Adjusted interface components to retrieve object data from the model instead of the index as needed.  [3307](https://github.com/keeps/roda/issues/3307)
-- Added welcome pages for languages other than English and Portuguese, improving user onboarding for a wider audience. [7c506370f](https://github.com/keeps/roda/commit/7c506370f22fd598ecaa48f5b26714ca4e3dbb8e)
-- Reviewed and updated pre-ingest text [3412](https://github.com/keeps/roda/pull/3412)
-- Improve support for E-ARK SIP administrative metadata (amdSec) [3380](https://github.com/keeps/roda/issues/3380)
-- Added detailed prompts and outcome tracking for lifting disposal holds, including preservation event generation via ModelService. Replaced liftDisposalHoldBySelectedItems API calls with dissociateDisposalHold for disposal hold removal.  [3235](https://github.com/keeps/roda/pull/3235)
-- Added indexing support for technical metadata to improve searchability and metadata management. [0723959e](https://github.com/keeps/roda/commit/0723959e45f137fee982d67450058fc8e757426a)
-
-#### Security:
-- Several dependency major upgrades to fix security vulnerabilities
 
 ---
 
