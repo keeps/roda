@@ -117,7 +117,7 @@
         <jersey.version>3.1.6</jersey.version>
         <swagger.version>2.2.21</swagger.version>
         <jackson.version>2.18.6</jackson.version>
-        <spring.version>6.1.14</spring.version>
+        <spring.version>6.2.19</spring.version>
         <solr.version>9.6.0</solr.version>
         <pekko.version>1.0.2</pekko.version>
         <solr.version>9.5.0</solr.version>
@@ -129,6 +129,9 @@
         <testng.groups>all</testng.groups>
         <springboot.version>3.4.10</springboot.version>
         <scope.gwt-dev>provided</scope.gwt-dev>
+        <tomcat.version>10.1.62</tomcat.version>
+        <mina.version>2.2.10</mina.version>
+        <netty.version>4.1.141.Final</netty.version>
     </properties>
     <profiles>
         <profile>
@@ -476,6 +479,20 @@
                 <groupId>org.glassfish.jaxb</groupId>
                 <artifactId>jaxb-runtime</artifactId>
                 <version>4.0.5</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-bom</artifactId>
+                <version>${netty.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-framework-bom</artifactId>
+                <version>${spring.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <!-- Import dependency management from Spring Boot -->
@@ -1143,6 +1160,26 @@
                 <groupId>com.ibm.icu</groupId>
                 <artifactId>icu4j</artifactId>
                 <version>63.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-core</artifactId>
+                <version>${tomcat.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-el</artifactId>
+                <version>${tomcat.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-websocket</artifactId>
+                <version>${tomcat.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.mina</groupId>
+                <artifactId>mina-core</artifactId>
+                <version>${mina.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
