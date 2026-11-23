@@ -1,15 +1,81 @@
 # Changelog
 
-## v6.4.4 (28/10/2026)
+## v6.4.5 (23/11/2026)
+#### New features
+- Find removed AIPs by UUID: repository-level preservation events (for example, AIP deletion) now index the identifier of their source object, so searching for a removed AIP's UUID returns its events. Events created before this version are only found after re-indexing preservation events. #3803
+
+#### Enhancements
+- Siegfried in server mode can now receive the file itself instead of a local path. Set `core.tools.siegfried.server.upload = true` when Siegfried runs in a separate container or host that does not share RODA's filesystem. The default (`false`) keeps the current behaviour. #3816
+- The preservation event detail page now shows the event's detail field. #3747
+
+#### Bug fixes
+- Fixed user creation on the sign-up page: the username, password and extra fields were missing or could not be filled in. #3760
+- BouncyCastle modules are now aligned to a single version. Previously `bcprov` was pinned while `bcpkix` and `bcutil` came in at other versions, which broke plugins that use BouncyCastle.
+
 #### Security
-- Several dependency upgrades to fix security vulnerabilities
+- Fixes CVE-2026-114938. RODA's code did not change for this; the fix comes from rebuilding the image on the current `eclipse-temurin:21-jre-jammy` base image. Users of the official Docker image only need to pull `keeps/roda:v6.4.5` (or `v6.4` / `v6`).
+- Spring Boot 4.1.0 → 4.1.2 and Spring Framework 7.0.8 → 7.0.10. Fixes CVE-2026-47884 and CVE-2026-47890 in spring-webmvc (fixed in 7.0.9).
+- Netty 4.2.15 → 4.2.19 (managed by Spring Boot). Fixes CVE-2026-75595 (critical).
+- Tomcat 11.0.27.
+- BouncyCastle 1.85 → 1.87 (`bcprov`, `bcpkix`, `bcutil`, `bcmail` and `bcjmail`).
 
 ---
 
 To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
 
+## v5.8.4 (23/11/2026)
+#### Security
+This is a security maintenance release for RODA 5. All RODA 5 installations should upgrade.
+
+**Docker image rebuilt on an updated base image**
+- Fixes CVE-2026-114938. RODA's code did not change for this; the fix comes from rebuilding the image on the current `tomcat:10-jre21` base image. Users of the official Docker image only need to pull `keeps/roda:v5.8.4` (or `v5.8` / `v5`).
+
+**Dependency upgrades** (patch-level only; Spring Boot stays on 3.4.x)
+- Netty 4.1.127 → 4.1.141. Fixes CVE-2026-75595 (critical): SNI routing bypass through a fragmented TLS ClientHello.
+- Apache MINA 2.2.3 → 2.2.10, used by the embedded LDAP server (ApacheDS). Fixes CVE-2024-52046, CVE-2026-41409, CVE-2026-41635, CVE-2026-42778, CVE-2026-42779 and CVE-2026-47065 (unsafe deserialization that can lead to remote code execution).
+- Spring Framework 6.2.11 → 6.2.19.
+- Tomcat embed 10.1.46 → 10.1.62, for the WAR/embedded run. The Docker image's Tomcat comes from the base image.
+- ZooKeeper client 3.9.3 → 3.9.5.
+
+**Scanner findings that do not affect RODA**
+- CVE-2026-47884 and CVE-2026-47890 (spring-webmvc) are only fixed upstream in Spring Framework 7. RODA does not use the affected features (`XsltView`, and Server-Sent Events rendered with views), so these findings do not apply.
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/roda-5/deploys/standalone/README.md).
+---
+
+## v5.8.3 (02/11/2026)
+#### Enhancements
+- Fixed missing audit log entry when a user is automatically created on first login through an external authentication provider
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
+## v6.4.4 (28/10/2026)
+### :warning: Breaking Changes
+RODA 6.3.0 onwards will use Apache Solr 10 as indexing system. If you have an existing RODA implementation with Solr 9 you will need to [upgrade the Solr to version 10](https://solr.apache.org/guide/solr/latest/upgrade-notes/major-changes-in-solr-10.html) and then rebuild all indexes on RODA.
+
+> [!WARNING]
+> **Flyway migration scripts.** The scripts under `db/migration` changed (schema is now taken from the database connection instead of being hardcoded), so their checksums changed too. **Any installation that already ran a 6.2.x release needs a Flyway `repair` step before starting 6.4.0 onwards**, or it will refuse to start. Follow the [Database Schema Migration Guide](https://github.com/keeps/roda/blob/master/documentation/Database_Schema_Migration.md).
+
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
 
 ## v6.4.3 (22/10/2026)
+### :warning: Breaking Changes
+RODA 6.3.0 onwards will use Apache Solr 10 as indexing system. If you have an existing RODA implementation with Solr 9 you will need to [upgrade the Solr to version 10](https://solr.apache.org/guide/solr/latest/upgrade-notes/major-changes-in-solr-10.html) and then rebuild all indexes on RODA.
+
+> [!WARNING]
+> **Flyway migration scripts.** The scripts under `db/migration` changed (schema is now taken from the database connection instead of being hardcoded), so their checksums changed too. **Any installation that already ran a 6.2.x release needs a Flyway `repair` step before starting 6.4.0 onwards**, or it will refuse to start. Follow the [Database Schema Migration Guide](https://github.com/keeps/roda/blob/master/documentation/Database_Schema_Migration.md).
+
 #### Security
 - Bumped tomcat to v11.0.27
 
@@ -418,57 +484,6 @@ To try out this version, check the [install instructions](https://github.com/kee
 ## v5.7.6 (27/06/2025)
 #### Bug fixes
 - Updated dependency of jaxb for glassfish (#3411)
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
-## v5.7.5 (19/05/2025)
-#### Security
-- Several dependency major upgrades to fix security vulnerabilities
-
----
-
-To try this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
-## v5.7.4 (29/04/2025)
-#### Enhancements 
-- Improve support for E-ARK SIP administrative metadata (amdSec) #3380
-
-#### Bug fixes
-- NPE when editing a user via profile #3405
-
-
-#### Security
-- Several major dependency upgrades to fix security vulnerabilities
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
-## v5.7.3 (03/04/2025)
-#### Security
--  Fix security vulnerabilities
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
-## v5.7.2 (24/03/2025)
-#### Bugs
-
-- Disposal confirmation cancel button message #3303
-
-#### Enhancements 
-
-- Missing translations for disposal rules order panel #3312
-
-#### Security
-- Several major dependency upgrades to fix security vulnerabilities
 
 ---
 
