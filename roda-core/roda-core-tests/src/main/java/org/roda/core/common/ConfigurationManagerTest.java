@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -29,6 +30,7 @@ import org.roda.core.config.ConfigurationManager;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.storage.fs.FSUtils;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -178,6 +180,71 @@ public class ConfigurationManagerTest {
     Map<String, List<String>> rodaPtProperties = configurationManager.getRodaSharedProperties(ptLocale);
     assert ptProperties.equals(rodaPtProperties) : "shared properties for locale '" + ptLocale + "' are "
       + rodaPtProperties + " when they should be " + ptProperties;
+  }
+
+  @Test
+  public void testSearchProfileWithoutMatchingGroup() {
+    Map<String, List<String>> defaultProperties = configurationManager.getRodaSharedProperties(Locale.ENGLISH);
+
+    User userWithoutProfile = createUser("groupC");
+    Assert.assertTrue(configurationManager.resolveSearchProfiles(userWithoutProfile).isEmpty());
+    Assert.assertEquals(configurationManager.getRodaSharedProperties(Locale.ENGLISH, userWithoutProfile),
+      defaultProperties);
+
+    User userWithoutGroups = createUser();
+    Assert.assertTrue(configurationManager.resolveSearchProfiles(userWithoutGroups).isEmpty());
+    Assert.assertEquals(configurationManager.getRodaSharedProperties(Locale.ENGLISH, userWithoutGroups),
+      defaultProperties);
+
+    Assert.assertTrue(configurationManager.resolveSearchProfiles(null).isEmpty());
+    Assert.assertEquals(configurationManager.getRodaSharedProperties(Locale.ENGLISH, null), defaultProperties);
+  }
+
+  @Test
+  public void testSearchProfileFields() {
+    User user = createUser("groupB");
+    Assert.assertEquals(configurationManager.resolveSearchProfiles(user), Collections.singletonList("second"));
+
+    Map<String, List<String>> expected = new HashMap<>(configurationManager.getRodaSharedProperties(Locale.ENGLISH));
+    expected.put(RodaConstants.SEARCH_ACTIVE_FIELD_PREFIX + ".IndexedAIP", Arrays.asList("reference", "title"));
+    expected.put(RodaConstants.SEARCH_ACTIVE_FIELD_PREFIX + ".IndexedFile", Collections.singletonList("filename"));
+
+    Assert.assertEquals(configurationManager.getRodaSharedProperties(Locale.ENGLISH, user), expected);
+  }
+
+  @Test
+  public void testSearchProfilesUnion() {
+    User user = createUser("groupB", "groupA");
+    Assert.assertEquals(configurationManager.resolveSearchProfiles(user), Arrays.asList("first", "second"));
+
+    Map<String, List<String>> properties = configurationManager.getRodaSharedProperties(Locale.ENGLISH, user);
+    Assert.assertEquals(properties.get(RodaConstants.SEARCH_ACTIVE_FIELD_PREFIX + ".IndexedAIP"),
+      Arrays.asList("title", "dates", "reference"));
+    Assert.assertEquals(properties.get(RodaConstants.SEARCH_ACTIVE_FIELD_PREFIX + ".IndexedFile"),
+      Collections.singletonList("filename"));
+  }
+
+  @Test
+  public void testSearchProfileWithoutClass() {
+    Map<String, List<String>> properties = configurationManager.getRodaSharedProperties(Locale.ENGLISH,
+      createUser("groupA"));
+    Assert.assertEquals(properties.get(RodaConstants.SEARCH_ACTIVE_FIELD_PREFIX + ".IndexedAIP"),
+      Arrays.asList("title", "dates"));
+    Assert.assertFalse(properties.containsKey(RodaConstants.SEARCH_ACTIVE_FIELD_PREFIX + ".IndexedFile"));
+  }
+
+  @Test
+  public void testSearchProfileDoesNotChangeSharedProperties() {
+    configurationManager.getRodaSharedProperties(Locale.ENGLISH, createUser("groupB"));
+
+    Assert.assertTrue(configurationManager.getRodaSharedProperties(Locale.ENGLISH).keySet().stream()
+      .noneMatch(key -> key.startsWith(RodaConstants.SEARCH_ACTIVE_FIELD_PREFIX)));
+  }
+
+  private static User createUser(String... groups) {
+    User user = new User("user");
+    user.setGroups(new HashSet<>(Arrays.asList(groups)));
+    return user;
   }
 
   @Test

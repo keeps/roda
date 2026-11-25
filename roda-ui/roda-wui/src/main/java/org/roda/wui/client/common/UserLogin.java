@@ -137,8 +137,10 @@ public class UserLogin {
       services.membersResource(s -> s.login(loginRequest)).whenComplete((loggedUser, error) -> {
         if (loggedUser != null) {
           getUserRequest.setCached(loggedUser);
-          onLoginStatusChanged(loggedUser);
-          callback.onSuccess(loggedUser);
+          ConfigurationManager.reload().whenComplete((result, reloadError) -> {
+            onLoginStatusChanged(loggedUser);
+            callback.onSuccess(loggedUser);
+          });
         } else if (error != null) {
           callback.onFailure(error);
         }

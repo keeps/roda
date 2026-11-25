@@ -42,7 +42,9 @@ public class AdvancedSearchFieldsPanel extends FlowPanel implements HasValueChan
 
   private static List<SearchField> getSearchFieldsFromConfig(String classSimpleName) {
     List<SearchField> searchFields = new ArrayList<>();
-    List<String> fields = ConfigurationManager.getStringList(RodaConstants.SEARCH_FIELD_PREFIX, classSimpleName);
+    List<String> fields = ConfigurationManager.getStringListWithDefault(
+      ConfigurationManager.getStringList(RodaConstants.SEARCH_FIELD_PREFIX, classSimpleName),
+      RodaConstants.SEARCH_ACTIVE_FIELD_PREFIX, classSimpleName);
 
     for (String field : fields) {
       String fieldPrefix = RodaConstants.SEARCH_FIELD_PREFIX + '.' + classSimpleName + '.' + field;

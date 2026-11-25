@@ -1819,6 +1819,10 @@ public class RodaCoreFactory {
     return configurationManager.getRodaSharedProperties(locale);
   }
 
+  public static Map<String, List<String>> getRodaSharedProperties(Locale locale, User user) {
+    return configurationManager.getRodaSharedProperties(locale, user);
+  }
+
   public static int getRodaConfigurationAsInt(String... keyParts) {
     return getRodaConfigurationAsInt(0, keyParts);
   }

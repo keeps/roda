@@ -55,6 +55,10 @@ public class SearchPortal extends Composite {
 
   private static SearchPortal instance = null;
 
+  static {
+    UserLoginPortal.getInstance().addLoginStatusListener(user -> instance = null);
+  }
+
   interface MyUiBinder extends UiBinder<Widget, SearchPortal> {
   }
 

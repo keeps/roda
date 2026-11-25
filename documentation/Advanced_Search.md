@@ -80,3 +80,29 @@ Add [translations for your fields](https://github.com/keeps/roda/blob/master/rod
 ```javaproperties
 ui.search.fields.IndexedAIP.destructiondate= Destruction Date
 ```
+
+## Advanced search profiles
+
+By default, every user sees the same advanced search fields, listed in `ui.search.fields.<class>`. Profiles let different groups see different sets of those fields.
+
+A profile selects, for each class, which of the fields defined in `ui.search.fields.<class>.<fieldname>.*` are shown, and is assigned to one or more groups. Add the profiles to your `roda-wui.properties`:
+
+```javaproperties
+ui.search.profiles = archivists
+ui.search.profiles = producers
+
+ui.search.profiles.archivists.groups = archivists
+ui.search.profiles.archivists.fields.IndexedAIP = reference
+ui.search.profiles.archivists.fields.IndexedAIP = title
+ui.search.profiles.archivists.fields.IndexedAIP = dates
+
+ui.search.profiles.producers.groups = producers
+ui.search.profiles.producers.groups = guests
+ui.search.profiles.producers.fields.IndexedAIP = title
+ui.search.profiles.producers.fields.IndexedFile = filename
+```
+
+- A user sees the fields of the profiles assigned to their groups. If their groups match more than one profile, the fields of all of them are shown, in the order of `ui.search.profiles` and without repetitions.
+- Users without a matching profile, and classes none of their profiles list, use the default fields in `ui.search.fields.<class>`.
+- With no `ui.search.profiles` configured, every user sees the default fields.
+- Profiles only affect the advanced search. The fields offered when building disposal rules always come from `ui.search.fields.<class>`.

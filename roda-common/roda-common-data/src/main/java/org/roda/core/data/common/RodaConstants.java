@@ -1988,6 +1988,10 @@ public final class RodaConstants {
   public static final String SEARCH_TRANSFERRED_RESOURCES = "transferred_resources";
 
   public static final String SEARCH_FIELD_PREFIX = "ui.search.fields";
+  public static final String SEARCH_ACTIVE_FIELD_PREFIX = "ui.search.active";
+  public static final String SEARCH_PROFILES = "ui.search.profiles";
+  public static final String SEARCH_PROFILE_GROUPS = "groups";
+  public static final String SEARCH_PROFILE_FIELDS = "fields";
 
   public static final String SEARCH_FIELD_FIELDS = "fields";
   public static final String SEARCH_FIELD_TYPE = "type";

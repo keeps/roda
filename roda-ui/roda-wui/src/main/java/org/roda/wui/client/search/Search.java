@@ -69,6 +69,10 @@ public class Search extends Composite {
 
   private static Search instance = null;
 
+  static {
+    UserLogin.getInstance().addLoginStatusListener(user -> instance = null);
+  }
+
   interface MyUiBinder extends UiBinder<Widget, Search> {
   }
 

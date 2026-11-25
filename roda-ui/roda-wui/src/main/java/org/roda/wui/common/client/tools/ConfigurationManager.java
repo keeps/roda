@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.CompletableFuture;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
@@ -24,10 +25,12 @@ import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.wui.client.common.lists.utils.ColumnOptions;
 import org.roda.wui.client.common.lists.utils.ColumnOptions.RenderingHint;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.i18n.client.LocaleInfo;
 
 /**
  * @author Bruno Ferreira <bferreira@keep.pt>
@@ -46,6 +49,20 @@ public class ConfigurationManager {
   // sets the default value for debug, and after initialization becomes the
   // configured value of the debug property
   private boolean debug = true;
+
+  public static CompletableFuture<Void> reload() {
+    Services services = new Services("Retrieve shared properties", "get");
+    return services
+      .configurationsResource(s -> s.retrieveSharedProperties(LocaleInfo.getCurrentLocale().getLocaleName()))
+      .handle((sharedProperties, throwable) -> {
+        if (throwable != null) {
+          logger.error("Failed reloading shared properties", throwable);
+        } else {
+          initialize(sharedProperties.getProperties());
+        }
+        return null;
+      });
+  }
 
   public static void initialize(Map<String, List<String>> properties) {
     instance = new ConfigurationManager(properties);
