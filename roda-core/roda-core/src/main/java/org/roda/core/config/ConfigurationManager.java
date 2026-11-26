@@ -135,8 +135,8 @@ public class ConfigurationManager {
         return sharedProperties;
       }
     });
-  private final List<String> CONFIGURATIONS = new ArrayList<>(Arrays.asList("roda-core.properties", "roda-roles.properties",
-    "roda-permissions.properties", "roda-instance.properties"));
+  private final List<String> CONFIGURATIONS = new ArrayList<>(Arrays.asList("roda-core.properties",
+    "roda-roles.properties", "roda-permissions.properties", "roda-instance.properties"));
 
   private ConfigurationManager() {
     // do nothing
@@ -336,7 +336,8 @@ public class ConfigurationManager {
 
     // CRITICAL FIX: Rebuild the configuration immediately!
     // This loops through 'configurationFiles' and correctly calls
-    // getInternalConfiguration() to load bundled classpath properties (like roda-wui.properties)
+    // getInternalConfiguration() to load bundled classpath properties (like
+    // roda-wui.properties)
     assembleGlobalConfiguration();
 
     // Invalidate the cache since we just injected new properties into the system
@@ -543,11 +544,26 @@ public class ConfigurationManager {
   }
 
   public InputStream getConfigurationFileAsStream(Path baseConfigPath, String configurationFile) {
-    Path configFile = baseConfigPath.resolve(configurationFile);
     InputStream inputStream = null;
+
+    Path normalizedRelativeConfigFile;
     try {
-      if (FSUtils.exists(configFile) && !FSUtils.isDirectory(configFile)
-        && checkPathIsWithin(configFile, baseConfigPath)) {
+      normalizedRelativeConfigFile = Paths.get(configurationFile).normalize();
+    } catch (RuntimeException e) {
+      LOGGER.warn("Invalid configuration path '{}'", configurationFile);
+      return null;
+    }
+    if (normalizedRelativeConfigFile.isAbsolute() || normalizedRelativeConfigFile.startsWith("..")) {
+      LOGGER.warn("Refusing to load configuration outside allowed scope: {}", configurationFile);
+      return null;
+    }
+    Path configFile = baseConfigPath.resolve(normalizedRelativeConfigFile).normalize();
+    if (!checkPathIsWithin(configFile, baseConfigPath)) {
+      LOGGER.warn("Refusing to load configuration outside base path: {}", configurationFile);
+      return null;
+    }
+    try {
+      if (FSUtils.exists(configFile) && !FSUtils.isDirectory(configFile)) {
         inputStream = Files.newInputStream(configFile);
         LOGGER.trace("Loading configuration from file {}", configFile);
       }
@@ -556,10 +572,11 @@ public class ConfigurationManager {
     }
 
     if (inputStream == null) {
-      Path relativizedPath = getConfigPath().getParent().relativize(baseConfigPath);
-      inputStream = ConfigurationManager.class
-        .getResourceAsStream("/" + relativizedPath + "/" + configurationFile);
-      LOGGER.trace("Loading configuration from classpath {}", configurationFile);
+      Path relativizedPath = getConfigPath().getParent().relativize(baseConfigPath).normalize();
+      String safeRelativeConfigFile = normalizedRelativeConfigFile.toString().replace('\\', '/');
+      String resourcePath = "/" + relativizedPath.toString().replace('\\', '/') + "/" + safeRelativeConfigFile;
+      inputStream = ConfigurationManager.class.getResourceAsStream(resourcePath);
+      LOGGER.trace("Loading configuration from classpath {}", safeRelativeConfigFile);
     }
 
     return inputStream;
