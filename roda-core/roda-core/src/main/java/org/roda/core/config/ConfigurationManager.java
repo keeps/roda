@@ -19,9 +19,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -42,6 +44,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.roda.core.common.Messages;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -737,6 +740,47 @@ public class ConfigurationManager {
       LOGGER.debug("Could not load shared properties", e);
       return Collections.emptyMap();
     }
+  }
+
+  public Map<String, List<String>> getRodaSharedProperties(Locale locale, User user) {
+    Map<String, List<String>> sharedProperties = getRodaSharedProperties(locale);
+    List<String> profiles = resolveSearchProfiles(user);
+    if (profiles.isEmpty()) {
+      return sharedProperties;
+    }
+
+    Map<String, Set<String>> activeFields = new HashMap<>();
+    for (String profile : profiles) {
+      String profileFieldsPrefix = getConfigurationKey(RodaConstants.SEARCH_PROFILES, profile,
+        RodaConstants.SEARCH_PROFILE_FIELDS);
+      Iterator<String> keys = rodaConfiguration.getKeys(profileFieldsPrefix);
+      while (keys.hasNext()) {
+        String key = keys.next();
+        if (key.startsWith(profileFieldsPrefix + ".")) {
+          String className = key.substring(profileFieldsPrefix.length() + 1);
+          if (!className.contains(".")) {
+            activeFields.computeIfAbsent(getConfigurationKey(RodaConstants.SEARCH_ACTIVE_FIELD_PREFIX, className),
+              k -> new LinkedHashSet<>()).addAll(getRodaConfigurationAsList(key));
+          }
+        }
+      }
+    }
+
+    Map<String, List<String>> profileProperties = new HashMap<>(sharedProperties);
+    activeFields.forEach((key, fields) -> profileProperties.put(key, new ArrayList<>(fields)));
+    return profileProperties;
+  }
+
+  public List<String> resolveSearchProfiles(User user) {
+    if (user == null || user.getGroups() == null || user.getGroups().isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    Set<String> groups = user.getGroups();
+    return getRodaConfigurationAsList(RodaConstants.SEARCH_PROFILES).stream().filter(
+      profile -> getRodaConfigurationAsList(RodaConstants.SEARCH_PROFILES, profile, RodaConstants.SEARCH_PROFILE_GROUPS)
+        .stream().anyMatch(groups::contains))
+      .toList();
   }
 
   private void checkForChangesInI18N() {

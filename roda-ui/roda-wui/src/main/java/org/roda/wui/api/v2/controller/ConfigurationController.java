@@ -98,7 +98,8 @@ public class ConfigurationController implements ConfigurationRestService {
   }
 
   /**
-   * This method retrieves shared properties based on the provided locale string.
+   * This method retrieves shared properties based on the provided locale string
+   * and on the advanced search profile of the requesting user.
    *
    * @param localeString
    *          The locale string to determine the language of the shared
@@ -114,7 +115,7 @@ public class ConfigurationController implements ConfigurationRestService {
     try {
       Locale locale = ServerTools.parseLocale(localeString);
       SharedProperties sharedProperties = new SharedProperties();
-      sharedProperties.setProperties(RodaCoreFactory.getRodaSharedProperties(locale));
+      sharedProperties.setProperties(RodaCoreFactory.getRodaSharedProperties(locale, requestContext.getUser()));
       return sharedProperties;
     } finally {
       controllerAssistant.registerAction(requestContext, LogEntryState.SUCCESS);
