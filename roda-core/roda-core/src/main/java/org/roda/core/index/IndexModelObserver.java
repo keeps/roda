@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.StreamSupport;
-
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
@@ -38,10 +37,7 @@ import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
-import org.roda.core.data.v2.disposal.metadata.DisposalConfirmationAIPMetadata;
 import org.roda.core.data.v2.disposal.metadata.DisposalHoldAIPMetadata;
-import org.roda.core.data.v2.disposal.metadata.DisposalScheduleAIPMetadata;
-import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldAIPMetadata;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -1517,12 +1513,30 @@ public class IndexModelObserver implements ModelObserver {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
     try {
       DIP dip = model.retrieveDIP(file.getDipId());
+      indexDIPFileAncestors(dip, file).addTo(ret);
       indexDIPFile(dip, file, true).addTo(ret);
     } catch (NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error indexing DIP file: {}", file, e);
       ret.add(e);
     }
 
+    return ret;
+  }
+
+  private ReturnWithExceptions<Void, ModelObserver> indexDIPFileAncestors(DIP dip, DIPFile file) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+    List<String> path = file.getPath();
+    if (path != null) {
+      for (int i = 0; i < path.size(); i++) {
+        try {
+          DIPFile ancestor = model.retrieveDIPFile(dip.getId(), new ArrayList<>(path.subList(0, i)), path.get(i));
+          indexDIPFile(dip, ancestor, false).addTo(ret);
+        } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+          LOGGER.error("Cannot index DIP file ancestor {} of {}", path.get(i), file, e);
+          ret.add(e);
+        }
+      }
+    }
     return ret;
   }
 
