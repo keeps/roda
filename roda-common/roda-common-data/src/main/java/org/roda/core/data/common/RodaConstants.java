@@ -1982,6 +1982,7 @@ public final class RodaConstants {
   public static final String SEARCH_NOTIFICATIONS = "notifications";
   public static final String SEARCH_TRANSFERRED_RESOURCES = "transferred_resources";
 
+  public static final String UI_BASIC_SEARCH_EDISMAX_ENABLED = "ui.basicSearch.edismax.enabled";
   public static final String SEARCH_BASICSEARCH_FIELD_PREFIX = "ui.basicSearch.fields";
   public static final String SEARCH_BASICSEARCH_FIELD_QUERYFIELD_SUFFIX = "queryFields";
 

@@ -15,6 +15,7 @@ import java.util.Map;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.AllFilterParameter;
+import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.EDismaxSimpleQueryFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
@@ -107,6 +108,7 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
   private String allFilter;
   private boolean defaultFilterIncremental = false;
   private List<String> queryFields = new ArrayList<>();
+  private boolean basicSearchEDismaxEnabled = false;
 
   private AdvancedSearchFieldsPanel advancedSearchFieldsPanel;
   private AsyncTableCell<T> list;
@@ -153,8 +155,14 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
       }
     });
 
+    // check if using edismax
+    this.basicSearchEDismaxEnabled = ConfigurationManager.getBoolean(false,
+      RodaConstants.UI_BASIC_SEARCH_EDISMAX_ENABLED);
+
     // setup basic search query fields
-    setupBasicSearch();
+    if (basicSearchEDismaxEnabled) {
+      setupQueryFields();
+    }
 
     // setup advanced search panel and button
     setupAdvancedSearch(false);
@@ -187,7 +195,7 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
     }
   }
 
-  private void setupBasicSearch() {
+  private void setupQueryFields() {
     List<String> basicSearchFields = ConfigurationManager.getStringList(RodaConstants.SEARCH_BASICSEARCH_FIELD_PREFIX,
       list.getClassToReturn().getSimpleName());
     for (String basicSearchField : basicSearchFields) {
@@ -375,7 +383,11 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
     Map<String, FilterParameter> advancedSearchFilters = new HashMap<>();
 
     if (basicQuery != null && basicQuery.trim().length() > 0) {
-      parameters.add(new EDismaxSimpleQueryFilterParameter(this.queryFields, basicQuery));
+      if (basicSearchEDismaxEnabled) {
+        parameters.add(new EDismaxSimpleQueryFilterParameter(this.queryFields, basicQuery));
+      } else {
+        parameters.add(new BasicSearchFilterParameter(allFilter, basicQuery));
+      }
     }
 
     // transform advanced search fields into filter parameters

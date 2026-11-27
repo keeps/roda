@@ -32,6 +32,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.common.lists.utils.ColumnOptions.RenderingHint;
 import org.roda.wui.client.common.utils.AipTitleBatchFetcher;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.StringUtils;
@@ -40,6 +41,7 @@ import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -335,10 +337,16 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
     return highlightFields;
   }
 
+  private static boolean isEdismaxEnabled() {
+    return ConfigurationManager.getBoolean(false, RodaConstants.UI_BASIC_SEARCH_EDISMAX_ENABLED);
+  }
+
   @Override
   protected void adjustOptions(AsyncTableCellOptions<T> options) {
     options.withFieldsToReturn(calculateFieldsToReturn(options));
-    options.withHighlightFields(calculateAllHighlightFields(options));
+    if (isEdismaxEnabled()) {
+      options.withHighlightFields(calculateAllHighlightFields(options));
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -364,7 +372,7 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
         sortBy = Collections.emptyList();
       } else if (name.startsWith("default_")) {
         // is a default column
-        column = (Column<T, ?>) DEFAULT_COLUMNS.get(name);
+        column = wrapDefaultColumn((Column<T, ?>) DEFAULT_COLUMNS.get(name), c);
         htmlHeader = header.equals(name) ? messages.defaultColumnHeader(name) : SafeHtmlUtils.fromString(header);
         sortBy = c.getSortBy().equals(Collections.singletonList(name)) ? DEFAULT_COLUMNS_FIELDS.get(name) : sortBy;
       } else {
@@ -414,17 +422,7 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
 
           @Override
           public String getCellStyleNames(Cell.Context context, T row) {
-            List<String> styleNames = new ArrayList<>();
-            String parentStyles = super.getCellStyleNames(context, row);
-            if (parentStyles != null) {
-              styleNames.add(parentStyles);
-            }
-
-            if (!getCellHighlights(row, c).isEmpty()) {
-              styleNames.add("highlighted-cell");
-            }
-
-            return String.join(" ", styleNames);
+            return addHighlightStyleNames(super.getCellStyleNames(context, row), row, c);
           }
         };
 
@@ -451,7 +449,58 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
 
     addStyleName("my-collections-table");
 
-    configureCellHighlightPopups(display);
+    if (isEdismaxEnabled()) {
+      configureCellHighlightPopups(display);
+    }
+  }
+
+  private String addHighlightStyleNames(String previousStyleNames, T row, ColumnOptions columnOptions) {
+    List<String> styleNames = new ArrayList<>();
+    if (previousStyleNames != null) {
+      styleNames.add(previousStyleNames);
+    }
+
+    if (isEdismaxEnabled() && !getCellHighlights(row, columnOptions).isEmpty()) {
+      styleNames.add("highlighted-cell");
+    }
+
+    return String.join(" ", styleNames);
+  }
+
+  /**
+   * Wraps a column in a per-table column. Used to customize static, shared column
+   * objects with per-table features.
+   */
+  private <C> Column<T, C> wrapDefaultColumn(final Column<T, C> original, final ColumnOptions columnOptions) {
+    Column<T, C> wrapper = new Column<T, C>(original.getCell()) {
+      @Override
+      public C getValue(T object) {
+        return original.getValue(object);
+      }
+
+      @Override
+      public void render(Cell.Context context, T object, SafeHtmlBuilder sb) {
+        original.render(context, object, sb);
+      }
+
+      @Override
+      public void onBrowserEvent(Cell.Context context, Element elem, T object, NativeEvent event) {
+        original.onBrowserEvent(context, elem, object, event);
+      }
+
+      @Override
+      public String getCellStyleNames(Cell.Context context, T row) {
+        return addHighlightStyleNames(original.getCellStyleNames(context, row), row, columnOptions);
+      }
+    };
+
+    wrapper.setFieldUpdater(original.getFieldUpdater());
+    wrapper.setHorizontalAlignment(original.getHorizontalAlignment());
+    wrapper.setVerticalAlignment(original.getVerticalAlignment());
+    wrapper.setDefaultSortAscending(original.isDefaultSortAscending());
+    wrapper.setSortable(original.isSortable());
+    wrapper.setDataStoreName(original.getDataStoreName());
+    return wrapper;
   }
 
   private void configureCellHighlightPopups(CellTable<T> display) {
