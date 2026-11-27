@@ -71,6 +71,10 @@ public class SecureString implements CharSequence, Closeable, Serializable {
     return chars.length;
   }
 
+  public synchronized boolean isEmpty() {
+    return chars == null || chars.length == 0;
+  }
+
   @Override
   public synchronized char charAt(int index) {
     ensureNotClosed();

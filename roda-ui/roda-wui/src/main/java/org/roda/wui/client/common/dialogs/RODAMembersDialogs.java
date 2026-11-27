@@ -22,12 +22,14 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.DateBox;
 import config.i18n.client.ClientMessages;
+import org.roda.core.data.common.SecureString;
 import org.roda.core.data.v2.accessKey.CreateAccessKeyRequest;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.user.RODAMember;
+import org.roda.core.data.v2.user.requests.UpdateUserRequest;
 import org.roda.wui.client.common.lists.RodaMemberList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
@@ -188,7 +190,8 @@ public class RODAMembersDialogs {
     return container;
   }
 
-  public static void setUserPassword(String title, final AsyncCallback<String> callback) {
+  public static void setUserPassword(String title, boolean askCurrentPassword,
+    final AsyncCallback<UpdateUserRequest> callback) {
     final DialogBox dialogBox = new DialogBox(false, true);
     final Button cancelButton = new Button(messages.cancelButton());
     final Button confirmButton = new Button(messages.confirmButton());
@@ -197,10 +200,27 @@ public class RODAMembersDialogs {
     final FlowPanel footer = new FlowPanel();
 
     PasswordDataPanel passwordDataPanel = new PasswordDataPanel(true);
+    final PasswordTextBox currentPasswordBox = new PasswordTextBox();
+    final Label currentPasswordErrorLabel = new Label(messages.isAMandatoryField(messages.currentPassword()));
 
     dialogBox.setText(title);
     layout.add(header);
     layout.add(footer);
+
+    if (askCurrentPassword) {
+      Label currentPasswordLabel = new Label(messages.currentPassword() + "*");
+      currentPasswordLabel.addStyleName("form-label");
+      currentPasswordBox.addStyleName("form-textbox");
+      currentPasswordErrorLabel.addStyleName("form-label-error");
+      currentPasswordErrorLabel.setVisible(false);
+
+      FlowPanel currentPasswordField = new FlowPanel();
+      currentPasswordField.addStyleName("generic-stacked-field");
+      currentPasswordField.add(currentPasswordLabel);
+      currentPasswordField.add(currentPasswordBox);
+      currentPasswordField.add(currentPasswordErrorLabel);
+      header.add(currentPasswordField);
+    }
     header.add(passwordDataPanel);
 
     footer.add(cancelButton);
@@ -209,9 +229,16 @@ public class RODAMembersDialogs {
     confirmButton.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent clickEvent) {
-        if (passwordDataPanel.isValid()) {
-            dialogBox.hide();
-            callback.onSuccess(passwordDataPanel.getValue());
+        boolean currentPasswordValid = !askCurrentPassword || !currentPasswordBox.getText().isEmpty();
+        currentPasswordErrorLabel.setVisible(!currentPasswordValid);
+        if (passwordDataPanel.isValid() && currentPasswordValid) {
+          dialogBox.hide();
+          UpdateUserRequest request = new UpdateUserRequest();
+          request.setPassword(new SecureString(passwordDataPanel.getValue().toCharArray()));
+          if (askCurrentPassword) {
+            request.setCurrentPassword(new SecureString(currentPasswordBox.getText().toCharArray()));
+          }
+          callback.onSuccess(request);
         }
       }
     });

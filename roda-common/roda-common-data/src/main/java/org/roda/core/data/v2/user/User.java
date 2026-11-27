@@ -175,6 +175,7 @@ public class User extends RodaPrincipal {
   /**
    * @return the resetPasswordToken
    */
+  @JsonIgnore
   public String getResetPasswordToken() {
     return resetPasswordToken;
   }
@@ -190,6 +191,7 @@ public class User extends RodaPrincipal {
   /**
    * @return the resetPasswordTokenExpirationDate
    */
+  @JsonIgnore
   public String getResetPasswordTokenExpirationDate() {
     return resetPasswordTokenExpirationDate;
   }
@@ -205,6 +207,7 @@ public class User extends RodaPrincipal {
   /**
    * @return the emailConfirmationToken
    */
+  @JsonIgnore
   public String getEmailConfirmationToken() {
     return emailConfirmationToken;
   }
@@ -220,6 +223,7 @@ public class User extends RodaPrincipal {
   /**
    * @return the emailConfirmationTokenExpirationDate
    */
+  @JsonIgnore
   public String getEmailConfirmationTokenExpirationDate() {
     return emailConfirmationTokenExpirationDate;
   }
@@ -333,10 +337,7 @@ public class User extends RodaPrincipal {
   @Override
   public String toString() {
     return "User{ " + super.toString() + ", groups=" + groups + ", email='" + email + '\'' + ", guest=" + guest
-      + ", ipAddress='" + ipAddress + '\'' + ", resetPasswordToken='" + resetPasswordToken + '\''
-      + ", resetPasswordTokenExpirationDate='" + resetPasswordTokenExpirationDate + '\'' + ", emailConfirmationToken='"
-      + emailConfirmationToken + '\'' + ", emailConfirmationTokenExpirationDate='"
-      + emailConfirmationTokenExpirationDate + '\''  + ", extra='" + extra + "\'}";
+      + ", ipAddress='" + ipAddress + '\'' + ", extra='" + extra + "\'}";
   }
 
   @Override

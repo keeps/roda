@@ -913,6 +913,9 @@ public interface ModelService extends ModelObservable {
   AccessKey updateAccessKey(AccessKey accessKey, String updatedBy)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
+  AccessKey regenerateAccessKey(AccessKey accessKey, Date expirationDate, String updatedBy)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+
   void deleteAccessKey(String accessKeyId)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException;
 

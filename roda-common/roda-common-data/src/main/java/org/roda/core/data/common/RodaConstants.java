@@ -199,6 +199,7 @@ public final class RodaConstants {
   public static final String UI_SERVICE_REPORTING_URL = "ui.service.reporting.url";
   public static final String UI_SERVICE_REPORTING_ACTIVE = "ui.service.reporting.active";
   public static final String UI_SERVICE_CAS_ACTIVE = "ui.service.cas.active";
+  public static final String UI_FILTER_CAS_ENABLED = "ui.filter.cas.enabled";
   public static final String UI_SERVICE_MULTI_METHOD_AUTHENTICATION_ACTIVE = "ui.service.multi.method.authentication.active";
   public static final String UI_SERVICE_MULTI_METHOD_AUTHENTICATION_LIST = "ui.service.multi.method.authentication.item[]";
   public static final String UI_SERVICE_DROPFOLDER_ACTIVE = "ui.service.dropfolder.active";

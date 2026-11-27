@@ -23,7 +23,7 @@ public class CreateAccessKeyRequest implements Serializable {
 
   public CreateAccessKeyRequest() {
     this.name = null;
-    this.expirationDate = new Date();
+    this.expirationDate = null;
   }
 
   public CreateAccessKeyRequest(String name, Date expirationDate) {

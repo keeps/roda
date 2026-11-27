@@ -496,7 +496,7 @@ public class LdapUtility {
   public User modifyUser(final User modifiedUser, final boolean changeExtra)
     throws NotFoundException, IllegalOperationException, EmailAlreadyExistsException, GenericException {
     modifyUser(modifiedUser, null, true, false, changeExtra);
-    return getUser(modifiedUser.getName());
+    return getUser(modifiedUser.getId());
   }
 
   /**
@@ -549,7 +549,7 @@ public class LdapUtility {
   public User modifySelfUser(final User modifiedUser, SecureString newPassword)
     throws NotFoundException, EmailAlreadyExistsException, IllegalOperationException, GenericException {
     modifyUser(modifiedUser, newPassword, false, false, true);
-    return getUser(modifiedUser.getName());
+    return getUser(modifiedUser.getId());
   }
 
   /**
@@ -1357,7 +1357,7 @@ public class LdapUtility {
 
     try {
       final User currentEmailOwner = getUserWithEmail(modifiedUser.getEmail());
-      if (currentEmailOwner != null && !modifiedUser.getName().equals(currentEmailOwner.getName())) {
+      if (currentEmailOwner != null && !modifiedUser.getId().equals(currentEmailOwner.getId())) {
         throw new EmailAlreadyExistsException(
           "The email address " + modifiedUser.getEmail() + " is already used by another user.");
       }
@@ -1372,7 +1372,9 @@ public class LdapUtility {
 
       LdapUser currentLdapUser = oCurrentLdapUser.get();
 
-      if (newPassword == null) {
+      if (newPassword != null && !newPassword.isEmpty()) {
+        modifiedLdapUser.setUserPassword(new Pbkdf2PasswordEncoderImpl().encode(newPassword));
+      } else {
         String currentUserPassword = currentLdapUser.getUserPassword();
         if (currentUserPassword != null) {
           // convert from ASCII
@@ -1384,19 +1386,15 @@ public class LdapUtility {
       }
       ldapUserRepository.save(modifiedLdapUser);
 
-      if (newPassword != null) {
-        modifyUserPassword(modifiedUser.getId(), newPassword);
-      }
-
       if (modifyRolesAndGroups) {
         setMemberGroups(getUserDN(modifiedUser.getId()), modifiedUser.getGroups());
         setMemberDirectRoles(getUserDN(modifiedUser.getId()), modifiedUser.getDirectRoles());
       }
     } catch (final NameNotFoundException e) {
       throw new NotFoundException("Error modifying user " + modifiedUser.getName() + " - " + e.getMessage(), e);
-    } catch (NamingException | InvalidKeySpecException e) {
+    } catch (NamingException e) {
       throw new GenericException("Error modifying user " + modifiedUser.getName() + " - " + e.getMessage(), e);
-    } catch (final NoSuchAlgorithmException e) {
+    } catch (final IllegalStateException e) {
       throw new GenericException("Error encoding password for user " + modifiedUser.getName(), e);
     }
   }
@@ -1664,6 +1662,9 @@ public class LdapUtility {
    */
   private void setUserPasswordUnchecked(final String username, SecureString password)
     throws NotFoundException, GenericException {
+    if (password == null || password.isEmpty()) {
+      throw new GenericException("Password for user " + username + " cannot be empty");
+    }
     try {
       modifyUserPassword(username, password);
     } catch (final InvalidKeySpecException e) {

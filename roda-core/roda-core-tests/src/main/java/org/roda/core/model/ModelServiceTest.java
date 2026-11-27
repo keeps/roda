@@ -46,6 +46,7 @@ import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -1066,6 +1067,24 @@ public class ModelServiceTest {
     model.deleteUser(user.getId(), true);
     model.deleteGroup(group1.getId(), true);
 
+  }
+
+  @Test
+  public void testUserUpdateWithEmptyPasswordKeepsPassword() throws RODAException {
+    User user = new User("user_password");
+    user.setActive(true);
+    user.setEmail("user_password@example.com");
+    user.setGuest(false);
+    user.setFullName("user password");
+    model.createUser(user, new SecureString("123456".toCharArray()), true);
+
+    User toUpdate = model.retrieveUser(user.getId());
+    toUpdate.setFullName("user password updated");
+    model.updateUser(toUpdate, new SecureString(), true);
+
+    Assert.assertNotNull(model.retrieveAuthenticatedUser(user.getName(), "123456"));
+
+    model.deleteUser(user.getId(), true);
   }
 
   @Test
